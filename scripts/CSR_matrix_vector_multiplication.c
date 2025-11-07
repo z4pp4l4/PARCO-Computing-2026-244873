@@ -1,122 +1,68 @@
+
+
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define ROWS 10000
-#define COLS 10000
 
-typedef struct
-{
-    int *Arow;
-    int *Acol;
-    int *Aval;
-    int non_zero_count;
-} CSR;
+//#include "bcsstk05_csr.h"
+//#include "west0067_csr.h"
+#include "adder_dcop_32_csr.h"
+//CONTINUARE ---------------------
 
-int **generate_matrix(int rows, int cols, float sparsity){
-    int **normal_matrix=malloc(rows*sizeof(int*));
-    for(int i=0;i<rows ;i++){
-        normal_matrix[i]=malloc(cols*sizeof(int));
-        for(int j=0;j<cols;j++){
-            float r = (float)rand() / RAND_MAX;
-            if (r < sparsity)   // zero with probability "sparsity"
-                normal_matrix[i][j] = 0;
-            else
-                normal_matrix[i][j] = rand() % 10;
+/*
+Tes results with different CSR matrices headers.
+
+
+...
+
+
+*/
+void mat_vec_mult(const int *Arow, const int *Acol, const double *Aval, const double *x, double *y, int nrows) {
+    for (int i = 0; i < nrows; i++) {
+        double sum = 0.0;
+        for (int j = Arow[i]; j < Arow[i + 1]; j++) {
+            sum += Aval[j] * x[Acol[j]];
         }
+        y[i] = sum;
     }
-    return normal_matrix;
 }
 
-CSR *matrix_to_CSR(int **normal_matrix, int rows, int cols){
-    //CREATE CSR STRUCTURE
-    CSR *csr_matrix=malloc(sizeof(CSR));
-    //want to iterate through normal matrix and count non zero elements
-    int non_zero_count=0;
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<cols;j++){
-            if(normal_matrix[i][j]!=0){
-                non_zero_count++;
-            }
-        }
-    }
-    csr_matrix->non_zero_count=non_zero_count;
-    csr_matrix->Aval=malloc(non_zero_count*sizeof(int));
-    csr_matrix->Acol=malloc(non_zero_count*sizeof(int));
-    csr_matrix->Arow=malloc((rows+1)*sizeof(int));
-    //fill CSR structure
-    if (non_zero_count==0){
-        csr_matrix->Arow[0]=0;
-        csr_matrix->Acol[0]=0;
-        csr_matrix->Aval[0]=0;
-        return csr_matrix;
-    } else {
-        int index=0;
-        for(int i=0;i<rows;i++){
-            csr_matrix->Arow[i]=index;
-            for(int j=0;j<cols;j++){
-                if(normal_matrix[i][j]!=0){
-                    csr_matrix->Aval[index]=normal_matrix[i][j];
-                    csr_matrix->Acol[index]=j;
-                    index++;
-                }
-            } 
-            //compressing row pointer with a prefix sum 
-            csr_matrix->Arow[i+1]=index;
-        }
-        return csr_matrix;
-    }
-
-}
-int* matrix_vector_mult(CSR *csr_matrix, int *vector, int rows){
-    int *result=malloc(rows*sizeof(int));
-    for(int i=0;i<rows;i++){
-        result[i]=0;
-        for(int j=csr_matrix->Arow[i];j<csr_matrix->Arow[i+1];j++){
-            result[i]+=(csr_matrix->Aval[j])*(vector[csr_matrix->Acol[j]]);
-        }
-    }
-    return result;
+long get_time_in_nanosec() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec * 1000000000LL + ts.tv_nsec;
 }
 
-int main(){
+int main() {
+    srand(time(NULL));
 
-    printf("Generating normal matrix...\n");
-    printf("Enter sparsity degree of the matrix (0-1): ");
-    float sparsity;
-    scanf("%f",&sparsity);
-    if (sparsity<0 || sparsity>1){
-        printf("Invalid sparsity degree. Exiting...\n");
-        return -1;
-    }
-    printf("Converting to CSR format...\n");
+    printf("========  CSR Matrix-Vector Multiplication  =======\n");
+    printf("Matrix size: %d x %d, non-zero values = %d\n", nrows, ncols, nnz);
 
-    
-    int rows=ROWS;
-    int cols=COLS;
-    int **matrix=generate_matrix(rows,cols,sparsity);
-    CSR *csr_matrix=matrix_to_CSR(matrix,rows,cols);
+    // Allocate vectors
+    double *x = malloc(ncols * sizeof(double));
+    double *result = calloc(nrows, sizeof(double));
 
-    int *vector=malloc(cols*sizeof(int));
-    for(int i=0;i<cols;i++){
-        vector[i]=rand()%10;
-    }
+    for (int i = 0; i < ncols; i++)
+        x[i] = ((double)rand() / RAND_MAX) * 10.0;
 
-    //perform matrix vector multiplication here
-    int* result = matrix_vector_mult(csr_matrix,vector,rows);    
-    
-    //free normal matrix
-    for(int i=0;i<rows;i++){
-        free(matrix[i]);
-    }   
-    free(matrix);
+    // Perform SpMV
+    long start = get_time_in_nanosec();
+    mat_vec_mult(Arow, Acol, Aval, x, result, nrows);
+    long end = get_time_in_nanosec();
 
-    free(vector);
+    long elapsed_ns = end -start;
+    double elapsed_ms = elapsed_ns / 1e6;
+
+    // Print summary
+    printf("Computation finished in %.6f milliseconds.\n", elapsed_ms);
+    printf("Sample results:\n");
+    for (int i = 0; i < (nrows < 10 ? nrows : 10); i++)
+        printf("result[%d]= %.6e\n", i, result[i]);
+
+    // Free memory
+    free(x);
     free(result);
-    free(csr_matrix->Arow);
-    free(csr_matrix->Acol);
-    free(csr_matrix->Aval);
-    free(csr_matrix);
-
     return 0;
 }

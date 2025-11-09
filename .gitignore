@@ -1,0 +1,38 @@
+# Ignore compiled binaries
+*.exe
+*.out
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+
+# Ignore build directories
+/build/
+bin/
+obj/
+Debug/
+Release/
+
+# Ignore temporary and system files
+*.log
+*.tmp
+*.swp
+*.bak
+*.cache
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+*.code-workspace
+*.user
+*.suo
+*.ncb
+*.vcproj*
+*.pdb
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db

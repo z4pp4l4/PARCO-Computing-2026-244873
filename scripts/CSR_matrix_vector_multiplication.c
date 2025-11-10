@@ -7,12 +7,10 @@
 
 //#include "bcsstk05_csr.h"
 //#include "west0067_csr.h"
-#include "adder_dcop_32_csr.h"
 //CONTINUARE ---------------------
 
 /*
 Tes results with different CSR matrices headers.
-
 
 ...
 
@@ -38,7 +36,7 @@ int main() {
     srand(time(NULL));
 
     printf("========  CSR Matrix-Vector Multiplication  =======\n");
-    printf("Matrix size: %d x %d, non-zero values = %d\n", nrows, ncols, nnz);
+    printf("Matrix size: %d x %d, non-zero values = %d\n", nrows, ncols, non_zero_val);
 
     // Allocate vectors
     double *x = malloc(ncols * sizeof(double));

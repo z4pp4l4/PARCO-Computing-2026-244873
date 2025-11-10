@@ -1,8 +1,7 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h> 
+#include <libgen.h>
 
 typedef struct {
     int *Arow;
@@ -10,9 +9,22 @@ typedef struct {
     double *Aval;
     int nrows;
     int ncols;
-    int nnz;
+    int non_zero_val;
 } CSR;
 
+typedef struct {
+    int row, col;
+    double val;
+} Coo_entry;
+
+// Comparison function for qsort — sort by row, then by column
+int compare_coo_entries(const void *a, const void *b) {
+    Coo_entry *Entry_row = (Coo_entry *)a;
+    Coo_entry *Entry_clm = (Coo_entry *)b;
+    if (Entry_row->row != Entry_clm->row)
+        return Entry_row->row - Entry_clm->row;
+    return Entry_row->col - Entry_clm->col;
+}
 
 CSR *read_matrix_market_to_CSR(const char *filename) {
     FILE *f = fopen(filename, "r");
@@ -24,7 +36,6 @@ CSR *read_matrix_market_to_CSR(const char *filename) {
     char line[256];
     int symmetric = 0;
 
-    // ---- Step 1. Read header line ----
     if (!fgets(line, sizeof(line), f)) {
         fprintf(stderr, "Empty file.\n");
         exit(EXIT_FAILURE);
@@ -35,91 +46,78 @@ CSR *read_matrix_market_to_CSR(const char *filename) {
     else if (strstr(line, "general") != NULL)
         symmetric = 0;
     else
-        printf("⚠️  Warning: symmetry not specified, assuming GENERAL.\n");
+        printf("symmetry not specified, assuming GENERAL.\n");
 
-    // ---- Step 2. Skip comments ----
-    do {
+    
+        do {
         if (!fgets(line, sizeof(line), f)) {
             fprintf(stderr, "Invalid Matrix Market file.\n");
             exit(EXIT_FAILURE);
         }
     } while (line[0] == '%');
 
-    // ---- Step 3. Read size and nnz ----
-    int rows, cols, nnz;
-    if (sscanf(line, "%d %d %d", &rows, &cols, &nnz) != 3) {
+       int rows, cols, non_zero_val;
+    if (sscanf(line, "%d %d %d", &rows, &cols, &non_zero_val) != 3) {
         fprintf(stderr, "Error reading matrix dimensions.\n");
         exit(EXIT_FAILURE);
     }
 
-    int capacity = symmetric ? (nnz * 2) : nnz;
-    int *coo_row = malloc(capacity * sizeof(int));
-    int *coo_col = malloc(capacity * sizeof(int));
-    double *coo_val = malloc(capacity * sizeof(double));
-
-    // ---- Step 4. Read COO entries ----
+    int capacity = symmetric ? (non_zero_val * 2) : non_zero_val;
+    Coo_entry *entries = malloc(capacity * sizeof(Coo_entry));
     int count = 0;
-    for (int i = 0; i < nnz; i++) {
+    for (int i = 0; i < non_zero_val; i++) {
         int r, c;
         double v;
         if (fscanf(f, "%d %d %lf", &r, &c, &v) != 3) {
             fprintf(stderr, "Error reading matrix data at line %d.\n", i + 1);
             exit(EXIT_FAILURE);
         }
-        r--; c--; // Convert to 0-based
+        r--; c--; // Convert to 0-based indices
 
-        coo_row[count] = r;
-        coo_col[count] = c;
-        coo_val[count++] = v;
-
-        // Mirror if symmetric and not on diagonal
-        if (symmetric && r != c) {
-            coo_row[count] = c;
-            coo_col[count] = r;
-            coo_val[count++] = v;
-        }
+        entries[count++] = (Coo_entry){r, c, v};
+        if (symmetric && r != c)
+            entries[count++] = (Coo_entry){c, r, v};
     }
     fclose(f);
-    nnz = count;
+    non_zero_val = count;
+    qsort(entries, non_zero_val, sizeof(Coo_entry), compare_coo_entries); //use quicksort to sort the entries
 
-    // ---- Step 5. Build CSR ----
+    // ---- Step 6. Build CSR ----
     CSR *csr = malloc(sizeof(CSR));
     csr->nrows = rows;
     csr->ncols = cols;
-    csr->nnz = nnz;
+    csr->non_zero_val = non_zero_val;
     csr->Arow = calloc(rows + 1, sizeof(int));
-    csr->Acol = malloc(nnz * sizeof(int));
-    csr->Aval = malloc(nnz * sizeof(double));
+    csr->Acol = malloc(non_zero_val * sizeof(int));
+    csr->Aval = malloc(non_zero_val * sizeof(double));
 
     // Count nonzeros per row
-    for (int i = 0; i < nnz; i++)
-        csr->Arow[coo_row[i] + 1]++;
+    for (int i = 0; i < non_zero_val; i++)
+        csr->Arow[entries[i].row + 1]++;
 
     // Prefix sum
     for (int i = 0; i < rows; i++)
         csr->Arow[i + 1] += csr->Arow[i];
 
-    // Fill CSR arrays
-    int *offset = calloc(rows, sizeof(int));
-    for (int i = 0; i < nnz; i++) {
-        int r = coo_row[i];
-        int dest = csr->Arow[r] + offset[r];
-        csr->Acol[dest] = coo_col[i];
-        csr->Aval[dest] = coo_val[i];
-        offset[r]++;
+    // Fill CSR arrays (already sorted)
+    for (int i = 0; i < non_zero_val; i++) {
+        int dest = csr->Arow[entries[i].row]++;
+        csr->Acol[dest] = entries[i].col;
+        csr->Aval[dest] = entries[i].val;
     }
 
-    free(offset);
-    free(coo_row);
-    free(coo_col);
-    free(coo_val);
+    // Fix prefix-sum shifting (Arow got incremented in loop)
+    for (int i = rows; i > 0; i--)
+        csr->Arow[i] = csr->Arow[i - 1];
+    csr->Arow[0] = 0;
 
-    printf("✅ Loaded %s matrix (%s)\n", symmetric ? "SYMMETRIC" : "GENERAL", filename);
-    printf("   → size: %dx%d, nnz = %d\n", rows, cols, nnz);
+    free(entries);
+
+    printf("Loaded %s matrix (%s)\n", symmetric ? "SYMMETRIC" : "GENERAL", filename);
+    printf("   → size: %dx%d, non_zero_val = %d\n", rows, cols, non_zero_val);
 
     return csr;
 }
-
 
 void export_CSR_to_header(CSR *csr, const char *basename) {
     char outpath[512];
@@ -131,7 +129,7 @@ void export_CSR_to_header(CSR *csr, const char *basename) {
         exit(EXIT_FAILURE);
     }
 
-    // Sanitize guard name (add prefix to avoid starting with digit)
+    // Sanitize guard name
     char guard[256];
     snprintf(guard, sizeof(guard), "M_%s_CSR_H", basename);
     for (char *p = guard; *p; ++p)
@@ -142,22 +140,21 @@ void export_CSR_to_header(CSR *csr, const char *basename) {
 
     fprintf(out, "static const int nrows = %d;\n", csr->nrows);
     fprintf(out, "static const int ncols = %d;\n", csr->ncols);
-    fprintf(out, "static const int nnz = %d;\n\n", csr->nnz);
+    fprintf(out, "static const int non_zero_val = %d;\n\n", csr->non_zero_val);
 
     fprintf(out, "static const int Arow[%d] = {", csr->nrows + 1);
     for (int i = 0; i <= csr->nrows; i++)
         fprintf(out, "%d%s", csr->Arow[i], (i == csr->nrows) ? "" : ", ");
     fprintf(out, "};\n\n");
 
-    fprintf(out, "static const int Acol[%d] = {", csr->nnz);
-    for (int i = 0; i < csr->nnz; i++)
-        fprintf(out, "%d%s", csr->Acol[i], (i == csr->nnz - 1) ? "" : ", ");
+    fprintf(out, "static const int Acol[%d] = {", csr->non_zero_val);
+    for (int i = 0; i < csr->non_zero_val; i++)
+        fprintf(out, "%d%s", csr->Acol[i], (i == csr->non_zero_val - 1) ? "" : ", ");
     fprintf(out, "};\n\n");
 
-    // Print Aval with scientific precision to preserve small values
-    fprintf(out, "static const double Aval[%d] = {", csr->nnz);
-    for (int i = 0; i < csr->nnz; i++)
-        fprintf(out, "%.12e%s", csr->Aval[i], (i == csr->nnz - 1) ? "" : ", ");
+    fprintf(out, "static const double Aval[%d] = {", csr->non_zero_val);
+    for (int i = 0; i < csr->non_zero_val; i++)
+        fprintf(out, "%.12e%s", csr->Aval[i], (i == csr->non_zero_val - 1) ? "" : ", ");
     fprintf(out, "};\n\n");
 
     fprintf(out, "#endif // %s\n", guard);
@@ -171,11 +168,9 @@ int main() {
     printf("Enter Matrix Market filename (in ../src): ");
     scanf("%255s", filename);
 
-    // Build full path
     char fullpath[512];
     snprintf(fullpath, sizeof(fullpath), "../src/%s", filename);
 
-    // Extract base name (without extension)
     char temp[512];
     strcpy(temp, filename);
     char *dot = strchr(temp, '.');

@@ -9,16 +9,20 @@
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
 
-// ====================== Timing utility ======================
+// ============================================================================
+// Utility: nanosecond timer
+// ============================================================================
 long get_time_in_nanosec() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec * 1000000000LL + ts.tv_nsec;
 }
 
-// ====================== Cache flush ======================
+// ============================================================================
+// Utility: cache flush (to avoid cache bias)
+// ============================================================================
 void flush_cache() {
-    const size_t size = 512 * 1024 * 1024;
+    const size_t size = 512 * 1024 * 1024; // 512 MB
     char *buffer = malloc(size);
     if (!buffer) return;
 
@@ -37,7 +41,9 @@ void flush_cache() {
 #endif
 }
 
-// ====================== 90th Percentile ======================
+// ============================================================================
+// Utility: 90th Percentile
+// ============================================================================
 double percentile90(double *array, int n) {
     for (int i = 0; i < n - 1; i++)
         for (int j = i + 1; j < n; j++)
@@ -51,7 +57,9 @@ double percentile90(double *array, int n) {
     return array[idx];
 }
 
-// ====================== Sequential SpMV ======================
+// ============================================================================
+// SEQUENTIAL SpMV (no OpenMP)
+// ============================================================================
 void test_sequential(const int *Arow, const int *Acol, const double *Aval,
                      const double *x, double *y, int nrows, double *times) {
     printf("\nSEQUENTIAL (no parallelization):\n");
@@ -74,18 +82,19 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
     }
 }
 
-// ====================== Runtime SpMV ======================
-void test_runtime(const int *Arow, const int *Acol, const double *Aval,
-                  const double *x, double *y, int nrows, double *times,
-                  const char *sched_type) {
-    printf("\nschedule(runtime) - OMP_SCHEDULE = %s\n", sched_type);
+// ============================================================================
+// RUNTIME SpMV with fixed schedule(guided,10)
+// ============================================================================
+void test_runtime_guided10(const int *Arow, const int *Acol, const double *Aval,
+                           const double *x, double *y, int nrows, double *times) {
+    printf("\nschedule(guided,10):\n");
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
 
         long start = get_time_in_nanosec();
 
-        #pragma omp parallel for schedule(runtime)
+        #pragma omp parallel for schedule(guided,10)
         for (int i = 0; i < nrows; i++) {
             double sum = 0.0;
             for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -99,33 +108,17 @@ void test_runtime(const int *Arow, const int *Acol, const double *Aval,
     }
 }
 
-// ====================== MAIN ======================
+// ============================================================================
+// MAIN
+// ============================================================================
 int main() {
     srand(time(NULL));
     printf("================================================================================\n");
     printf("SPARSE MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
-    printf("SEQUENTIAL vs RUNTIME SCHEDULING COMPARISON\n");
+    printf("SEQUENTIAL vs schedule(guided,10) RUNTIME\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d, nnz = %d\n", nrows, ncols, non_zero_val);
-    //printf("Threads: %d\n", omp_get_max_threads());
     printf("================================================================================\n\n");
-
-    // Ask user for scheduling policy
-    char sched_type[32];
-    printf("Enter scheduling type (static / dynamic / guided / auto): ");
-    fflush(stdout);
-    scanf("%31s", sched_type);
-
-    // Validate input
-    if (strcmp(sched_type, "static") != 0 && strcmp(sched_type, "dynamic") != 0 &&
-        strcmp(sched_type, "guided") != 0 && strcmp(sched_type, "auto") != 0) {
-        fprintf(stderr, "Invalid scheduling type. Use: static, dynamic, guided, or auto\n");
-        return 1;
-    }
-
-    // Set OMP_SCHEDULE environment variable
-    setenv("OMP_SCHEDULE", sched_type, 1);
-    printf("-> OMP_SCHEDULE set to \"%s\"\n\n", sched_type);
 
     double *x = malloc(ncols * sizeof(double));
     double *y = calloc(nrows, sizeof(double));
@@ -139,11 +132,13 @@ int main() {
 
     double t_seq[RUNS], t_runtime[RUNS];
 
-    // Run both
+    // --- Run Sequential
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
-    test_runtime(Arow, Acol, Aval, x, y, nrows, t_runtime, sched_type);
 
-    // Compute averages and 90th percentiles
+    // --- Run schedule(guided,10)
+    test_runtime_guided10(Arow, Acol, Aval, x, y, nrows, t_runtime);
+
+    // --- Compute averages and percentiles
     double avg_seq = 0, avg_rt = 0;
     for (int i = 0; i < RUNS; i++) {
         avg_seq += t_seq[i];
@@ -155,41 +150,38 @@ int main() {
     double p90_seq = percentile90(t_seq, RUNS);
     double p90_rt = percentile90(t_runtime, RUNS);
 
+    // --- Summary
     printf("\n================================================================================\n");
     printf("SUMMARY\n");
     printf("================================================================================\n");
     printf("Mode                         | Avg (ms)  | 90th Perc (ms) | Speedup\n");
     printf("-----------------------------------------------------------------\n");
     printf("SEQUENTIAL                   | %.6f | %.6f | 1.00x\n", avg_seq, p90_seq);
-    printf("schedule(runtime) - %s    | %.6f | %.6f | %.2fx\n", 
-           sched_type, avg_rt, p90_rt, avg_seq / avg_rt);
+    printf("schedule(guided,10)          | %.6f | %.6f | %.2fx\n",
+           avg_rt, p90_rt, avg_seq / avg_rt);
     printf("================================================================================\n\n");
 
-    // Save results
+    // --- Save results
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/runtime/RESULTS_%s_RUNTIME_%s.txt", 
-             MATRIX_NAME, sched_type);
+    snprintf(filename, sizeof(filename),
+             "../results/CLUSTER/scheduling_type/runtime/RESULTS_%s_RUNTIME_guided_chunk10.txt",
+             MATRIX_NAME);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);
-        fprintf(f, "nrows: %d, ncols: %d, nnz: %d\n", nrows, ncols, non_zero_val);
-        fprintf(f, "Threads: %d\n", omp_get_max_threads());
-        fprintf(f, "OMP_SCHEDULE: %s\n\n", sched_type);
-
-        fprintf(f, "Sequential runs (ms):\n");
+        fprintf(f, "Schedule: guided, chunk=10 (runtime test)\n\n");
+        fprintf(f, "SEQUENTIAL times (ms):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
         fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_seq, p90_seq);
-
-        fprintf(f, "Runtime schedule runs (ms):\n");
+        fprintf(f, "RUNTIME guided (chunk=10) times (ms):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_runtime[i]);
         fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_rt, p90_rt);
-
         fprintf(f, "Speedup: %.2fx\n", avg_seq / avg_rt);
         fclose(f);
         printf("Results saved to: %s\n", filename);
     } else {
         perror("Error creating result file");
-    } 
+    }
 
     free(x);
     free(y);

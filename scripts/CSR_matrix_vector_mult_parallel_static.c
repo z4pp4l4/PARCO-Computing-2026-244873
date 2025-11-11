@@ -70,7 +70,7 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
         printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
-
+/*
 // Static schedule - default
 void test_static_default(const int *Arow, const int *Acol, const double *Aval,
                          const double *x, double *y, int nrows, double *times) {
@@ -118,7 +118,7 @@ void test_static_1(const int *Arow, const int *Acol, const double *Aval,
         printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
-
+*/
 // Static schedule - chunk size 10
 void test_static_10(const int *Arow, const int *Acol, const double *Aval,
                     const double *x, double *y, int nrows, double *times) {
@@ -142,7 +142,7 @@ void test_static_10(const int *Arow, const int *Acol, const double *Aval,
         printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
-
+/*
 // Static schedule - chunk size 50
 void test_static_50(const int *Arow, const int *Acol, const double *Aval,
                     const double *x, double *y, int nrows, double *times) {
@@ -190,7 +190,7 @@ void test_static_100(const int *Arow, const int *Acol, const double *Aval,
         printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
-
+*/
 int main() {
     srand(time(NULL));
     printf("================================================================================\n");
@@ -215,42 +215,46 @@ int main() {
     
     double t_seq[RUNS], t_default[RUNS], t_1[RUNS], t_10[RUNS], t_50[RUNS], t_100[RUNS];
     
+    /*
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
     printf("\n");
     test_static_default(Arow, Acol, Aval, x, y, nrows, t_default);
     printf("\n");
     test_static_1(Arow, Acol, Aval, x, y, nrows, t_1);
     printf("\n");
+    */
     test_static_10(Arow, Acol, Aval, x, y, nrows, t_10);
     printf("\n");
+    /*
     test_static_50(Arow, Acol, Aval, x, y, nrows, t_50);
     printf("\n");
     test_static_100(Arow, Acol, Aval, x, y, nrows, t_100);
     printf("\n");
+    */
     
     // Calculate averages and percentiles
     double avg_seq = 0, avg_default = 0, avg_1 = 0, avg_10 = 0, avg_50 = 0, avg_100 = 0;
     for (int i = 0; i < RUNS; i++) {
-        avg_seq += t_seq[i];
-        avg_default += t_default[i];
-        avg_1 += t_1[i];
+        //avg_seq += t_seq[i];
+        //avg_default += t_default[i];
+        //avg_1 += t_1[i];
         avg_10 += t_10[i];
-        avg_50 += t_50[i];
-        avg_100 += t_100[i];
+        //avg_50 += t_50[i];
+        //avg_100 += t_100[i];
     }
-    avg_seq /= RUNS;
-    avg_default /= RUNS;
-    avg_1 /= RUNS;
+    //avg_seq /= RUNS;
+    //avg_default /= RUNS;
+    //avg_1 /= RUNS;
     avg_10 /= RUNS;
-    avg_50 /= RUNS;
-    avg_100 /= RUNS;
+    //avg_50 /= RUNS;
+    //avg_100 /= RUNS;
     
     double p90_seq = percentile90(t_seq, RUNS);
-    double p90_default = percentile90(t_default, RUNS);
-    double p90_1 = percentile90(t_1, RUNS);
+    /*double p90_default = percentile90(t_default, RUNS);
+    double p90_1 = percentile90(t_1, RUNS);*/
     double p90_10 = percentile90(t_10, RUNS);
-    double p90_50 = percentile90(t_50, RUNS);
-    double p90_100 = percentile90(t_100, RUNS);
+    //double p90_50 = percentile90(t_50, RUNS);
+    //double p90_100 = percentile90(t_100, RUNS);
     
     printf("================================================================================\n");
     printf("SUMMARY\n");
@@ -259,16 +263,16 @@ int main() {
     printf("--------------------------------------------------------------------------------\n");
     printf("SEQUENTIAL (baseline)            | %.6f       | %.6f         | 1.00x\n", 
            avg_seq, p90_seq);
-    printf("schedule(static) - default       | %.6f       | %.6f         | %.2fx\n", 
+    /*printf("schedule(static) - default       | %.6f       | %.6f         | %.2fx\n", 
            avg_default, p90_default, avg_seq / avg_default);
     printf("schedule(static, 1)              | %.6f       | %.6f         | %.2fx\n", 
-           avg_1, p90_1, avg_seq / avg_1);
+           avg_1, p90_1, avg_seq / avg_1);*/
     printf("schedule(static, 10)             | %.6f       | %.6f         | %.2fx\n", 
-           avg_10, p90_10, avg_seq / avg_10);
+           avg_10, p90_10, avg_seq / avg_10);/*
     printf("schedule(static, 50)             | %.6f       | %.6f         | %.2fx\n", 
            avg_50, p90_50, avg_seq / avg_50);
     printf("schedule(static, 100)            | %.6f       | %.6f         | %.2fx\n", 
-           avg_100, p90_100, avg_seq / avg_100);
+           avg_100, p90_100, avg_seq / avg_100);*/
     printf("================================================================================\n\n");
     
     // Save results to file
@@ -285,7 +289,7 @@ int main() {
         fprintf(f, "SEQUENTIAL (no parallelization - baseline):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_seq, p90_seq);
-        
+        /*
         fprintf(f, "schedule(static) - default:\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_default[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_default, p90_default);
@@ -293,11 +297,11 @@ int main() {
         fprintf(f, "schedule(static, 1):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_1[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_1, p90_1);
-        
+        */
         fprintf(f, "schedule(static, 10):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_10[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_10, p90_10);
-        
+        /*
         fprintf(f, "schedule(static, 50):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_50[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_50, p90_50);
@@ -305,14 +309,15 @@ int main() {
         fprintf(f, "schedule(static, 100):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_100[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_100, p90_100);
-        
+        */
         fprintf(f, "SUMMARY:\n");
+        /*
         fprintf(f, "SEQUENTIAL (baseline):           %.6f ms\n", avg_seq);
         fprintf(f, "schedule(static) - default:      %.6f ms (%.2fx speedup)\n", avg_default, avg_seq / avg_default);
-        fprintf(f, "schedule(static, 1):             %.6f ms (%.2fx speedup)\n", avg_1, avg_seq / avg_1);
+        fprintf(f, "schedule(static, 1):             %.6f ms (%.2fx speedup)\n", avg_1, avg_seq / avg_1);*/
         fprintf(f, "schedule(static, 10):            %.6f ms (%.2fx speedup)\n", avg_10, avg_seq / avg_10);
-        fprintf(f, "schedule(static, 50):            %.6f ms (%.2fx speedup)\n", avg_50, avg_seq / avg_50);
-        fprintf(f, "schedule(static, 100):           %.6f ms (%.2fx speedup)\n", avg_100, avg_seq / avg_100);
+        //fprintf(f, "schedule(static, 50):            %.6f ms (%.2fx speedup)\n", avg_50, avg_seq / avg_50);
+        //fprintf(f, "schedule(static, 100):           %.6f ms (%.2fx speedup)\n", avg_100, avg_seq / avg_100);
         
         fclose(f);
         printf("Results saved to: %s\n", filename);

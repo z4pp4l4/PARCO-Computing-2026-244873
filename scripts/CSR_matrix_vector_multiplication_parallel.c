@@ -3,9 +3,10 @@
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
+#include <omp.h>
 
-//#include "bcsstk05_csr.h"
-//#define MATRIX_NAME "bcsstk05"
+#include "bcsstk05_csr.h"
+#define MATRIX_NAME "bcsstk05"
 //#include "bcsstm05_csr.h"
 //#define MATRIX_NAME "bcsstm05"
 //#include "CAG_mat72_csr.h"
@@ -18,14 +19,14 @@
 //#define MATRIX_NAME "nemeth19"
 //#include "tols2000_csr.h"
 //#define MATRIX_NAME "tols2000"
-
-#include "Trefethen_2000_csr.h"
-#define MATRIX_NAME "Trefethen_2000"
+//#include "Trefethen_2000_csr.h"
+//#define MATRIX_NAME "Trefethen_2000"
 
 #define RUNS 15
 
-void mat_vec_mult(const int *Arow, const int *Acol, const double *Aval,
-                  const double *x, double *y, int nrows) {
+void mat_vec_mult(const int *Arow,const int *Acol, const double *Aval,const double *x, double *y, int nrows) {
+    #pragma omp parallel for
+
     for (int i = 0; i < nrows; i++) {
         double sum = 0.0;
         for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -81,7 +82,7 @@ double percentile90(double *array, int n) {
 
 int main() {
     srand(time(NULL));
-    printf("MATRIX-VECTOR MULTIPLICATION (CSR FORMAT) --> SEQUENTIAL VERSION\n");
+    printf("MATRIX-VECTOR MULTIPLICATION (CSR FORMAT) --> PARALLEL VERSION\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d,non_zero_val = %d\n", nrows, ncols,non_zero_val);
     printf("--- Cache flushed before each run for unbiased measurements ---\n\n");
@@ -113,7 +114,7 @@ int main() {
     double p90 = percentile90(t, RUNS);
 
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/RESULTS_%s_SEQUENTIAL.txt", MATRIX_NAME);
+    snprintf(filename, sizeof(filename), "../results/LOCAL/RESULTS_%s_PARALLEL.txt", MATRIX_NAME);
 
     FILE *f = fopen(filename, "w");
     if (f) {
@@ -122,7 +123,7 @@ int main() {
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t[i]);
         fprintf(f, "\nAverage: %.6f ms\n90th percentile: %.6f ms\n", avg, p90);
         fclose(f);
-        printf("\n✅ Results saved to: %s\n", filename);
+        printf("\nResults saved to: %s\n", filename);
     } else {
         perror("Error creating result file");
     }

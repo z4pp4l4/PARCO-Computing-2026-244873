@@ -273,7 +273,7 @@ int main() {
     
     // Save results to file
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/LOCAL/scheduling_type/static/RESULTS_%s_STATIC_with_SEQ.txt", MATRIX_NAME);
+    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/static/RESULTS_%s_STATIC_with_SEQ.txt", MATRIX_NAME);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);

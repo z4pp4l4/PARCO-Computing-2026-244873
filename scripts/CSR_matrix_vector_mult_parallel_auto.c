@@ -149,7 +149,7 @@ int main() {
     
     // Save results to file
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/LOCAL/scheudling_type/auto/RESULTS_%s_AUTO_with_SEQ.txt", MATRIX_NAME);
+    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/auto/RESULTS_%s_AUTO_with_SEQ.txt", MATRIX_NAME);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);

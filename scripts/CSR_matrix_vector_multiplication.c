@@ -113,7 +113,7 @@ int main() {
     double p90 = percentile90(t, RUNS);
 
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/RESULTS_%s_SEQUENTIAL.txt", MATRIX_NAME);
+    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/sequential/RESULTS_%s_SEQUENTIAL.txt", MATRIX_NAME);
 
     FILE *f = fopen(filename, "w");
     if (f) {

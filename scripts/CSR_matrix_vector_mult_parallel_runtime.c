@@ -167,7 +167,7 @@ int main() {
 
     // Save results
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/LOCAL/scheduling_type/runtime/RESULTS_%s_RUNTIME_%s.txt", 
+    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/runtime/RESULTS_%s_RUNTIME_%s.txt", 
              MATRIX_NAME, sched_type);
     FILE *f = fopen(filename, "w");
     if (f) {
@@ -189,7 +189,7 @@ int main() {
         printf("Results saved to: %s\n", filename);
     } else {
         perror("Error creating result file");
-    }
+    } 
 
     free(x);
     free(y);

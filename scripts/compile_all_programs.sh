@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================================
 # Compile and Run All Sparse Matrix-Vector Multiplication Benchmarks
-# Using all CSR_matrix_vector_mult_* implementations
+# Across Multiple Thread Counts (4, 8, 12, 16, 32, 64)
 # ============================================================================
 
 set -e  # Stop on error
@@ -22,6 +22,11 @@ declare -a SOURCES=(
     "CSR_matrix_vector_mult_parallel_auto.c:AUTO"
     "CSR_matrix_vector_mult_parallel_runtime.c:RUNTIME"
 )
+
+# ============================================================================
+# Define all thread counts to test
+# ============================================================================
+THREAD_LIST=(4 8 12 16 32 64)
 
 # ============================================================================
 # Compilation phase
@@ -51,61 +56,40 @@ done
 echo ""
 echo "All implementations compiled successfully!"
 echo ""
-
 echo "============================================================================"
 echo "EXECUTING THE PROGRAMS"
 echo "============================================================================"
 
-mkdir -p "$OUTPUT_BASE_DIR/LOCAL"
 mkdir -p "$OUTPUT_BASE_DIR/CLUSTER/scheduling_type"
-
 COUNT=0
 for entry in "${SOURCES[@]}"; do
     COUNT=$((COUNT + 1))
     LABEL="${entry#*:}"
     EXECUTABLE="CSR_matrix_vector_multipl_cluster_${LABEL}.exe"
-
-    echo "[${COUNT}/${TOTAL}] Running ${LABEL}..."
-    mkdir -p "$OUTPUT_BASE_DIR/LOCAL/${LABEL,,}"
-    mkdir -p "$OUTPUT_BASE_DIR/CLUSTER/scheduling_type/${LABEL,,}"
-
-    if ./"$EXECUTABLE"; then
-        echo "Completed ${LABEL}"
-    else
-        echo "Execution failed for ${LABEL}"
-    fi
-    echo ""
-done
-echo "============================================================================"
-echo "ORGANIZING RESULTS"
-echo "============================================================================"
-
-for entry in "${SOURCES[@]}"; do
-    LABEL="${entry#*:}"
-    LOWER="${LABEL,,}"
-    SRC_FILE="$OUTPUT_BASE_DIR/LOCAL/${LOWER}/RESULTS_*.txt"
-    DEST_DIR="$OUTPUT_BASE_DIR/CLUSTER/scheduling_type/${LOWER}"
-
-    if ls $SRC_FILE 1> /dev/null 2>&1; then
-        cp $SRC_FILE "$DEST_DIR/" 2>/dev/null || true
-        echo "   ✓ Organized results for ${LABEL}"
-    fi
+    for THREADS in "${THREAD_LIST[@]}"; do
+        export OMP_NUM_THREADS=$THREADS
+        echo "------------------------------------------------------------"
+        echo "[${COUNT}/${TOTAL}] Running ${LABEL} with ${THREADS} threads..."
+        echo "OMP_NUM_THREADS=$OMP_NUM_THREADS"
+        OUT_DIR="$OUTPUT_BASE_DIR/CLUSTER/scheduling_type/${LABEL,,}/${THREADS}_threads"
+        mkdir -p "$OUT_DIR"
+        if ./"$EXECUTABLE"; then
+            echo "✓ Completed ${LABEL} with ${THREADS} threads"
+        else
+            echo "✗ Execution failed for ${LABEL} (${THREADS} threads)"
+        fi
+        # Move any result files (if they exist) to the correct folder
+        find "$OUTPUT_BASE_DIR/CLUSTER/scheduling_type/${LABEL,,}" -maxdepth 1 -type f -name "RESULTS_*" -exec mv {} "$OUT_DIR/" \; 2>/dev/null || true
+        echo ""
+    done
 done
 
-echo ""
 echo "============================================================================"
 echo "SUMMARY"
 echo "============================================================================"
-echo "Results stored in:"
-echo "  $OUTPUT_BASE_DIR/LOCAL/{sequential,parallel,static,dynamic,guided,auto,runtime}/"
-echo "  $OUTPUT_BASE_DIR/CLUSTER/scheduling_type/{same}/"
-echo ""
-echo "Executables available:"
-for entry in "${SOURCES[@]}"; do
-    LABEL="${entry#*:}"
-    echo "  ./CSR_matrix_vector_multipl_cluster_${LABEL}.exe"
-done
-
+echo "All runs completed for thread counts: ${THREAD_LIST[*]}"
+echo "Results organized under:"
+echo "  $OUTPUT_BASE_DIR/CLUSTER/scheduling_type/<version>/<threads>_threads/"
 echo ""
 echo "Done!"
 echo "============================================================================"

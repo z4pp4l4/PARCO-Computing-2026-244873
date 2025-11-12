@@ -5,6 +5,21 @@
 #include <unistd.h>
 #include <omp.h>
 
+
+//#include "bcsstk05_csr.h"
+//#define MATRIX_NAME "bcsstk05"
+//#include "bcsstm05_csr.h"
+//#define MATRIX_NAME "bcsstm05"
+//#include "CAG_mat72_csr.h"
+//#define MATRIX_NAME "CAG_mat72"
+//#include "dataset20mfeatpixel_10NN_csr.h"
+//#define MATRIX_NAME "dataset20mfeatpixel_10NN"
+//#include "nemeth05_csr.h"
+//#define MATRIX_NAME "nemeth05"
+//#include "nemeth19_csr.h"
+//#define MATRIX_NAME "nemeth19"
+//#include "tols2000_csr.h"
+//#define MATRIX_NAME "tols2000"
 #include "Trefethen_2000_csr.h"
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
@@ -22,8 +37,8 @@ void mat_vec_mult_sequential(const int *Arow, const int *Acol, const double *Ava
 
 // ====================== Parallel version (WITH #pragma) ======================
 void mat_vec_mult_parallel(const int *Arow, const int *Acol, const double *Aval,
-                           const double *x, double *y, int nrows) {
-    #pragma omp parallel for
+                           const double *x, double *y, int nrows,int num_threads) {
+    #pragma omp parallel for num_threads(num_threads)
     for (int i = 0; i < nrows; i++) {
         double sum = 0.0;
         for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -74,7 +89,19 @@ double percentile90(double *array, int n) {
     return array[idx];
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    int num_threads = omp_get_max_threads();  // Default: max available threads
+    if (argc > 1) {
+        num_threads = atoi(argv[1]);
+        if (num_threads < 1) {
+            fprintf(stderr, "Error: number of threads must be >= 1\n");
+            fprintf(stderr, "Usage: %s [num_threads]\n", argv[0]);
+            fprintf(stderr, "Example: %s 8\n", argv[0]);
+            return 1;
+        }
+    }
+    // Set the number of threads for OpenMP
+    omp_set_num_threads(num_threads);
     srand(time(NULL));
     printf("================================================================================\n");
     printf("MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
@@ -113,24 +140,19 @@ int main() {
 
     // Reset y array
     memset(y, 0, nrows * sizeof(double));
-
     printf("\n");
-
-    // ====================== Test PARALLEL ======================
     printf("PARALLEL VERSION (with #pragma omp parallel for):\n");
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
 
         long start = get_time_in_nanosec();
-        mat_vec_mult_parallel(Arow, Acol, Aval, x, y, nrows);
+        mat_vec_mult_parallel(Arow, Acol, Aval, x, y, nrows, num_threads);
         long end = get_time_in_nanosec();
 
         t_par[r] = (end - start) / 1e6;
         printf("  Run %2d: %.6f ms\n", r + 1, t_par[r]);
     }
-
-    // ====================== Calculate Statistics ======================
     double avg_seq = 0, avg_par = 0;
     for (int i = 0; i < RUNS; i++) {
         avg_seq += t_seq[i];
@@ -138,12 +160,9 @@ int main() {
     }
     avg_seq /= RUNS;
     avg_par /= RUNS;
-
     double p90_seq = percentile90(t_seq, RUNS);
     double p90_par = percentile90(t_par, RUNS);
-
     double speedup = avg_seq / avg_par;
-
     printf("\n");
     printf("================================================================================\n");
     printf("SUMMARY\n");
@@ -165,28 +184,27 @@ int main() {
         fprintf(f, "Matrix size: %d x %d, non_zero_val = %d\n", nrows, ncols, non_zero_val);
         //fprintf(f, "Threads: %d\n", omp_get_max_threads());
         fprintf(f, "Number of runs: %d\n\n", RUNS);
-
         fprintf(f, "SEQUENTIAL VERSION (no #pragma):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
+        for (int i = 0; i < RUNS; i++) {
+            fprintf(f, "%.6f\n", t_seq[i]);
+        }
         fprintf(f, "Average: %.6f ms\n", avg_seq);
         fprintf(f, "90th percentile: %.6f ms\n\n", p90_seq);
-
         fprintf(f, "PARALLEL VERSION (with #pragma omp parallel for):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_par[i]);
+        for (int i = 0; i < RUNS; i++){
+            fprintf(f, "%.6f\n", t_par[i]);
+        }
         fprintf(f, "Average: %.6f ms\n", avg_par);
         fprintf(f, "90th percentile: %.6f ms\n\n", p90_par);
-
         fprintf(f, "SUMMARY:\n");
         fprintf(f, "Sequential Average:  %.6f ms\n", avg_seq);
         fprintf(f, "Parallel Average:    %.6f ms\n", avg_par);
         fprintf(f, "Speedup:             %.2fx\n", speedup);
-
         fclose(f);
         printf("Results saved to: %s\n", filename);
     } else {
         perror("Error creating result file");
     }
-
     free(x);
     free(y);
     return 0;

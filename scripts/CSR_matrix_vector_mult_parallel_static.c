@@ -5,6 +5,21 @@
 #include <unistd.h>
 #include <omp.h>
 
+
+//#include "bcsstk05_csr.h"
+//#define MATRIX_NAME "bcsstk05"
+//#include "bcsstm05_csr.h"
+//#define MATRIX_NAME "bcsstm05"
+//#include "CAG_mat72_csr.h"
+//#define MATRIX_NAME "CAG_mat72"
+//#include "dataset20mfeatpixel_10NN_csr.h"
+//#define MATRIX_NAME "dataset20mfeatpixel_10NN"
+//#include "nemeth05_csr.h"
+//#define MATRIX_NAME "nemeth05"
+//#include "nemeth19_csr.h"
+//#define MATRIX_NAME "nemeth19"
+//#include "tols2000_csr.h"
+//#define MATRIX_NAME "tols2000"
 #include "Trefethen_2000_csr.h"
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
@@ -70,90 +85,19 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
         printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
-/*
-// Static schedule - default
-void test_static_default(const int *Arow, const int *Acol, const double *Aval,
-                         const double *x, double *y, int nrows, double *times) {
-    printf("schedule(static) - default:\n");
-    for (int r = 0; r < RUNS; r++) {
-        flush_cache();
-        usleep(100);
-        
-        long start = get_time_in_nanosec();
-        
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < nrows; i++) {
-            double sum = 0.0;
-            for (int j = Arow[i]; j < Arow[i + 1]; j++)
-                sum += Aval[j] * x[Acol[j]];
-            y[i] = sum;
-        }
-        
-        long end = get_time_in_nanosec();
-        times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
-    }
-}
 
-// Static schedule - chunk size 1
-void test_static_1(const int *Arow, const int *Acol, const double *Aval,
-                   const double *x, double *y, int nrows, double *times) {
-    printf("schedule(static, 1):\n");
-    for (int r = 0; r < RUNS; r++) {
-        flush_cache();
-        usleep(100);
-        
-        long start = get_time_in_nanosec();
-        
-        #pragma omp parallel for schedule(static, 1)
-        for (int i = 0; i < nrows; i++) {
-            double sum = 0.0;
-            for (int j = Arow[i]; j < Arow[i + 1]; j++)
-                sum += Aval[j] * x[Acol[j]];
-            y[i] = sum;
-        }
-        
-        long end = get_time_in_nanosec();
-        times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
-    }
-}
-*/
 // Static schedule - chunk size 10
 void test_static_10(const int *Arow, const int *Acol, const double *Aval,
-                    const double *x, double *y, int nrows, double *times) {
-    printf("schedule(static, 10):\n");
+                    const double *x, double *y, int nrows, double *times,
+                    int num_threads) {
+    printf("schedule(static, 10) with %d threads:\n", num_threads);
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
         
         long start = get_time_in_nanosec();
         
-        #pragma omp parallel for schedule(static, 10)
-        for (int i = 0; i < nrows; i++) {
-            double sum = 0.0;
-            for (int j = Arow[i]; j < Arow[i + 1]; j++)
-                sum += Aval[j] * x[Acol[j]];
-            y[i] = sum;
-        }
-        
-        long end = get_time_in_nanosec();
-        times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
-    }
-}
-/*
-// Static schedule - chunk size 50
-void test_static_50(const int *Arow, const int *Acol, const double *Aval,
-                    const double *x, double *y, int nrows, double *times) {
-    printf("schedule(static, 50):\n");
-    for (int r = 0; r < RUNS; r++) {
-        flush_cache();
-        usleep(100);
-        
-        long start = get_time_in_nanosec();
-        
-        #pragma omp parallel for schedule(static, 50)
+        #pragma omp parallel for schedule(static, 10) num_threads(num_threads)
         for (int i = 0; i < nrows; i++) {
             double sum = 0.0;
             for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -167,41 +111,35 @@ void test_static_50(const int *Arow, const int *Acol, const double *Aval,
     }
 }
 
-// Static schedule - chunk size 100
-void test_static_100(const int *Arow, const int *Acol, const double *Aval,
-                     const double *x, double *y, int nrows, double *times) {
-    printf("schedule(static, 100):\n");
-    for (int r = 0; r < RUNS; r++) {
-        flush_cache();
-        usleep(100);
-        
-        long start = get_time_in_nanosec();
-        
-        #pragma omp parallel for schedule(static, 100)
-        for (int i = 0; i < nrows; i++) {
-            double sum = 0.0;
-            for (int j = Arow[i]; j < Arow[i + 1]; j++)
-                sum += Aval[j] * x[Acol[j]];
-            y[i] = sum;
-        }
-        
-        long end = get_time_in_nanosec();
-        times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
-    }
-}
-*/
-int main() {
+int main(int argc, char *argv[]) {
     srand(time(NULL));
+
+    // ========================================================================
+    // Parse command-line arguments for number of threads
+    // ========================================================================
+    int num_threads = omp_get_max_threads();  // Default: max available threads
+
+    if (argc > 1) {
+        num_threads = atoi(argv[1]);
+        if (num_threads < 1) {
+            fprintf(stderr, "Error: number of threads must be >= 1\n");
+            fprintf(stderr, "Usage: %s [num_threads]\n", argv[0]);
+            fprintf(stderr, "Example: %s 8\n", argv[0]);
+            return 1;
+        }
+    }
+
+    // Set the number of threads for OpenMP
+    omp_set_num_threads(num_threads);
+
     printf("================================================================================\n");
     printf("SPARSE MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
     printf("SEQUENTIAL vs STATIC SCHEDULING COMPARISON\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d, non_zero_val = %d\n", nrows, ncols, non_zero_val);
-    //printf("Threads: %d\n", omp_get_max_threads());
-    printf("Schedule Type: STATIC (different chunk sizes)\n");
+    printf("Number of threads: %d\n", num_threads);
+    printf("Schedule Type: STATIC (chunk size 10)\n");
     printf("================================================================================\n\n");
-    
     double *x = malloc(ncols * sizeof(double));
     double *y = calloc(nrows, sizeof(double));
     
@@ -209,52 +147,26 @@ int main() {
         fprintf(stderr, "Memory allocation failed\n");
         return 1;
     }
-    
     for (int i = 0; i < ncols; i++)
         x[i] = ((double)rand() / RAND_MAX) * 10.0;
     
-    double t_seq[RUNS], t_default[RUNS], t_1[RUNS], t_10[RUNS], t_50[RUNS], t_100[RUNS];
-    
-    /*
+    double t_seq[RUNS], t_10[RUNS];
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
     printf("\n");
-    test_static_default(Arow, Acol, Aval, x, y, nrows, t_default);
+    test_static_10(Arow, Acol, Aval, x, y, nrows, t_10, num_threads);
     printf("\n");
-    test_static_1(Arow, Acol, Aval, x, y, nrows, t_1);
-    printf("\n");
-    */
-    test_static_10(Arow, Acol, Aval, x, y, nrows, t_10);
-    printf("\n");
-    /*
-    test_static_50(Arow, Acol, Aval, x, y, nrows, t_50);
-    printf("\n");
-    test_static_100(Arow, Acol, Aval, x, y, nrows, t_100);
-    printf("\n");
-    */
     
     // Calculate averages and percentiles
-    double avg_seq = 0, avg_default = 0, avg_1 = 0, avg_10 = 0, avg_50 = 0, avg_100 = 0;
+    double avg_seq = 0, avg_10 = 0;
     for (int i = 0; i < RUNS; i++) {
-        //avg_seq += t_seq[i];
-        //avg_default += t_default[i];
-        //avg_1 += t_1[i];
+        avg_seq += t_seq[i];
         avg_10 += t_10[i];
-        //avg_50 += t_50[i];
-        //avg_100 += t_100[i];
     }
-    //avg_seq /= RUNS;
-    //avg_default /= RUNS;
-    //avg_1 /= RUNS;
+    avg_seq /= RUNS;
     avg_10 /= RUNS;
-    //avg_50 /= RUNS;
-    //avg_100 /= RUNS;
     
     double p90_seq = percentile90(t_seq, RUNS);
-    /*double p90_default = percentile90(t_default, RUNS);
-    double p90_1 = percentile90(t_1, RUNS);*/
     double p90_10 = percentile90(t_10, RUNS);
-    //double p90_50 = percentile90(t_50, RUNS);
-    //double p90_100 = percentile90(t_100, RUNS);
     
     printf("================================================================================\n");
     printf("SUMMARY\n");
@@ -263,61 +175,34 @@ int main() {
     printf("--------------------------------------------------------------------------------\n");
     printf("SEQUENTIAL (baseline)            | %.6f       | %.6f         | 1.00x\n", 
            avg_seq, p90_seq);
-    /*printf("schedule(static) - default       | %.6f       | %.6f         | %.2fx\n", 
-           avg_default, p90_default, avg_seq / avg_default);
-    printf("schedule(static, 1)              | %.6f       | %.6f         | %.2fx\n", 
-           avg_1, p90_1, avg_seq / avg_1);*/
-    printf("schedule(static, 10)             | %.6f       | %.6f         | %.2fx\n", 
-           avg_10, p90_10, avg_seq / avg_10);/*
-    printf("schedule(static, 50)             | %.6f       | %.6f         | %.2fx\n", 
-           avg_50, p90_50, avg_seq / avg_50);
-    printf("schedule(static, 100)            | %.6f       | %.6f         | %.2fx\n", 
-           avg_100, p90_100, avg_seq / avg_100);*/
+    printf("schedule(static, 10) [%d th]    | %.6f       | %.6f         | %.2fx\n", 
+           num_threads, avg_10, p90_10, avg_seq / avg_10);
     printf("================================================================================\n\n");
     
-    // Save results to file
+    // Save results to file with thread count in filename
     char filename[256];
-    snprintf(filename, sizeof(filename), "../results/CLUSTER/scheduling_type/static/RESULTS_%s_STATIC_with_SEQ.txt", MATRIX_NAME);
+    snprintf(filename, sizeof(filename), 
+             "../results/CLUSTER/scheduling_type/static/RESULTS_%s_STATIC_chunk10_threads%d.txt", 
+             MATRIX_NAME, num_threads);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);
-        fprintf(f, "Schedule Type: STATIC (different chunk sizes) vs SEQUENTIAL\n");
+        fprintf(f, "Schedule Type: STATIC (chunk size 10) vs SEQUENTIAL\n");
         fprintf(f, "Matrix size: %d x %d, non_zero_val: %d\n", nrows, ncols, non_zero_val);
-        //fprintf(f, "Threads: %d\n", omp_get_max_threads());
+        fprintf(f, "Number of threads: %d\n", num_threads);
         fprintf(f, "Number of runs: %d\n\n", RUNS);
         
         fprintf(f, "SEQUENTIAL (no parallelization - baseline):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_seq, p90_seq);
-        /*
-        fprintf(f, "schedule(static) - default:\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_default[i]);
-        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_default, p90_default);
         
-        fprintf(f, "schedule(static, 1):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_1[i]);
-        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_1, p90_1);
-        */
         fprintf(f, "schedule(static, 10):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_10[i]);
         fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_10, p90_10);
-        /*
-        fprintf(f, "schedule(static, 50):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_50[i]);
-        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_50, p90_50);
         
-        fprintf(f, "schedule(static, 100):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_100[i]);
-        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_100, p90_100);
-        */
         fprintf(f, "SUMMARY:\n");
-        /*
         fprintf(f, "SEQUENTIAL (baseline):           %.6f ms\n", avg_seq);
-        fprintf(f, "schedule(static) - default:      %.6f ms (%.2fx speedup)\n", avg_default, avg_seq / avg_default);
-        fprintf(f, "schedule(static, 1):             %.6f ms (%.2fx speedup)\n", avg_1, avg_seq / avg_1);*/
         fprintf(f, "schedule(static, 10):            %.6f ms (%.2fx speedup)\n", avg_10, avg_seq / avg_10);
-        //fprintf(f, "schedule(static, 50):            %.6f ms (%.2fx speedup)\n", avg_50, avg_seq / avg_50);
-        //fprintf(f, "schedule(static, 100):           %.6f ms (%.2fx speedup)\n", avg_100, avg_seq / avg_100);
         
         fclose(f);
         printf("Results saved to: %s\n", filename);

@@ -5,13 +5,25 @@
 #include <unistd.h>
 #include <omp.h>
 
+
+//#include "bcsstk05_csr.h"
+//#define MATRIX_NAME "bcsstk05"
+//#include "bcsstm05_csr.h"
+//#define MATRIX_NAME "bcsstm05"
+//#include "CAG_mat72_csr.h"
+//#define MATRIX_NAME "CAG_mat72"
+//#include "dataset20mfeatpixel_10NN_csr.h"
+//#define MATRIX_NAME "dataset20mfeatpixel_10NN"
+//#include "nemeth05_csr.h"
+//#define MATRIX_NAME "nemeth05"
+//#include "nemeth19_csr.h"
+//#define MATRIX_NAME "nemeth19"
+//#include "tols2000_csr.h"
+//#define MATRIX_NAME "tols2000"
 #include "Trefethen_2000_csr.h"
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
 
-// ============================================================================
-// Utility: nanosecond timer
-// ============================================================================
 long get_time_in_nanosec() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -41,9 +53,6 @@ void flush_cache() {
 #endif
 }
 
-// ============================================================================
-// Utility: compute 90th percentile
-// ============================================================================
 double percentile90(double *array, int n) {
     for (int i = 0; i < n - 1; i++)
         for (int j = i + 1; j < n; j++)
@@ -86,7 +95,7 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
 // GUIDED schedule with chunk = 10
 // ============================================================================
 void test_guided_chunk10(const int *Arow, const int *Acol, const double *Aval,
-                         const double *x, double *y, int nrows, double *times) {
+                         const double *x, double *y, int nrows, double *times, int num_threads) {
     printf("schedule(guided,10):\n");
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
@@ -111,13 +120,29 @@ void test_guided_chunk10(const int *Arow, const int *Acol, const double *Aval,
 // ============================================================================
 // MAIN
 // ============================================================================
-int main() {
+int main(int argc, char *argv[]) {
+
+    int num_threads = omp_get_max_threads();
+    if (argc > 1) {
+        num_threads = atoi(argv[1]);
+        if (num_threads < 1) {
+            fprintf(stderr, "Error: number of threads must be >= 1\n");
+            fprintf(stderr, "Usage: %s [num_threads]\n", argv[0]);
+            fprintf(stderr, "Example: %s 8\n", argv[0]);
+            return 1;
+        }
+    }
+
+    // Set the number of threads for OpenMP
+    omp_set_num_threads(num_threads);
+
     srand(time(NULL));
-    printf("================================================================================\n");
+     printf("================================================================================\n");
     printf("SPARSE MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
     printf("SEQUENTIAL vs schedule(guided,10)\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d, non_zero_val = %d\n", nrows, ncols, non_zero_val);
+    printf("Number of threads: %d\n", num_threads);
     printf("================================================================================\n\n");
 
     double *x = malloc(ncols * sizeof(double));
@@ -136,8 +161,8 @@ int main() {
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
     printf("\n");
 
-    // --- Run GUIDED (chunk=10)
-    test_guided_chunk10(Arow, Acol, Aval, x, y, nrows, t_guided);
+    // --- Run GUIDED (chunk=10) with specified threads
+    test_guided_chunk10(Arow, Acol, Aval, x, y, nrows, t_guided, num_threads);
     printf("\n");
 
     // --- Compute averages & 90th percentile
@@ -159,25 +184,29 @@ int main() {
     printf("Mode                        | Avg (ms)  | 90th Perc (ms) | Speedup\n");
     printf("-----------------------------------------------------------------\n");
     printf("SEQUENTIAL                  | %.6f | %.6f | 1.00x\n", avg_seq, p90_seq);
-    printf("schedule(guided,10)         | %.6f | %.6f | %.2fx\n",
-           avg_guided, p90_guided, avg_seq / avg_guided);
+    printf("schedule(guided,10) [%d th] | %.6f | %.6f | %.2fx\n",
+           num_threads, avg_guided, p90_guided, avg_seq / avg_guided);
     printf("================================================================================\n\n");
 
     // --- Save results to file
     char filename[256];
     snprintf(filename, sizeof(filename),
-             "../results/CLUSTER/scheduling_type/guided/RESULTS_%s_GUIDED_chunk10.txt",
-             MATRIX_NAME);
+             "../results/CLUSTER/scheduling_type/guided/RESULTS_%s_GUIDED_chunk10_threads%d.txt",
+             MATRIX_NAME, num_threads);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);
-        fprintf(f, "Schedule: guided, chunk=10\n\n");
+        fprintf(f, "Schedule: guided, chunk=10\n");
+        fprintf(f, "Number of threads: %d\n\n", num_threads);
+
         fprintf(f, "SEQUENTIAL times (ms):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
         fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_seq, p90_seq);
+
         fprintf(f, "GUIDED (chunk=10) times (ms):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_guided[i]);
         fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_guided, p90_guided);
+
         fprintf(f, "Speedup: %.2fx\n", avg_seq / avg_guided);
         fclose(f);
         printf("Results saved to: %s\n", filename);

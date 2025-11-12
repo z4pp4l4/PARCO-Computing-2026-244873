@@ -7,7 +7,7 @@
 set -e  # Stop on error
 
 COMPILER="gcc"
-COMPILER_FLAGS="-fopenmp"
+COMPILER_FLAGS="-fopenmp -std=c99 -lm"
 OUTPUT_BASE_DIR="../results"
 
 # ============================================================================

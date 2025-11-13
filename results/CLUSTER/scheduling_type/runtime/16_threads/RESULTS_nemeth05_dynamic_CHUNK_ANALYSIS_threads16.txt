@@ -1,0 +1,16 @@
+Matrix: nemeth05
+Schedule: dynamic
+Threads: 16
+
+SEQUENTIAL baseline avg: 2.126500 ms | 90th: 3.198556 ms
+
+Chunk 1: Avg 1.465011 ms | 90th 1.874655 ms | Speedup 1.45x
+Chunk 2: Avg 0.962628 ms | 90th 1.008718 ms | Speedup 2.21x
+Chunk 5: Avg 0.607956 ms | 90th 0.617165 ms | Speedup 3.50x
+Chunk 10: Avg 0.540838 ms | 90th 0.641559 ms | Speedup 3.93x
+Chunk 20: Avg 0.456746 ms | 90th 0.485951 ms | Speedup 4.66x
+Chunk 50: Avg 0.478619 ms | 90th 0.478133 ms | Speedup 4.44x
+Chunk 100: Avg 0.433421 ms | 90th 0.465638 ms | Speedup 4.91x
+Chunk 200: Avg 0.450034 ms | 90th 0.524372 ms | Speedup 4.73x
+
+Best chunk size: 100 (Avg 0.433421 ms, Speedup 4.91x)

@@ -1,0 +1,46 @@
+Matrix: nemeth05
+Matrix size: 9506 x 9506, non_zero_val = 394808
+Number of runs: 15
+
+SEQUENTIAL VERSION (no #pragma):
+1.938185
+1.939846
+1.965127
+1.969839
+1.980008
+1.981841
+1.996932
+2.018099
+2.269709
+2.383742
+2.812325
+2.879240
+3.518906
+4.320306
+104.277308
+Average: 9.216761 ms
+90th percentile: 4.320306 ms
+
+PARALLEL VERSION (with #pragma omp parallel for):
+1.168844
+1.236513
+1.324744
+1.332581
+1.332991
+1.335546
+1.342130
+1.378113
+1.378299
+1.389793
+1.391185
+1.418728
+1.429375
+1.439803
+1.631562
+Average: 1.368680 ms
+90th percentile: 1.439803 ms
+
+SUMMARY:
+Sequential Average:  9.216761 ms
+Parallel Average:    1.368680 ms
+Speedup:             6.73x

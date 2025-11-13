@@ -1,0 +1,16 @@
+Matrix: tols2000
+Schedule: static
+Threads: 16
+
+SEQUENTIAL baseline avg: 0.063120 ms | 90th: 0.112126 ms
+
+Chunk 1: Avg 0.244524 ms | 90th 0.303857 ms | Speedup 0.26x
+Chunk 2: Avg 0.180467 ms | 90th 0.205598 ms | Speedup 0.35x
+Chunk 5: Avg 0.172706 ms | 90th 0.197369 ms | Speedup 0.37x
+Chunk 10: Avg 0.196623 ms | 90th 0.228232 ms | Speedup 0.32x
+Chunk 20: Avg 0.179015 ms | 90th 0.194625 ms | Speedup 0.35x
+Chunk 50: Avg 0.175296 ms | 90th 0.199697 ms | Speedup 0.36x
+Chunk 100: Avg 0.201874 ms | 90th 0.219145 ms | Speedup 0.31x
+Chunk 200: Avg 0.221346 ms | 90th 0.396100 ms | Speedup 0.29x
+
+Best chunk size: 5 (Avg 0.172706 ms, Speedup 0.37x)

@@ -1,0 +1,46 @@
+Matrix: Trefethen_2000
+Matrix size: 2000 x 2000, non_zero_val = 41906
+Number of runs: 15
+
+SEQUENTIAL VERSION (no #pragma):
+0.163373
+0.164558
+0.165021
+0.165333
+0.165639
+0.169904
+0.175358
+0.179183
+0.181894
+0.183386
+0.184761
+0.185649
+0.187755
+0.198697
+0.349832
+Average: 0.188023 ms
+90th percentile: 0.198697 ms
+
+PARALLEL VERSION (with #pragma omp parallel for):
+0.166640
+0.176641
+0.181040
+0.185184
+0.185473
+0.186645
+0.189765
+0.196197
+0.196347
+0.197143
+0.197157
+0.197967
+0.238422
+0.290718
+0.589015
+Average: 0.224957 ms
+90th percentile: 0.290718 ms
+
+SUMMARY:
+Sequential Average:  0.188023 ms
+Parallel Average:    0.224957 ms
+Speedup:             0.84x

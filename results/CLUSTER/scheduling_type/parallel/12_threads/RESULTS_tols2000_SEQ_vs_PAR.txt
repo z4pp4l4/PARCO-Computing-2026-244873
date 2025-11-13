@@ -1,0 +1,46 @@
+Matrix: tols2000
+Matrix size: 2000 x 2000, non_zero_val = 5184
+Number of runs: 15
+
+SEQUENTIAL VERSION (no #pragma):
+0.039882
+0.039989
+0.040472
+0.040786
+0.040807
+0.040911
+0.041026
+0.041137
+0.041164
+0.041210
+0.041237
+0.041240
+0.049951
+0.051868
+0.063123
+Average: 0.043654 ms
+90th percentile: 0.051868 ms
+
+PARALLEL VERSION (with #pragma omp parallel for):
+0.154536
+0.155209
+0.156791
+0.158350
+0.161023
+0.161910
+0.170088
+0.173092
+0.179459
+0.188319
+0.188451
+0.214812
+0.241033
+0.337516
+0.445463
+Average: 0.205737 ms
+90th percentile: 0.337516 ms
+
+SUMMARY:
+Sequential Average:  0.043654 ms
+Parallel Average:    0.205737 ms
+Speedup:             0.21x

@@ -1,0 +1,46 @@
+Matrix: dataset20mfeatpixel_10NN
+Matrix size: 2000 x 2000, non_zero_val = 27932
+Number of runs: 15
+
+SEQUENTIAL VERSION (no #pragma):
+0.179685
+0.229452
+0.241785
+0.242568
+0.329014
+0.362162
+0.395526
+0.396401
+0.397881
+0.398564
+0.401694
+0.403446
+0.407129
+0.422420
+0.515476
+Average: 0.354880 ms
+90th percentile: 0.422420 ms
+
+PARALLEL VERSION (with #pragma omp parallel for):
+0.166379
+0.185332
+0.188138
+0.188397
+0.189841
+0.196425
+0.197044
+0.197933
+0.198177
+0.198554
+0.205754
+0.206065
+0.247124
+0.349361
+0.573944
+Average: 0.232565 ms
+90th percentile: 0.349361 ms
+
+SUMMARY:
+Sequential Average:  0.354880 ms
+Parallel Average:    0.232565 ms
+Speedup:             1.53x

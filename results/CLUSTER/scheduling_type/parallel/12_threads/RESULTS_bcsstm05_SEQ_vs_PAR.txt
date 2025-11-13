@@ -1,0 +1,46 @@
+Matrix: bcsstm05
+Matrix size: 153 x 153, non_zero_val = 153
+Number of runs: 15
+
+SEQUENTIAL VERSION (no #pragma):
+0.004025
+0.004340
+0.004349
+0.004358
+0.004413
+0.004573
+0.004732
+0.004763
+0.004771
+0.004805
+0.004844
+0.004901
+0.005380
+0.005678
+0.006862
+Average: 0.004853 ms
+90th percentile: 0.005678 ms
+
+PARALLEL VERSION (with #pragma omp parallel for):
+0.136232
+0.141761
+0.142088
+0.151846
+0.164857
+0.169335
+0.175437
+0.175847
+0.178675
+0.183971
+0.185868
+0.193523
+0.227429
+0.293779
+0.635859
+Average: 0.210434 ms
+90th percentile: 0.293779 ms
+
+SUMMARY:
+Sequential Average:  0.004853 ms
+Parallel Average:    0.210434 ms
+Speedup:             0.02x

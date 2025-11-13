@@ -1,0 +1,49 @@
+Matrix: dataset20mfeatpixel_10NN
+Schedule Type: AUTO - CHUNK SIZE ANALYSIS
+Matrix size: 2000 x 2000, non_zero_val: 27932
+Number of threads: 4
+Number of runs per chunk size: 15
+
+SEQUENTIAL (baseline - no parallelization):
+0.160170
+0.163722
+0.163996
+0.164201
+0.164370
+0.164664
+0.164670
+0.164935
+0.165151
+0.165547
+0.165705
+0.168672
+0.179760
+0.215672
+0.294832
+Average: 0.177738 ms | 90th percentile: 0.215672 ms
+
+================================================================================
+CHUNK SIZE ANALYSIS - schedule(auto, chunk_size)
+================================================================================
+
+CHUNK SIZE: 0
+0.619785
+0.187576
+0.218260
+0.273339
+0.208368
+0.156614
+0.192514
+0.159765
+0.208433
+0.177849
+0.206532
+0.207746
+0.187796
+0.183772
+0.212034
+Average: 0.226692 ms | 90th percentile: 0.273339 ms | Speedup: 0.78x
+
+================================================================================
+BEST CHUNK SIZE: 0
+Best Average: 0.226692 ms (Speedup: 0.78x)

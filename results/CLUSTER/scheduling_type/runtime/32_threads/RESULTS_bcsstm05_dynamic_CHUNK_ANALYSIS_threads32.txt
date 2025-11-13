@@ -1,0 +1,16 @@
+Matrix: bcsstm05
+Schedule: dynamic
+Threads: 32
+
+SEQUENTIAL baseline avg: 0.006042 ms | 90th: 0.008262 ms
+
+Chunk 1: Avg 0.309038 ms | 90th 0.432134 ms | Speedup 0.02x
+Chunk 2: Avg 0.249319 ms | 90th 0.293701 ms | Speedup 0.02x
+Chunk 5: Avg 0.237263 ms | 90th 0.261987 ms | Speedup 0.03x
+Chunk 10: Avg 0.236144 ms | 90th 0.255281 ms | Speedup 0.03x
+Chunk 20: Avg 0.259028 ms | 90th 0.302943 ms | Speedup 0.02x
+Chunk 50: Avg 0.303518 ms | 90th 0.333104 ms | Speedup 0.02x
+Chunk 100: Avg 0.252767 ms | 90th 0.293094 ms | Speedup 0.02x
+Chunk 200: Avg 0.310870 ms | 90th 0.347284 ms | Speedup 0.02x
+
+Best chunk size: 10 (Avg 0.236144 ms, Speedup 0.03x)

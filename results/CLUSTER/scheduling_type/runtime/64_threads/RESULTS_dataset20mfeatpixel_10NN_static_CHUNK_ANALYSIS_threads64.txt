@@ -1,0 +1,16 @@
+Matrix: dataset20mfeatpixel_10NN
+Schedule: static
+Threads: 64
+
+SEQUENTIAL baseline avg: 0.329719 ms | 90th: 0.410546 ms
+
+Chunk 1: Avg 0.738603 ms | 90th 1.701495 ms | Speedup 0.45x
+Chunk 2: Avg 0.543641 ms | 90th 0.551363 ms | Speedup 0.61x
+Chunk 5: Avg 0.492787 ms | 90th 0.529998 ms | Speedup 0.67x
+Chunk 10: Avg 0.485820 ms | 90th 0.531733 ms | Speedup 0.68x
+Chunk 20: Avg 0.449762 ms | 90th 0.513653 ms | Speedup 0.73x
+Chunk 50: Avg 0.482394 ms | 90th 0.536927 ms | Speedup 0.68x
+Chunk 100: Avg 0.472264 ms | 90th 0.530415 ms | Speedup 0.70x
+Chunk 200: Avg 0.520913 ms | 90th 0.552745 ms | Speedup 0.63x
+
+Best chunk size: 20 (Avg 0.449762 ms, Speedup 0.73x)

@@ -1,0 +1,16 @@
+Matrix: Trefethen_2000
+Schedule: static
+Threads: 12
+
+SEQUENTIAL baseline avg: 0.172114 ms | 90th: 0.175117 ms
+
+Chunk 1: Avg 0.235348 ms | 90th 0.301083 ms | Speedup 0.73x
+Chunk 2: Avg 0.221860 ms | 90th 0.301865 ms | Speedup 0.78x
+Chunk 5: Avg 0.199165 ms | 90th 0.218078 ms | Speedup 0.86x
+Chunk 10: Avg 0.194218 ms | 90th 0.207187 ms | Speedup 0.89x
+Chunk 20: Avg 0.180180 ms | 90th 0.183343 ms | Speedup 0.96x
+Chunk 50: Avg 0.176730 ms | 90th 0.181223 ms | Speedup 0.97x
+Chunk 100: Avg 0.181333 ms | 90th 0.187689 ms | Speedup 0.95x
+Chunk 200: Avg 0.182186 ms | 90th 0.192907 ms | Speedup 0.94x
+
+Best chunk size: 50 (Avg 0.176730 ms, Speedup 0.97x)

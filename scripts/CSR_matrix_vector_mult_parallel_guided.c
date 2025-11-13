@@ -23,6 +23,10 @@
 #include "Trefethen_2000_csr.h"
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
+#define NUM_CHUNK_SIZES 8
+
+// Different chunk sizes to test with guided schedule
+int chunk_sizes[NUM_CHUNK_SIZES] = {1, 2, 5, 10, 20, 50, 100, 200};
 
 long get_time_in_nanosec() {
     struct timespec ts;
@@ -71,7 +75,7 @@ double percentile90(double *array, int n) {
 // ============================================================================
 void test_sequential(const int *Arow, const int *Acol, const double *Aval,
                      const double *x, double *y, int nrows, double *times) {
-    printf("SEQUENTIAL (no parallelization):\n");
+    //printf("SEQUENTIAL (no parallelization):\n");
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
@@ -87,23 +91,21 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
 
         long end = get_time_in_nanosec();
         times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
+        //printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
 
 // ============================================================================
-// GUIDED schedule with chunk = 10
+// GUIDED schedule with variable chunk size
 // ============================================================================
-void test_guided_chunk10(const int *Arow, const int *Acol, const double *Aval,
-                         const double *x, double *y, int nrows, double *times, int num_threads) {
-    printf("schedule(guided,10):\n");
+void test_guided_chunk(const int *Arow, const int *Acol, const double *Aval,
+                       const double *x, double *y, int nrows, double *times,
+                       int num_threads, int chunk_size) {
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
-
         long start = get_time_in_nanosec();
-
-        #pragma omp parallel for schedule(guided,10)
+        #pragma omp parallel for schedule(guided,chunk_size) num_threads(num_threads)
         for (int i = 0; i < nrows; i++) {
             double sum = 0.0;
             for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -113,7 +115,7 @@ void test_guided_chunk10(const int *Arow, const int *Acol, const double *Aval,
 
         long end = get_time_in_nanosec();
         times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
+        //printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
 
@@ -133,13 +135,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Set the number of threads for OpenMP
     omp_set_num_threads(num_threads);
-
     srand(time(NULL));
-     printf("================================================================================\n");
+
+    printf("================================================================================\n");
     printf("SPARSE MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
-    printf("SEQUENTIAL vs schedule(guided,10)\n");
+    printf("CHUNK SIZE PERFORMANCE ANALYSIS - schedule(guided, chunk_size)\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d, non_zero_val = %d\n", nrows, ncols, non_zero_val);
     printf("Number of threads: %d\n", num_threads);
@@ -155,59 +156,102 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < ncols; i++)
         x[i] = ((double)rand() / RAND_MAX) * 10.0;
 
-    double t_seq[RUNS], t_guided[RUNS];
-
-    // --- Run SEQUENTIAL
+    // Test sequential baseline
+    double t_seq[RUNS];
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
     printf("\n");
 
-    // --- Run GUIDED (chunk=10) with specified threads
-    test_guided_chunk10(Arow, Acol, Aval, x, y, nrows, t_guided, num_threads);
-    printf("\n");
-
-    // --- Compute averages & 90th percentile
-    double avg_seq = 0, avg_guided = 0;
-    for (int i = 0; i < RUNS; i++) {
+    // Calculate sequential statistics
+    double avg_seq = 0;
+    for (int i = 0; i < RUNS; i++)
         avg_seq += t_seq[i];
-        avg_guided += t_guided[i];
-    }
     avg_seq /= RUNS;
-    avg_guided /= RUNS;
-
     double p90_seq = percentile90(t_seq, RUNS);
-    double p90_guided = percentile90(t_guided, RUNS);
+
+    // Store results for all chunk sizes
+    double results[NUM_CHUNK_SIZES][RUNS];
+    double avg[NUM_CHUNK_SIZES], p90[NUM_CHUNK_SIZES];
+
+    // Test each chunk size
+    for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+        int chunk = chunk_sizes[cs];
+        printf("Testing schedule(guided, %d) with %d threads:\n", chunk, num_threads);
+
+        test_guided_chunk(Arow, Acol, Aval, x, y, nrows, results[cs], num_threads, chunk);
+
+        // Calculate statistics
+        avg[cs] = 0;
+        for (int i = 0; i < RUNS; i++)
+            avg[cs] += results[cs][i];
+        avg[cs] /= RUNS;
+
+        double temp[RUNS];
+        memcpy(temp, results[cs], RUNS * sizeof(double));
+        p90[cs] = percentile90(temp, RUNS);
+
+        printf("  Average: %.6f ms | 90th percentile: %.6f ms | Speedup: %.2fx\n\n",
+               avg[cs], p90[cs], avg_seq / avg[cs]);
+    }
+
+    // Find best chunk size
+    double best_avg = avg[0];
+    int best_idx = 0;
+    for (int i = 1; i < NUM_CHUNK_SIZES; i++) {
+        if (avg[i] < best_avg) {
+            best_avg = avg[i];
+            best_idx = i;
+        }
+    }
 
     // --- Summary
     printf("================================================================================\n");
-    printf("SUMMARY\n");
+    printf("SUMMARY: CHUNK SIZE COMPARISON - schedule(guided, chunk_size)\n");
     printf("================================================================================\n");
-    printf("Mode                        | Avg (ms)  | 90th Perc (ms) | Speedup\n");
-    printf("-----------------------------------------------------------------\n");
-    printf("SEQUENTIAL                  | %.6f | %.6f | 1.00x\n", avg_seq, p90_seq);
-    printf("schedule(guided,10) [%d th] | %.6f | %.6f | %.2fx\n",
-           num_threads, avg_guided, p90_guided, avg_seq / avg_guided);
+    printf("Chunk Size | Average (ms) | 90th Percentile (ms) | Speedup vs Sequential\n");
+    printf("--------------------------------------------------------------------------------\n");
+    printf("  BASELINE | %.6f       | %.6f               | 1.00x\n", avg_seq, p90_seq);
+    printf("--------------------------------------------------------------------------------\n");
+
+    for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+        printf("    %3d    | %.6f       | %.6f               | %.2fx\n",
+               chunk_sizes[cs], avg[cs], p90[cs], avg_seq / avg[cs]);
+    }
     printf("================================================================================\n\n");
+    printf("BEST CHUNK SIZE: %d (Average: %.6f ms, Speedup: %.2fx)\n\n",
+           chunk_sizes[best_idx], best_avg, avg_seq / best_avg);
 
     // --- Save results to file
     char filename[256];
     snprintf(filename, sizeof(filename),
-             "../results/CLUSTER/scheduling_type/guided/RESULTS_%s_GUIDED_chunk10_threads%d.txt",
+             "../results/CLUSTER/scheduling_type/guided/RESULTS_%s_GUIDED_CHUNK_ANALYSIS_threads%d.txt",
              MATRIX_NAME, num_threads);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);
-        fprintf(f, "Schedule: guided, chunk=10\n");
-        fprintf(f, "Number of threads: %d\n\n", num_threads);
+        fprintf(f, "Schedule Type: GUIDED - CHUNK SIZE ANALYSIS\n");
+        fprintf(f, "Matrix size: %d x %d, non_zero_val: %d\n", nrows, ncols, non_zero_val);
+        fprintf(f, "Number of threads: %d\n", num_threads);
+        fprintf(f, "Number of runs per chunk size: %d\n\n", RUNS);
 
-        fprintf(f, "SEQUENTIAL times (ms):\n");
+        fprintf(f, "SEQUENTIAL (baseline - no parallelization):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
-        fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_seq, p90_seq);
+        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_seq, p90_seq);
 
-        fprintf(f, "GUIDED (chunk=10) times (ms):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_guided[i]);
-        fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_guided, p90_guided);
+        fprintf(f, "================================================================================\n");
+        fprintf(f, "CHUNK SIZE ANALYSIS - schedule(guided, chunk_size)\n");
+        fprintf(f, "================================================================================\n\n");
 
-        fprintf(f, "Speedup: %.2fx\n", avg_seq / avg_guided);
+        for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+            fprintf(f, "CHUNK SIZE: %d\n", chunk_sizes[cs]);
+            for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", results[cs][i]);
+            fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms | Speedup: %.2fx\n\n",
+                    avg[cs], p90[cs], avg_seq / avg[cs]);
+        }
+
+        fprintf(f, "================================================================================\n");
+        fprintf(f, "BEST CHUNK SIZE: %d\n", chunk_sizes[best_idx]);
+        fprintf(f, "Best Average: %.6f ms (Speedup: %.2fx)\n", best_avg, avg_seq / best_avg);
+
         fclose(f);
         printf("Results saved to: %s\n", filename);
     } else {

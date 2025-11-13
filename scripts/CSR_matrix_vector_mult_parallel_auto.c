@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <omp.h>
 
-
 //#include "bcsstk05_csr.h"
 //#define MATRIX_NAME "bcsstk05"
 //#include "bcsstm05_csr.h"
@@ -23,6 +22,11 @@
 #include "Trefethen_2000_csr.h"
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
+
+#define NUM_CHUNK_SIZES 1
+
+// Auto schedule (no chunk size parameter)
+int chunk_sizes[NUM_CHUNK_SIZES] = {0};
 
 // ============================================================================
 // Utility: nanosecond timer
@@ -77,7 +81,7 @@ double percentile90(double *array, int n) {
 // ============================================================================
 void test_sequential(const int *Arow, const int *Acol, const double *Aval,
                      const double *x, double *y, int nrows, double *times) {
-    printf("SEQUENTIAL (no parallelization):\n");
+    //printf("SEQUENTIAL (no parallelization):\n");
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
@@ -93,24 +97,23 @@ void test_sequential(const int *Arow, const int *Acol, const double *Aval,
 
         long end = get_time_in_nanosec();
         times[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
+        //printf("  Run %2d: %.6f ms\n", r + 1, times[r]);
     }
 }
 
 // ============================================================================
-// schedule(auto, 10)
+// schedule(auto, chunk_size) with variable chunk size
 // ============================================================================
-void test_auto_chunk10(const int *Arow, const int *Acol, const double *Aval,
-                       const double *x, double *y, int nrows, double *times,
-                       int num_threads) {
-    printf("schedule(auto,10) with %d threads:\n", num_threads);
+void test_auto_chunk(const int *Arow, const int *Acol, const double *Aval,
+                     const double *x, double *y, int nrows, double *times,
+                     int num_threads, int chunk_size) {
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         usleep(100);
 
         long start = get_time_in_nanosec();
 
-        #pragma omp parallel for schedule(auto,10) num_threads(num_threads)
+        #pragma omp parallel for schedule(auto) num_threads(num_threads)
         for (int i = 0; i < nrows; i++) {
             double sum = 0.0;
             for (int j = Arow[i]; j < Arow[i + 1]; j++)
@@ -127,7 +130,7 @@ void test_auto_chunk10(const int *Arow, const int *Acol, const double *Aval,
 int main(int argc, char *argv[]) {
     srand(time(NULL));
 
-    int num_threads = omp_get_max_threads();  // Default: max available threads
+    int num_threads = omp_get_max_threads();
 
     if (argc > 1) {
         num_threads = atoi(argv[1]);
@@ -138,13 +141,15 @@ int main(int argc, char *argv[]) {
             return 1;
         }
     }
-    // Set the number of threads for OpenMP
+
     omp_set_num_threads(num_threads);
+
     printf("================================================================================\n");
     printf("SPARSE MATRIX-VECTOR MULTIPLICATION (CSR FORMAT)\n");
-    printf("SEQUENTIAL vs schedule(auto,10)\n");
+    printf("CHUNK SIZE PERFORMANCE ANALYSIS - schedule(auto, chunk_size)\n");
     printf("Matrix: %s\n", MATRIX_NAME);
     printf("Matrix size: %d x %d, non_zero_val = %d\n", nrows, ncols, non_zero_val);
+    printf("Number of threads: %d\n", num_threads);
     printf("================================================================================\n\n");
 
     double *x = malloc(ncols * sizeof(double));
@@ -157,55 +162,100 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < ncols; i++)
         x[i] = ((double)rand() / RAND_MAX) * 10.0;
 
-    double t_seq[RUNS], t_auto[RUNS];
-
-    // --- Run sequential
+    // Test sequential baseline
+    double t_seq[RUNS];
     test_sequential(Arow, Acol, Aval, x, y, nrows, t_seq);
     printf("\n");
 
-    // --- Run schedule(auto,10)
-    test_auto_chunk10(Arow, Acol, Aval, x, y, nrows, t_auto, num_threads);
-    printf("\n");
-
-    // --- Compute averages & 90th percentile
-    double avg_seq = 0, avg_auto = 0;
-    for (int i = 0; i < RUNS; i++) {
+    // Calculate sequential statistics
+    double avg_seq = 0;
+    for (int i = 0; i < RUNS; i++)
         avg_seq += t_seq[i];
-        avg_auto += t_auto[i];
-    }
     avg_seq /= RUNS;
-    avg_auto /= RUNS;
-
     double p90_seq = percentile90(t_seq, RUNS);
-    double p90_auto = percentile90(t_auto, RUNS);
 
-    // --- Summary
+    // Store results for all chunk sizes
+    double results[NUM_CHUNK_SIZES][RUNS];
+    double avg[NUM_CHUNK_SIZES], p90[NUM_CHUNK_SIZES];
+
+    // Test each auto scheduling variant
+    for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+        printf("Testing schedule(auto) with %d threads:\n", num_threads);
+
+        test_auto_chunk(Arow, Acol, Aval, x, y, nrows, results[cs], num_threads, chunk_sizes[cs]);
+
+        // Calculate statistics
+        avg[cs] = 0;
+        for (int i = 0; i < RUNS; i++)
+            avg[cs] += results[cs][i];
+        avg[cs] /= RUNS;
+
+        double temp[RUNS];
+        memcpy(temp, results[cs], RUNS * sizeof(double));
+        p90[cs] = percentile90(temp, RUNS);
+
+        printf("  Average: %.6f ms | 90th percentile: %.6f ms | Speedup: %.2fx\n\n",
+               avg[cs], p90[cs], avg_seq / avg[cs]);
+    }
+
+    // Find best chunk size
+    double best_avg = avg[0];
+    int best_idx = 0;
+    for (int i = 1; i < NUM_CHUNK_SIZES; i++) {
+        if (avg[i] < best_avg) {
+            best_avg = avg[i];
+            best_idx = i;
+        }
+    }
+
     printf("================================================================================\n");
-    printf("SUMMARY\n");
+    printf("SUMMARY: CHUNK SIZE COMPARISON - schedule(auto, chunk_size)\n");
     printf("================================================================================\n");
-    printf("Mode                        | Avg (ms)  | 90th Perc (ms) | Speedup\n");
-    printf("-----------------------------------------------------------------\n");
-    printf("SEQUENTIAL                  | %.6f | %.6f | 1.00x\n", avg_seq, p90_seq);
-    printf("schedule(auto,10)           | %.6f | %.6f | %.2fx\n",
-           avg_auto, p90_auto, avg_seq / avg_auto);
+    printf("Chunk Size | Average (ms) | 90th Percentile (ms) | Speedup vs Sequential\n");
+    printf("--------------------------------------------------------------------------------\n");
+    printf("  BASELINE | %.6f       | %.6f               | 1.00x\n", avg_seq, p90_seq);
+    printf("--------------------------------------------------------------------------------\n");
+
+    for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+        printf("    %3d    | %.6f       | %.6f               | %.2fx\n",
+               chunk_sizes[cs], avg[cs], p90[cs], avg_seq / avg[cs]);
+    }
     printf("================================================================================\n\n");
+    printf("BEST CHUNK SIZE: %d (Average: %.6f ms, Speedup: %.2fx)\n\n",
+           chunk_sizes[best_idx], best_avg, avg_seq / best_avg);
 
-    // --- Save results to file
+    // Save results to file
     char filename[256];
     snprintf(filename, sizeof(filename),
-             "../results/CLUSTER/scheduling_type/auto/RESULTS_%s_AUTO_chunk10.txt",
-             MATRIX_NAME);
+             "../results/CLUSTER/scheduling_type/auto/RESULTS_%s_AUTO_CHUNK_ANALYSIS_threads%d.txt",
+             MATRIX_NAME, num_threads);
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, "Matrix: %s\n", MATRIX_NAME);
-        fprintf(f, "Schedule: auto, chunk=10\n\n");
-        fprintf(f, "SEQUENTIAL times (ms):\n");
+        fprintf(f, "Schedule Type: AUTO - CHUNK SIZE ANALYSIS\n");
+        fprintf(f, "Matrix size: %d x %d, non_zero_val: %d\n", nrows, ncols, non_zero_val);
+        fprintf(f, "Number of threads: %d\n", num_threads);
+        fprintf(f, "Number of runs per chunk size: %d\n\n", RUNS);
+
+        fprintf(f, "SEQUENTIAL (baseline - no parallelization):\n");
         for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_seq[i]);
-        fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_seq, p90_seq);
-        fprintf(f, "AUTO (chunk=10) times (ms):\n");
-        for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", t_auto[i]);
-        fprintf(f, "Average: %.6f | 90th: %.6f\n\n", avg_auto, p90_auto);
-        fprintf(f, "Speedup: %.2fx\n", avg_seq / avg_auto);
+        fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms\n\n", avg_seq, p90_seq);
+
+        fprintf(f, "================================================================================\n");
+        fprintf(f, "CHUNK SIZE ANALYSIS - schedule(auto, chunk_size)\n");
+        fprintf(f, "================================================================================\n\n");
+
+        for (int cs = 0; cs < NUM_CHUNK_SIZES; cs++) {
+            fprintf(f, "CHUNK SIZE: %d\n", chunk_sizes[cs]);
+            for (int i = 0; i < RUNS; i++) fprintf(f, "%.6f\n", results[cs][i]);
+            fprintf(f, "Average: %.6f ms | 90th percentile: %.6f ms | Speedup: %.2fx\n\n",
+                    avg[cs], p90[cs], avg_seq / avg[cs]);
+        }
+
+        fprintf(f, "================================================================================\n");
+        fprintf(f, "BEST CHUNK SIZE: %d\n", chunk_sizes[best_idx]);
+        fprintf(f, "Best Average: %.6f ms (Speedup: %.2fx)\n", best_avg, avg_seq / best_avg);
+
         fclose(f);
         printf("Results saved to: %s\n", filename);
     } else {

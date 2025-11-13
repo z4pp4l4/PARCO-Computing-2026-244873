@@ -24,6 +24,7 @@
 #define MATRIX_NAME "Trefethen_2000"
 #define RUNS 15
 
+
 // ====================== Sequential version (NO parallelization) ======================
 void mat_vec_mult_sequential(const int *Arow, const int *Acol, const double *Aval,
                              const double *x, double *y, int nrows) {
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
         long end = get_time_in_nanosec();
 
         t_seq[r] = (end - start) / 1e6;
-        printf("  Run %2d: %.6f ms\n", r + 1, t_seq[r]);
+        //printf("  Run %2d: %.6f ms\n", r + 1, t_seq[r]);
     }
 
     // Reset y array

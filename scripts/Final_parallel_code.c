@@ -85,12 +85,12 @@ void select_matrix(char *name) {
 }
 
 //function used to get time in milliseconds
-long get_time_ms()
-{
+double get_time_ms(){
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec * 1000000000LL + ts.tv_nsec;
+    return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1e6;
 }
+
 
 //function used to simulate a cache flush 
 //used at each iteration for unbiased results
@@ -211,10 +211,11 @@ int main(int argc, char *argv[])
     int threads= atoi(argv[4]);
     select_matrix(matrix_name); // for chosing the right matrix pointers 
 
+    /*
     printf(" ---- SPMV BENCHMARK ----\n");
     printf("Matrix: %s of size %d x %d with nnz = %d\n", matrix_name, NROWS, NCOLS, NNZ);
     printf("Schedule: %s - Chunk size = %d - Number of threads = %d\n", sched_name, chunk, threads);
-    printf("-------------------------\n");
+    printf("-------------------------\n");*/
     
     // Allocate input/output vectors
     srand(time(NULL)); //seed for random number generation

@@ -129,30 +129,35 @@ void export_CSR_to_header(CSR *csr, const char *basename) {
         exit(EXIT_FAILURE);
     }
 
-    // Sanitize guard name
+    // Sanitize to form valid identifier
+    char prefix[256];
+    strcpy(prefix, basename);
+    for (char *p = prefix; *p; ++p)
+        if (*p == '.' || *p == '-') *p = '_';
+
+    // Header guard
     char guard[256];
-    snprintf(guard, sizeof(guard), "M_%s_CSR_H", basename);
-    for (char *p = guard; *p; ++p)
-        if (*p == '.') *p = '_';
+    snprintf(guard, sizeof(guard), "M_%s_CSR_H", prefix);
 
     fprintf(out, "// Auto-generated CSR matrix header\n");
     fprintf(out, "#ifndef %s\n#define %s\n\n", guard, guard);
 
-    fprintf(out, "static const int nrows = %d;\n", csr->nrows);
-    fprintf(out, "static const int ncols = %d;\n", csr->ncols);
-    fprintf(out, "static const int non_zero_val = %d;\n\n", csr->non_zero_val);
+    // Unique names using prefix
+    fprintf(out, "static const int %s_nrows = %d;\n", prefix, csr->nrows);
+    fprintf(out, "static const int %s_ncols = %d;\n", prefix, csr->ncols);
+    fprintf(out, "static const int %s_nnz = %d;\n\n", prefix, csr->non_zero_val);
 
-    fprintf(out, "static const int Arow[%d] = {", csr->nrows + 1);
+    fprintf(out, "static const int %s_Arow[%d] = {", prefix, csr->nrows + 1);
     for (int i = 0; i <= csr->nrows; i++)
         fprintf(out, "%d%s", csr->Arow[i], (i == csr->nrows) ? "" : ", ");
     fprintf(out, "};\n\n");
 
-    fprintf(out, "static const int Acol[%d] = {", csr->non_zero_val);
+    fprintf(out, "static const int %s_Acol[%d] = {", prefix, csr->non_zero_val);
     for (int i = 0; i < csr->non_zero_val; i++)
         fprintf(out, "%d%s", csr->Acol[i], (i == csr->non_zero_val - 1) ? "" : ", ");
     fprintf(out, "};\n\n");
 
-    fprintf(out, "static const double Aval[%d] = {", csr->non_zero_val);
+    fprintf(out, "static const double %s_Aval[%d] = {", prefix, csr->non_zero_val);
     for (int i = 0; i < csr->non_zero_val; i++)
         fprintf(out, "%.12e%s", csr->Aval[i], (i == csr->non_zero_val - 1) ? "" : ", ");
     fprintf(out, "};\n\n");
@@ -160,8 +165,9 @@ void export_CSR_to_header(CSR *csr, const char *basename) {
     fprintf(out, "#endif // %s\n", guard);
     fclose(out);
 
-    printf("💾 Exported CSR matrix to %s\n", outpath);
+    printf("Exported CSR matrix to %s\n", outpath);
 }
+
 
 int main() {
     char filename[256];

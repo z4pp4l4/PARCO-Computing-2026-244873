@@ -36,11 +36,12 @@ fi
 sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" Final_parallel_code.c > Final_parallel_code_generated.c
 
 #compilation phase
-gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable -lm
+gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable.exe -lm
 
 if [ $? -ne 0 ]; then
     echo "Compilation failed."
     exit 1
 fi
 
-./SpmV_final_executable "$MATRIX"
+./SpmV_final_executable.exe "$MATRIX" "$SCHED" "$CHUNK" "$THREADS"
+

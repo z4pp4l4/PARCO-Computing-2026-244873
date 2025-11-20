@@ -85,10 +85,12 @@ void select_matrix(char *name) {
 }
 
 //function used to get time in milliseconds
-double get_time_ms(){
+// function used to get time in nanoseconds (for maximum precision)
+long long get_time_ns() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1e6;
+    // Return time in nanoseconds
+    return (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec; 
 }
 
 
@@ -231,20 +233,21 @@ int main(int argc, char *argv[])
     //Running simulations for 15 times
     for (int r = 0; r < RUNS; r++) {
         flush_cache(); //done to avoid cache prefetching effect
-        long start = get_time_ms();
-        sequential_SpMV(x, output_SpMV); //
-        long end = get_time_ms();
-        sequential_time[r] = (end - start) ;
+        long long start = get_time_ns(); // Use long long
+        sequential_SpMV(x, output_SpMV); 
+        long long end = get_time_ns();   // Use long long
+        // Convert elapsed time (nanoseconds) to milliseconds
+        sequential_time[r] = (double)(end - start) / 1000000.0; 
     }
     //runnin parallelized version
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
-        long start = get_time_ms();
+        long long start = get_time_ns(); // Use long long
         parallel_SpMV(x, output_SpMV, sched_name, chunk, threads);
-        long end = get_time_ms();
-        parallel_time[r] = (end - start); 
-     }
-    
+        long long end = get_time_ns();   // Use long long
+        // Convert elapsed time (nanoseconds) to milliseconds
+        parallel_time[r] = (double)(end - start) / 1000000.0; 
+    }
     double p90_seq = percentile90(sequential_time, RUNS);
     double p90_par = percentile90(parallel_time, RUNS);
 

@@ -135,9 +135,11 @@ void export_CSR_to_header(CSR *csr, const char *basename) {
     for (char *p = prefix; *p; ++p)
         if (*p == '.' || *p == '-') *p = '_';
 
-    // Header guard
+
+    // Header guard (safe truncation)
     char guard[256];
-    snprintf(guard, sizeof(guard), "M_%s_CSR_H", prefix);
+    snprintf(guard, sizeof(guard), "M_%.*s_CSR_H", 200, prefix);
+
 
     fprintf(out, "// Auto-generated CSR matrix header\n");
     fprintf(out, "#ifndef %s\n#define %s\n\n", guard, guard);

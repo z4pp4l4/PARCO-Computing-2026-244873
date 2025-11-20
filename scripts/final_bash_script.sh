@@ -36,7 +36,7 @@ fi
 sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" Final_parallel_code.c > Final_parallel_code_generated.c
 
 #compilation phase
-gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable.exe -lm
+gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable.exe -lm -std=gnu99
 
 if [ $? -ne 0 ]; then
     echo "Compilation failed."

@@ -12,13 +12,13 @@ SCHED=$2
 CHUNK=$3
 THREADS=$4
 
-if [ "$SCHED"== "static" ]; then
+if [ "$SCHED" == "static" ]; then
     REPL="schedule(static,$CHUNK) num_threads($THREADS)"
-elif [ "$SCHED" =="dynamic" ]; then
+elif [ "$SCHED" == "dynamic" ]; then
     REPL="schedule(dynamic,$CHUNK) num_threads($THREADS)"
-elif [ "$SCHED"=="guided" ]; then
+elif [ "$SCHED" == "guided" ]; then
     REPL="schedule(guided,$CHUNK) num_threads($THREADS)"
-elif [ "$SCHED"=="auto" ]; then
+elif [ "$SCHED"== "auto" ]; then
     REPL="schedule(auto) num_threads($THREADS)"
 else
     echo "Invalid schedule type: $SCHED"
@@ -27,11 +27,16 @@ else
 fi
 
 echo "Using OpenMP: $REPL"
+if [ ! -f Final_parallel_code.c ]; then
+    echo " Error: Final_parallel_code.c not found!"
+    exit 1
+fi
+
 #code generation phase
-sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" spmv_template.c > spmv_generated.c
+sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" Final_parallel_code.c > Final_parallel_code_generated.c
 
 #compilation phase
-gcc -fopenmp spmv_generated.c -o spmv_exec
+gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable -lm
 
 if [ $? -ne 0 ]; then
     echo "Compilation failed."

@@ -16,45 +16,71 @@
 #include "nemeth19_csr.h"
 #include "tols2000_csr.h"
 
-// Pointers to chosen matrix
-const int *Arow_ptr;
-const int *Acol_ptr;
-const double *Aval_ptr;
-int NROWS, NCOLS, NNZ;
-// Select matrix by name
-void select_matrix(char *name){
+// Global pointers to the chosen matrix
+const int *Arow_ptr = NULL;
+const int *Acol_ptr = NULL;
+const double *Aval_ptr = NULL;
+int NROWS = 0, NCOLS = 0, NNZ = 0;
+
+void select_matrix(char *name) {
     if (strcmp(name, "Trefethen_2000") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+        Arow_ptr = Trefethen_2000_Arow;
+        Acol_ptr = Trefethen_2000_Acol;
+        Aval_ptr = Trefethen_2000_Aval;
+        NROWS    = Trefethen_2000_nrows;
+        NCOLS    = Trefethen_2000_ncols;
+        NNZ      = Trefethen_2000_nnz;
         return;
-    }
-    else if (strcmp(name, "bcsstk05") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+    } else if (strcmp(name, "bcsstk05") == 0) {
+        Arow_ptr = bcsstk05_Arow;
+        Acol_ptr = bcsstk05_Acol;
+        Aval_ptr = bcsstk05_Aval;
+        NROWS    = bcsstk05_nrows;
+        NCOLS    = bcsstk05_ncols;
+        NNZ      = bcsstk05_nnz;
         return;
-    } else if (strcmp(name, "bcsstm05") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+    } else if (strcmp(name, "bcsstm05") ==0) {
+        Arow_ptr = bcsstm05_Arow;
+        Acol_ptr = bcsstm05_Acol;
+        Aval_ptr = bcsstm05_Aval; 
+        NROWS    = bcsstm05_nrows;
+        NCOLS    = bcsstm05_ncols;
+        NNZ      = bcsstm05_nnz;
         return;
     } else if (strcmp(name, "dataset20mfeatpixel_10NN") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+        Arow_ptr = dataset20mfeatpixel_10NN_Arow;
+        Acol_ptr = dataset20mfeatpixel_10NN_Acol;
+        Aval_ptr  = dataset20mfeatpixel_10NN_Aval;  
+        NROWS    = dataset20mfeatpixel_10NN_nrows;
+        NCOLS    = dataset20mfeatpixel_10NN_ncols; 
+        NNZ      = dataset20mfeatpixel_10NN_nnz;
         return;
-    } else if (strcmp(name, "nemeth05") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+    } else if (strcmp(name, "nemeth05") ==0) {
+        Arow_ptr = nemeth05_Arow;
+        Acol_ptr = nemeth05_Acol;
+        Aval_ptr = nemeth05_Aval;
+        NROWS    = nemeth05_nrows;
+        NCOLS    =  nemeth05_ncols;
+        NNZ      = nemeth05_nnz;
         return;
-    } else if (strcmp(name, "nemeth19") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+    } else if (strcmp(name,"nemeth19") ==0) {
+        Arow_ptr = nemeth19_Arow;
+        Acol_ptr = nemeth19_Acol;
+        Aval_ptr = nemeth19_Aval;
+        NROWS    = nemeth19_nrows;
+        NCOLS    = nemeth19_ncols;
+        NNZ      = nemeth19_nnz;
         return;
-    } else if (strcmp(name, "tols2000") == 0) {
-        Arow_ptr = Arow; Acol_ptr = Acol; Aval_ptr = Aval;
-        NROWS = nrows; NCOLS = ncols; NNZ = non_zero_val;
+    } else if (strcmp(name,"tols2000") ==0) {
+        Arow_ptr = tols2000_Arow;
+        Acol_ptr = tols2000_Acol;  
+        Aval_ptr = tols2000_Aval;
+        NROWS    = tols2000_nrows;
+        NCOLS    = tols2000_ncols;
+        NNZ      = tols2000_nnz;
         return;
-    }
-
-    printf(" Unknown matrix in input: '%s'\n", name);
+    } 
+    printf("Unknown matrix in input: '%s'\n", name);
     exit(1);
 }
 

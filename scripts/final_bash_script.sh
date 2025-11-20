@@ -18,7 +18,7 @@ elif [ "$SCHED" == "dynamic" ]; then
     REPL="schedule(dynamic,$CHUNK) num_threads($THREADS)"
 elif [ "$SCHED" == "guided" ]; then
     REPL="schedule(guided,$CHUNK) num_threads($THREADS)"
-elif [ "$SCHED"== "auto" ]; then
+elif [ "$SCHED" == "auto" ]; then
     REPL="schedule(auto) num_threads($THREADS)"
 else
     echo "Invalid schedule type: $SCHED"

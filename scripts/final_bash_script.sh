@@ -43,4 +43,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-./spmv_exec "$MATRIX"
+./SpmV_final_executable "$MATRIX"

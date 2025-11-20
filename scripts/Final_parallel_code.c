@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
     printf("\nRESULTS:\n");
     printf("SEQUENTIAL  :  90th = %.6f ms\n", p90_seq);
     printf("PARALLEL    :  90th = %.6f ms | speedup = %.2fx\n",
-         p90_par, p90_seq / p90_par);
+         p90_par, p90_par / p90_seq);
 
     printf("\nDONE.\n");
 

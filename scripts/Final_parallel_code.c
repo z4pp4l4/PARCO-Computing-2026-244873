@@ -1,96 +1,89 @@
-
-
-#define _POSIX_C_SOURCE 199309L
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#define _POSIX_C_SOURCE 199309L 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <unistd.h> 
 #include <time.h>
 #include <omp.h>
-
-#include "Trefethen_2000_csr.h"        // Default example
-#include "bcsstk05_csr.h"
-#include "bcsstm05_csr.h"
-#include "dataset20mfeatpixel_10NN_csr.h"
-#include "nemeth05_csr.h"
-#include "nemeth19_csr.h"
+#include "Trefethen_2000_csr.h" 
+#include "bcsstk05_csr.h" 
+#include "bcsstm05_csr.h" 
+#include "dataset20mfeatpixel_10NN_csr.h" 
+#include "nemeth05_csr.h" 
+#include "nemeth19_csr.h" 
 #include "tols2000_csr.h"
 
-// Global pointers to the chosen matrix
-const int *Arow_ptr = NULL;
-const int *Acol_ptr = NULL;
-const double *Aval_ptr = NULL;
-int NROWS = 0, NCOLS = 0, NNZ = 0;
 
+const int *Arow_ptr = NULL; 
+const int *Acol_ptr = NULL; 
+const double *Aval_ptr = NULL; 
+int NROWS = 0; int NCOLS = 0; int NNZ = 0; 
 void select_matrix(char *name) {
     if (strcmp(name, "Trefethen_2000") == 0) {
         Arow_ptr = Trefethen_2000_Arow;
         Acol_ptr = Trefethen_2000_Acol;
         Aval_ptr = Trefethen_2000_Aval;
-        NROWS    = Trefethen_2000_nrows;
-        NCOLS    = Trefethen_2000_ncols;
-        NNZ      = Trefethen_2000_nnz;
+        NROWS = Trefethen_2000_nrows;
+        NCOLS = Trefethen_2000_ncols;
+        NNZ = Trefethen_2000_nnz;
         return;
     } else if (strcmp(name, "bcsstk05") == 0) {
         Arow_ptr = bcsstk05_Arow;
         Acol_ptr = bcsstk05_Acol;
         Aval_ptr = bcsstk05_Aval;
-        NROWS    = bcsstk05_nrows;
-        NCOLS    = bcsstk05_ncols;
-        NNZ      = bcsstk05_nnz;
+        NROWS = bcsstk05_nrows;
+        NCOLS = bcsstk05_ncols;
+        NNZ = bcsstk05_nnz;
         return;
-    } else if (strcmp(name, "bcsstm05") ==0) {
+    } else if (strcmp(name, "bcsstm05") == 0) {
         Arow_ptr = bcsstm05_Arow;
         Acol_ptr = bcsstm05_Acol;
-        Aval_ptr = bcsstm05_Aval; 
-        NROWS    = bcsstm05_nrows;
-        NCOLS    = bcsstm05_ncols;
-        NNZ      = bcsstm05_nnz;
+        Aval_ptr = bcsstm05_Aval;
+        NROWS = bcsstm05_nrows;
+        NCOLS = bcsstm05_ncols;
+        NNZ = bcsstm05_nnz;
         return;
     } else if (strcmp(name, "dataset20mfeatpixel_10NN") == 0) {
         Arow_ptr = dataset20mfeatpixel_10NN_Arow;
         Acol_ptr = dataset20mfeatpixel_10NN_Acol;
-        Aval_ptr  = dataset20mfeatpixel_10NN_Aval;  
-        NROWS    = dataset20mfeatpixel_10NN_nrows;
-        NCOLS    = dataset20mfeatpixel_10NN_ncols; 
-        NNZ      = dataset20mfeatpixel_10NN_nnz;
+        Aval_ptr = dataset20mfeatpixel_10NN_Aval;
+        NROWS = dataset20mfeatpixel_10NN_nrows;
+        NCOLS = dataset20mfeatpixel_10NN_ncols;
+        NNZ = dataset20mfeatpixel_10NN_nnz;
         return;
-    } else if (strcmp(name, "nemeth05") ==0) {
+    } else if (strcmp(name, "nemeth05") == 0) {
         Arow_ptr = nemeth05_Arow;
         Acol_ptr = nemeth05_Acol;
         Aval_ptr = nemeth05_Aval;
-        NROWS    = nemeth05_nrows;
-        NCOLS    =  nemeth05_ncols;
-        NNZ      = nemeth05_nnz;
+        NROWS = nemeth05_nrows;
+        NCOLS = nemeth05_ncols;
+        NNZ = nemeth05_nnz;
         return;
-    } else if (strcmp(name,"nemeth19") ==0) {
+    } else if (strcmp(name,"nemeth19") == 0) {
         Arow_ptr = nemeth19_Arow;
         Acol_ptr = nemeth19_Acol;
         Aval_ptr = nemeth19_Aval;
-        NROWS    = nemeth19_nrows;
-        NCOLS    = nemeth19_ncols;
-        NNZ      = nemeth19_nnz;
+        NROWS = nemeth19_nrows;
+        NCOLS = nemeth19_ncols;
+        NNZ = nemeth19_nnz;
         return;
-    } else if (strcmp(name,"tols2000") ==0) {
+    } else if (strcmp(name,"tols2000") == 0) {
         Arow_ptr = tols2000_Arow;
-        Acol_ptr = tols2000_Acol;  
+        Acol_ptr = tols2000_Acol;
         Aval_ptr = tols2000_Aval;
-        NROWS    = tols2000_nrows;
-        NCOLS    = tols2000_ncols;
-        NNZ      = tols2000_nnz;
+        NROWS = tols2000_nrows;
+        NCOLS = tols2000_ncols;
+        NNZ = tols2000_nnz;
         return;
     } 
     printf("Unknown matrix in input: '%s'\n", name);
     exit(1);
 }
-
-//function used to get time in milliseconds
-// function used to get time in nanoseconds (for maximum precision)
+// Function used to get time in nanoseconds (for maximum precision) 
 long long get_time_ns() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    // Return time in nanoseconds
-    return (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec; 
+    return (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec;
 }
 
 
@@ -187,7 +180,7 @@ void parallel_SpMV(double *x, double *result_arr, char *sched_name, int chunk_si
             break; 
         
         case 3: 
-            #pragma omp parallel for schedule(auto)
+            #pragma omp parallel for schedule(auto) num_threads(t)
             for (int i = 0; i < NROWS; i++) {
                 double sum = 0.0; 
                 for (int j = Arow_ptr[i]; j < Arow_ptr[i+1]; j++)
@@ -213,19 +206,16 @@ int main(int argc, char *argv[])
     int threads= atoi(argv[4]);
     select_matrix(matrix_name); // for chosing the right matrix pointers 
 
-    /*
-    printf(" ---- SPMV BENCHMARK ----\n");
-    printf("Matrix: %s of size %d x %d with nnz = %d\n", matrix_name, NROWS, NCOLS, NNZ);
-    printf("Schedule: %s - Chunk size = %d - Number of threads = %d\n", sched_name, chunk, threads);
-    printf("-------------------------\n");*/
-    
-    // Allocate input/output vectors
-    srand(time(NULL)); //seed for random number generation
-    double *x = malloc(NCOLS * sizeof(double)); //random vector
-    double *output_SpMV = malloc(NROWS * sizeof(double));
+    srand(time(NULL));
+    double *x = malloc(NCOLS * sizeof(double));
+    double *result_spmv =  malloc(NROWS * sizeof(double));
+    if (!x || !result_spmv) {
+        printf("Memory allocation failed\n");
+        return 1; 
+    }
     for (int i = 0; i < NCOLS; i++){
         x[i] = (double)rand() / RAND_MAX;
-    }
+    }  
 
     const int RUNS = 15;
     double sequential_time[RUNS];
@@ -234,7 +224,7 @@ int main(int argc, char *argv[])
     for (int r = 0; r < RUNS; r++) {
         flush_cache(); //done to avoid cache prefetching effect
         long long start = get_time_ns(); // Use long long
-        sequential_SpMV(x, output_SpMV); 
+        sequential_SpMV(x, result_spmv); 
         long long end = get_time_ns();   // Use long long
         // Convert elapsed time (nanoseconds) to milliseconds
         sequential_time[r] = (double)(end - start) / 1000000.0; 
@@ -243,7 +233,7 @@ int main(int argc, char *argv[])
     for (int r = 0; r < RUNS; r++) {
         flush_cache();
         long long start = get_time_ns(); // Use long long
-        parallel_SpMV(x, output_SpMV, sched_name, chunk, threads);
+        parallel_SpMV(x, result_spmv, sched_name, chunk, threads);
         long long end = get_time_ns();   // Use long long
         // Convert elapsed time (nanoseconds) to milliseconds
         parallel_time[r] = (double)(end - start) / 1000000.0; 
@@ -259,7 +249,7 @@ int main(int argc, char *argv[])
     printf("\nDONE.\n");
 
     free(x);
-    free(output_SpMV);
+    free(result_spmv);
 
     return 0;
 }

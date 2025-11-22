@@ -3,7 +3,7 @@
 This repository contains the parallel computing implementation for the "Introduction to parallel computing" course project. 
 The project focuses on Sparse matrix-vector multiplication using parallel scheduling strategies offered by OpenMP.
 
-## 📂 Repository Structure
+## Repository structure
 
 * **`src/`**: Matrices in .mtx format.
 * **`scripts/`**: Contains execution script(bash), the C programs and the .h files containing matrix data in CSR format.
@@ -14,7 +14,7 @@ The project focuses on Sparse matrix-vector multiplication using parallel schedu
 
 #### Follow these instructions to clone the repository and run the simulation.
 ---
-### 1. Clone the Repository
+### 1. Clone the repository
 Open your terminal and clone the project using Git:
 
 ```bash
@@ -37,22 +37,24 @@ Command Syntax
 ```Bash
 ./scripts/final_bash_script.sh <MATRIX_NAME> <SCHED_TYPE> <CHUNK_SIZE> <NUM_THREADS>
 ```
-Parameters description: 
-MATRIX_NAME	---> The name of the matrix header file (without _csr.h). See "Available Matrices" below.
-SCHED_TYPE	---> OpenMP scheduling type (e.g., static, dynamic, guided).
-CHUNK_SIZE	---> The chunk size for the scheduler (integer).
-NUM_THREADS	---> Number of parallel threads to utilize.
-
+Parameters description:  
+```
+MATRIX_NAME	---> The name of the matrix header file (without _csr.h). See "Available Matrices" below.  
+SCHED_TYPE	---> OpenMP scheduling type (e.g., static, dynamic, guided).  
+CHUNK_SIZE	---> The chunk size for the scheduler (integer).  
+NUM_THREADS	---> Number of parallel threads to utilize.  
+```
 Available Matrices:
-Based on the header files in the scripts/ directory, you can use the following names for the <MATRIX_NAME> argument:
-    nemeth19
-    nemeth05
-    Trefethen_2000
-    tols2000
-    bcsstk05
-    bcsstm05
-    dataset20mfeatpixel_10NN
-
+Based on the header files in the scripts/ directory, you can use the following names for the <MATRIX_NAME> argument:  
+```
+    nemeth19  
+    nemeth05  
+    Trefethen_2000  
+    tols2000  
+    bcsstk05  
+    bcsstm05  
+    dataset20mfeatpixel_10NN  
+```
 #### Examples for execution:
 Here are a few example commands to reproduce specific test cases:
 

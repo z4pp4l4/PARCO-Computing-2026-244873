@@ -28,6 +28,10 @@ Before running the bash script, ensure that it has the necessary executable perm
 chmod +x scripts/final_bash_script.sh
 ```
 to make the script executable.
+### 3. Compile the C program implementing parallelization
+```Bash
+gcc scripts/Final_parallel_code.c -o scripts/Final_parallel_code.exe -fopenmp -lm
+```
 ### Usage:
 
 To execute the code, run the main bash script located in the scripts/ folder. The script compiles the parallel C code and executes it with the specified parameters.

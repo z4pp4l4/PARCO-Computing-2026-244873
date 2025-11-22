@@ -12,7 +12,9 @@
 #include "nemeth05_csr.h" 
 #include "nemeth19_csr.h" 
 #include "tols2000_csr.h"
-
+#include "ww_36_pmec_36_csr.h"
+#include "Journals_csr.h"
+#include "breasttissue_10NN_csr.h"
 
 const int *Arow_ptr = NULL; 
 const int *Acol_ptr = NULL; 
@@ -75,7 +77,31 @@ void select_matrix(char *name) {
         NCOLS = tols2000_ncols;
         NNZ = tols2000_nnz;
         return;
-    } 
+    } else if (strcmp(name,"ww_36_pmec_36") == 0) {
+        Arow_ptr = ww_36_pmec_36_Arow;
+        Acol_ptr = ww_36_pmec_36_Acol;
+        Aval_ptr = ww_36_pmec_36_Aval;
+        NROWS = ww_36_pmec_36_nrows;
+        NCOLS = ww_36_pmec_36_ncols;
+        NNZ = ww_36_pmec_36_nnz;
+        return;
+    } else if (strcmp(name,"Journals") == 0) {
+        Arow_ptr = Journals_Arow;
+        Acol_ptr = Journals_Acol;
+        Aval_ptr = Journals_Aval;
+        NROWS = Journals_nrows;
+        NCOLS = Journals_ncols;
+        NNZ = Journals_nnz;
+        return;
+    } else if (strcmp(name,"breasttissue_10NN") == 0) {
+        Arow_ptr = breasttissue_10NN_Arow;
+        Acol_ptr = breasttissue_10NN_Acol;
+        Aval_ptr = breasttissue_10NN_Aval;
+        NROWS = breasttissue_10NN_nrows;
+        NCOLS = breasttissue_10NN_ncols;
+        NNZ = breasttissue_10NN_nnz;
+        return;
+    }
     printf("Unknown matrix in input: '%s'\n", name);
     exit(1);
 }

@@ -27,16 +27,16 @@ else
 fi
 
 echo "Using OpenMP: $REPL"
-if [ ! -f Final_parallel_code.c ]; then
+if [ ! -f scripts/Final_parallel_code.c ]; then
     echo " Error: Final_parallel_code.c not found!"
     exit 1
 fi
 
 #code generation phase
-sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" Final_parallel_code.c > Final_parallel_code_generated.c
+sed "s/SCHEDULE_PLACEHOLDER/$REPL/g" scripts/Final_parallel_code.c > scripts/Final_parallel_code_generated.c
 
 #compilation phase
-gcc -fopenmp Final_parallel_code_generated.c -o SpmV_final_executable.exe -lm -std=gnu99
+gcc -fopenmp scripts/Final_parallel_code_generated.c -o scripts/SpmV_final_executable.exe -lm -std=gnu99
 
 if [ $? -ne 0 ]; then
     echo "Compilation failed."

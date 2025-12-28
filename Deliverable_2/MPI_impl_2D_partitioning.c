@@ -12,12 +12,20 @@
   #define DPRINTF(...)                       // Silent if DEBUG=0
 #endif
 
-// COO (Coordinate) format: stores matrix entries as (row, col, value)
 typedef struct {
     int row;
     int col;
     double val;
-} COO;
+} COO_entry;
+
+static int compare_coo_entries(const void *a, const void *b) {
+    const COO_entry *ea = (const COO_entry *)a;
+    const COO_entry *eb = (const COO_entry *)b;
+
+    if (ea->row != eb->row)
+        return ea->row - eb->row;
+    return ea->col - eb->col;
+}
 
 /* 
    In cyclic distribution across P processors with stride P,
@@ -189,43 +197,55 @@ static void read_and_distribute_2D(
 }
 
 static void coo_to_csr(
-    int local_nnz,int local_rows, const int *coo_r,const int *coo_c,const double *coo_v,int **row_ptr,int **col_idx,double **vals) {
-    // Allocate CSR arrays
-    *row_ptr = (int*)calloc((size_t)local_rows + 1, sizeof(int));
-    *col_idx = (int*)malloc((size_t)local_nnz * sizeof(int));
-    *vals    = (double*)malloc((size_t)local_nnz * sizeof(double));
+    int local_nnz, int local_rows,
+    const int *coo_r,const int *coo_c,const double *coo_v,
+    int **row_ptr,int **col_idx,double **vals
+) {
+    COO_entry *entries = malloc(local_nnz * sizeof(COO_entry));
+    if (!entries) {
+        fprintf(stderr, "ERROR: COO_entry allocation failed\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+
+    for (int k = 0; k < local_nnz; k++) {
+        entries[k].row = coo_r[k];
+        entries[k].col = coo_c[k];
+        entries[k].val = coo_v[k];
+    }
+    //sort COO entries by (row, col) 
+    qsort(entries, local_nnz, sizeof(COO_entry), compare_coo_entries);
+
+    //CSR building
+    *row_ptr = calloc(local_rows + 1, sizeof(int));
+    *col_idx = malloc(local_nnz * sizeof(int));
+    *vals    = malloc(local_nnz * sizeof(double));
+
     if (!(*row_ptr) || !(*col_idx) || !(*vals)) {
         fprintf(stderr, "ERROR: CSR allocation failed\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    // Count non-zeros per row
     for (int k = 0; k < local_nnz; k++) {
-        int r = coo_r[k];
-        if (r < 0 || r >= local_rows) continue;
-        (*row_ptr)[r + 1]++;  // Increment count for this row
+        int r = entries[k].row;
+        if (r >= 0 && r < local_rows)
+            (*row_ptr)[r + 1]++;
     }
-
-    // Convert counts to cumulative indices (prefix sum)
     for (int r = 0; r < local_rows; r++)
         (*row_ptr)[r + 1] += (*row_ptr)[r];
 
-    // Fill col_idx and vals arrays by iterating COO again
-    int *offset = (int*)calloc((size_t)local_rows, sizeof(int));
-    if (!offset) {
-        fprintf(stderr, "ERROR: offset allocation failed\n");
-        MPI_Abort(MPI_COMM_WORLD, 1);
-    }
+    // fill CSR col_idx and vals
+    int *cursor = malloc(local_rows * sizeof(int));
+    memcpy(cursor, *row_ptr, local_rows * sizeof(int));
 
     for (int k = 0; k < local_nnz; k++) {
-        int r = coo_r[k];
-        // Position in CSR arrays = start of row + current offset in row
-        int p = (*row_ptr)[r] + offset[r]++;
-        (*col_idx)[p] = coo_c[k];
-        (*vals)[p]    = coo_v[k];
+        int r = entries[k].row;
+        int dest = cursor[r]++;
+        (*col_idx)[dest] = entries[k].col;
+        (*vals)[dest]    = entries[k].val;
     }
 
-    free(offset);
+    free(cursor);
+    free(entries);
 }
 
 int main(int argc, char **argv) {
@@ -236,7 +256,9 @@ int main(int argc, char **argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);  // Total number of processes
 
     if (argc < 2) {
-        if (rank == 0) printf("Usage: %s matrix.mtx\n", argv[0]);
+        if (rank == 0) {
+            //printf("Usage: %s matrix.mtx\n", argv[0]);
+        }
         MPI_Finalize();
         return 0;
     }
@@ -262,10 +284,12 @@ int main(int argc, char **argv) {
     
 
     //------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     DPRINTF("[Rank %d] Cordinates = (pr=%d, pc=%d) in grid %dx%d\n",
             rank, pr, pc, Px, Py);
     MPI_Barrier(MPI_COMM_WORLD);
+    */
     //------------------------------------
 
     /* 
@@ -287,12 +311,14 @@ int main(int argc, char **argv) {
     read_and_distribute_2D(argv[1], rank, size,grid_comm, Px, Py, pr, pc, &rows, &cols, &global_nnz,&local_nnz,&coo_r, &coo_c, &coo_v);
     
     //------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     DPRINTF("[Rank %d] First local COO entries:\n", rank);
     for (int k = 0; k<10 && k < local_nnz; k++) {
         DPRINTF("  COO[%d] = (row=%d, col=%d, value=%.3f)\n",k, coo_r[k], coo_c[k], coo_v[k]);
     }
     MPI_Barrier(MPI_COMM_WORLD);
+    */
     //------------------------------------
 
     // Calculate local matrix dimensions
@@ -300,9 +326,11 @@ int main(int argc, char **argv) {
     int local_num_cols = local_cyclic_size(cols, Py, pc);
     
     //------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     DPRINTF("[Rank %d] local_nnz=%d | local_rows=%d local_cols=%d\n", rank, local_nnz, local_num_rows, local_num_cols);
     MPI_Barrier(MPI_COMM_WORLD);
+    */
     //------------------------------------
 
     if (rank == 0) {
@@ -312,10 +340,11 @@ int main(int argc, char **argv) {
     // Verify total non-zeros read (should match global_nnz if no truncation)
     int sum_local_nnz = 0;
     MPI_Reduce(&local_nnz, &sum_local_nnz, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    /*
     if (rank == 0) {
         printf("[Rank 0] Sum of local nnz (after 2D filter) = %d (can be <= global_nnz if file parsing cuts some boundary lines)\n",
                sum_local_nnz);
-    }
+    } */
 
     // Convert from COO to CSR format (more efficient for SpMV)
     int *row_ptr = NULL, *col_idx = NULL; double *vals = NULL;
@@ -324,12 +353,14 @@ int main(int argc, char **argv) {
     long long local_flops = 2LL * local_nnz;   //CHECK FLOPS CALCULATION
 
     // ------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     DPRINTF("[Rank %d] CSR row_ptr[0..5]: ", rank);
     for (int i = 0; i<5 && i <= local_num_rows; i++)
         DPRINTF("%d ", row_ptr[i]);
     DPRINTF("\n");
     MPI_Barrier(MPI_COMM_WORLD);
+    */
     //------------------------------------
     
 
@@ -376,6 +407,7 @@ int main(int argc, char **argv) {
     free(x_global_values);
     
     // ------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     // Debug: print first few x_local values
     DPRINTF("[Rank %d] First 5 x_local values: ", rank);
@@ -383,7 +415,8 @@ int main(int argc, char **argv) {
         DPRINTF("%.6f ", x_local[j]);
     }
     DPRINTF("\n");
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD); 
+    */
     //--------------------------------------
 
     // Compute local SpMV: y_partial[i] = sum of A[i,j]*x[j] for local columns j
@@ -415,12 +448,14 @@ int main(int argc, char **argv) {
     }
 
     // ------------ DEBUG ------------------
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     DPRINTF("[Rank %d] y_partial[0..4]: ", rank);
     for (int i = 0; i < 10 && local_num_rows; i++)
         DPRINTF("%.3f ", y_partial[i]);
     DPRINTF("\n");
     MPI_Barrier(MPI_COMM_WORLD);
+    */
     //------------------------------------
 
     /* 

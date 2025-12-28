@@ -82,7 +82,7 @@ CSR *read_matrix_market_to_CSR(const char *filename) {
     non_zero_val = count;
     qsort(entries, non_zero_val, sizeof(Coo_entry), compare_coo_entries); //use quicksort to sort the entries
 
-    // ---- Step 6. Build CSR ----
+    // Build CSR ----
     CSR *csr = malloc(sizeof(CSR));
     csr->nrows = rows;
     csr->ncols = cols;
@@ -106,7 +106,7 @@ CSR *read_matrix_market_to_CSR(const char *filename) {
         csr->Aval[dest] = entries[i].val;
     }
 
-    // Fix prefix-sum shifting (Arow got incremented in loop)
+    // prefix-sum shifting (Arow got incremented in loop)
     for (int i = rows; i > 0; i--)
         csr->Arow[i] = csr->Arow[i - 1];
     csr->Arow[0] = 0;

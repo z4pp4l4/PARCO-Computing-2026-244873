@@ -1,6 +1,7 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <omp.h>
 #include <time.h>
@@ -27,6 +28,19 @@ static int compare_coo_entries(const void *a, const void *b) {
     return ea->col - eb->col;
 }
 
+static double env_double_or_neg(const char *name) {
+    const char *s = getenv(name);
+    if (!s || !*s) return -1.0;
+    char *end = NULL;
+    double v = strtod(s, &end);
+    if (end == s) return -1.0;
+    return v;
+}
+
+static double bytes_to_mib(double bytes) {
+    return bytes / (1024.0 * 1024.0);
+
+}
 /* 
    In cyclic distribution across P processors with stride P,
    a processor at offset gets elements: offset, offset+P, offset+2P, ...
@@ -352,6 +366,34 @@ int main(int argc, char **argv) {
     // For performance measurement (count FLOPs: each non-zero = 2 FLOPs in SpMV)
     long long local_flops = 2LL * local_nnz;   //CHECK FLOPS CALCULATION
 
+    //  NNZ stats across ranks (min/avg/max) 
+    int nnz_min = 0, nnz_max = 0;
+    MPI_Allreduce(&local_nnz, &nnz_min, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+    MPI_Allreduce(&local_nnz, &nnz_max, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+    long long local_nnz_ll = (long long)local_nnz;
+    long long nnz_sum = 0;
+    MPI_Allreduce(&local_nnz_ll, &nnz_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+
+    double nnz_avg = (size > 0) ? ((double)nnz_sum / (double)size) : 0.0;
+    //  memory estimate per rank (MiB) 
+    // NOTE: excludes MPI internals and temporary read buffer already freed.
+    double mem_bytes =
+        (double)local_nnz * sizeof(int)        // coo_r
+        + (double)local_nnz * sizeof(int)        // coo_c
+        + (double)local_nnz * sizeof(double)     // coo_v
+        + (double)(local_num_rows + 1) * sizeof(int) // row_ptr
+        + (double)local_nnz * sizeof(int)        // col_idx
+        + (double)local_nnz * sizeof(double)     // vals
+        + (double)local_num_cols * sizeof(double)    // x_local
+        + (double)local_num_rows * sizeof(double)    // y_partial
+        + (double)local_num_rows * sizeof(double);   // y_row_sum
+
+    double mem_mib = bytes_to_mib(mem_bytes);
+    double mem_mib_max = 0.0; // report worst rank
+    MPI_Allreduce(&mem_mib, &mem_mib_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
+
     // ------------ DEBUG ------------------
     /*
     MPI_Barrier(MPI_COMM_WORLD);
@@ -394,7 +436,15 @@ int main(int argc, char **argv) {
     }
     
     // Broadcast the complete x vector to all processes
+    // PERFORMANCE TIMERS 
+    double t_total_start = MPI_Wtime();
+    double t_comp = 0.0;
+    double t_comm = 0.0;
+
+    //COMM: Bcast x vector 
+    double t0 = MPI_Wtime();
     MPI_Bcast(x_global_values, cols, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    t_comm += MPI_Wtime() - t0;
     // Now each process extracts its LOCAL columns from the global vector
     // Global column j belongs to process with pc = j % Py
     // Local index in that process is: j / Py
@@ -435,9 +485,9 @@ int main(int argc, char **argv) {
         y_partial[r] = acc;
     } 
     //---------------------------------------------------
-    MPI_Barrier(MPI_COMM_WORLD);
-    double end_time = MPI_Wtime();
-    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, end_time - start_time);
+    
+    t_comp += MPI_Wtime() - start_time;
+    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, MPI_Wtime() - start_time);
 
     // Count total FLOPs globally
     long long global_flops;
@@ -464,8 +514,11 @@ int main(int argc, char **argv) {
        Now sum across the row: reduce along row_comm so that
        processes in column 0 (pc=0) get the final result.
     */
+
+    t0 = MPI_Wtime();
     //use MPI_Reduce to collect results from all processes in the same row
     MPI_Reduce(y_partial, y_row_sum, local_num_rows, MPI_DOUBLE, MPI_SUM, 0, row_comm);
+    t_comm += MPI_Wtime() - t0;
 
     double *y_global = NULL;
     int *recvcounts = NULL;
@@ -480,7 +533,9 @@ int main(int argc, char **argv) {
     int sendcount = (pc == 0) ? local_rows : 0;
     // Gather send counts from all processes
     //use MPI_Gather to know how much data to collect: ech process tells rank 0 how much data it's sending
+    t0 = MPI_Wtime();
     MPI_Gather(&sendcount, 1, MPI_INT, recvcounts, 1, MPI_INT,0, MPI_COMM_WORLD);
+    t_comm += MPI_Wtime() - t0;
 
     // calculate displacements for Gatherv
     if (rank == 0) {
@@ -497,8 +552,56 @@ int main(int argc, char **argv) {
         accommodates scenarios where different processes contribute differing
         amounts of data. 
     */
+   t0 = MPI_Wtime();
     MPI_Gatherv(y_row_sum, sendcount, MPI_DOUBLE, y_global, recvcounts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    t_comm += MPI_Wtime() - t0;
     //After this Gatherv, the final result vector y is fully assembled and has the order of the elements which follow the ranks.
+    double t_total = MPI_Wtime() - t_total_start;
+
+    //MAX among all ranks (worst-case performance)
+    double t_total_max, t_comp_max, t_comm_max;
+    MPI_Allreduce(&t_total, &t_total_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_comp,  &t_comp_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_comm,  &t_comm_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
+    // percentage calculations
+    double comp_pct = 100.0 * t_comp_max / t_total_max;
+    double comm_pct = 100.0 * t_comm_max / t_total_max;
+
+    // GFLOP/s
+    double gflops = (2.0 * nnz_sum) / (t_total_max * 1e9);
+
+    // Speedup & efficiency (external baseline)
+    double T1 = env_double_or_neg("BASELINE_T1");
+    double speedup = (T1 > 0) ? T1 / t_total_max : -1.0;
+    double efficiency = (speedup > 0) ? speedup / size : -1.0;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("\n");
+        printf("-----------------------------------------------------------------------------------------------\n");
+        printf("  P |  Time(s) | Comp%% | Comm%% |  GFLOP/s | Speedup |  Eff%% | Mem(MiB) | NNZ min | NNZ avg | NNZ max\n");
+        printf("-----------------------------------------------------------------------------------------------\n");
+    }
+    if (rank == 0) {
+        printf(
+            "%3d | %8.4f | %5.1f | %5.1f | %9.3f | ",
+            size, t_total_max, comp_pct, comm_pct, gflops
+        );
+
+        if (speedup < 0) {
+            printf("   N/A   |   N/A  | ");
+        } else {
+            printf("%7.2f | %6.2f | ", speedup, efficiency * 100.0);
+        }
+
+        printf(
+            "%8.2f | %7d | %8.1f | %7d\n",
+            mem_mib_max, nnz_min, nnz_avg, nnz_max
+        );
+    }
+
+
     // Rank 0 prints the final result
     if (rank == 0) {
         double *y_correct = malloc(rows * sizeof(double)); 

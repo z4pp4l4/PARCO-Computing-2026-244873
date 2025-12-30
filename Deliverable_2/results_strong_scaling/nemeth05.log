@@ -1,0 +1,353 @@
+Strong scaling results for nemeth05.mtx
+Date: Tue Dec 30 19:32:26 CET 2025
+========================================
+
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=1x1
+[Rank 0] Local SpMV time: 0.002564 s
+Global FLOPs per SpMV: 789616
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+  1 |   0.0027 |  95.8 |   2.2 |     0.295 |    N/A   |   N/A  |    10.80 |  394808 | 394808.0 |  394808
+BASELINE_T1=0.0027
+
+----------------------------------------
+np = 2
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=2x1 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=2x1
+[Rank 0] Local SpMV time: 0.000784 s
+[Rank 1] Local SpMV time: 0.000572 s
+Global FLOPs per SpMV: 399104
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+  2 |   0.0036 |  22.0 |  61.3 |     0.112 |    0.76 |  37.92 |     2.88 |   97922 |  99776.0 |  101630
+
+----------------------------------------
+np = 4
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=2x2 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=2x2
+[Rank 0] Local SpMV time: 0.000207 s
+[Rank 1] Local SpMV time: 0.000221 s
+[Rank 3] Local SpMV time: 0.000202 s
+[Rank 2] Local SpMV time: 0.000246 s
+Global FLOPs per SpMV: 203734
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+  4 |   0.0012 |  20.3 |  65.5 |     0.168 |    2.23 |  55.64 |     0.83 |   23604 |  25466.8 |   26407
+
+----------------------------------------
+np = 8
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=4x2 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=4x2
+[Rank 0] Local SpMV time: 0.000094 s
+[Rank 2] Local SpMV time: 0.000092 s
+[Rank 4] Local SpMV time: 0.000097 s
+[Rank 6] Local SpMV time: 0.000072 s
+Global FLOPs per SpMV: 105876
+[Rank 1] Local SpMV time: 0.000064 s
+[Rank 3] Local SpMV time: 0.000057 s
+[Rank 5] Local SpMV time: 0.000065 s
+[Rank 7] Local SpMV time: 0.000057 s
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+  8 |   0.0005 |  20.0 |  74.7 |     0.217 |    5.55 |  69.32 |     0.27 |    5904 |   6617.2 |    6870
+
+----------------------------------------
+np = 16
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=4x4 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=4x4
+[Rank 0] Local SpMV time: 0.000047 s
+[Rank 4] Local SpMV time: 0.000047 s
+[Rank 12] Local SpMV time: 0.000037 s
+[Rank 8] Local SpMV time: 0.000042 s
+[Rank 1] Local SpMV time: 0.000043 s
+[Rank 3] Local SpMV time: 0.000040 s
+[Rank 5] Local SpMV time: 0.000036 s
+[Rank 7] Local SpMV time: 0.000035 s
+[Rank 9] Local SpMV time: 0.000034 s
+[Rank 11] Local SpMV time: 0.000039 s
+[Rank 13] Local SpMV time: 0.000033 s
+[Rank 15] Local SpMV time: 0.000029 s
+[Rank 2] Local SpMV time: 0.000059 s
+[Rank 6] Local SpMV time: 0.000055 s
+[Rank 10] Local SpMV time: 0.000042 s
+[Rank 14] Local SpMV time: 0.000044 s
+Global FLOPs per SpMV: 57014
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+ 16 |   0.0240 |   0.2 |  74.9 |     0.002 |    0.11 |   0.70 |     0.11 |    1507 |   1781.7 |    1926
+
+----------------------------------------
+np = 32
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=8x4 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=8x4
+[Rank 0] Local SpMV time: 0.000049 s
+[Rank 1] Local SpMV time: 0.000032 s
+[Rank 4] Local SpMV time: 0.000033 s
+[Rank 3] Local SpMV time: 0.000032 s
+[Rank 8] Local SpMV time: 0.000039 s
+[Rank 5] Local SpMV time: 0.000026 s
+[Rank 12] Local SpMV time: 0.000039 s
+[Rank 7] Local SpMV time: 0.000026 s
+[Rank 16] Local SpMV time: 0.000038 s
+[Rank 9] Local SpMV time: 0.000022 s
+[Rank 24] Local SpMV time: 0.000037 s
+[Rank 11] Local SpMV time: 0.000022 s
+[Rank 13] Local SpMV time: 0.000018 s
+[Rank 15] Local SpMV time: 0.000021 s
+[Rank 17] Local SpMV time: 0.000021 s
+[Rank 19] Local SpMV time: 0.000020 s
+[Rank 21] Local SpMV time: 0.000019 s
+[Rank 23] Local SpMV time: 0.000020 s
+[Rank 25] Local SpMV time: 0.000022 s
+[Rank 27] Local SpMV time: 0.000020 s
+[Rank 29] Local SpMV time: 0.000020 s
+[Rank 31] Local SpMV time: 0.000018 s
+[Rank 28] Local SpMV time: 0.000320 s
+[Rank 2] Local SpMV time: 0.000028 s
+[Rank 10] Local SpMV time: 0.000034 s
+[Rank 14] Local SpMV time: 0.000031 s
+[Rank 18] Local SpMV time: 0.000043 s
+[Rank 6] Local SpMV time: 0.000036 s
+[Rank 26] Local SpMV time: 0.000033 s
+[Rank 20] Local SpMV time: 0.000029 s
+[Rank 22] Local SpMV time: 0.000034 s
+[Rank 30] Local SpMV time: 0.000036 s
+Global FLOPs per SpMV: 32558
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+ 32 |   0.0218 |   1.5 |  93.9 |     0.001 |    0.12 |   0.39 |     0.06 |     378 |    508.7 |     571
+
+----------------------------------------
+np = 64
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=8x8 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=8x8
+[Rank 0] Local SpMV time: 0.000036 s
+[Rank 2] Local SpMV time: 0.000046 s
+[Rank 8] Local SpMV time: 0.000036 s
+[Rank 10] Local SpMV time: 0.000038 s
+[Rank 1] Local SpMV time: 0.000030 s
+[Rank 3] Local SpMV time: 0.000025 s
+[Rank 5] Local SpMV time: 0.000030 s
+[Rank 7] Local SpMV time: 0.000017 s
+[Rank 9] Local SpMV time: 0.000024 s
+[Rank 11] Local SpMV time: 0.000022 s
+[Rank 13] Local SpMV time: 0.000021 s
+[Rank 32] Local SpMV time: 0.000034 s
+[Rank 15] Local SpMV time: 0.000025 s
+[Rank 17] Local SpMV time: 0.000030 s
+[Rank 19] Local SpMV time: 0.000019 s
+[Rank 21] Local SpMV time: 0.000026 s
+[Rank 25] Local SpMV time: 0.000024 s
+[Rank 27] Local SpMV time: 0.000042 s
+[Rank 33] Local SpMV time: 0.000022 s
+[Rank 35] Local SpMV time: 0.000020 s
+[Rank 37] Local SpMV time: 0.000025 s
+[Rank 39] Local SpMV time: 0.000024 s
+[Rank 41] Local SpMV time: 0.000027 s
+[Rank 43] Local SpMV time: 0.000040 s
+[Rank 47] Local SpMV time: 0.000029 s
+[Rank 49] Local SpMV time: 0.000026 s
+[Rank 57] Local SpMV time: 0.000021 s
+[Rank 59] Local SpMV time: 0.000033 s
+[Rank 63] Local SpMV time: 0.000033 s
+[Rank 23] Local SpMV time: 0.000021 s
+[Rank 29] Local SpMV time: 0.000019 s
+[Rank 31] Local SpMV time: 0.000046 s
+[Rank 45] Local SpMV time: 0.000031 s
+[Rank 51] Local SpMV time: 0.000022 s
+[Rank 53] Local SpMV time: 0.000031 s
+[Rank 55] Local SpMV time: 0.000031 s
+[Rank 61] Local SpMV time: 0.000029 s
+[Rank 4] Local SpMV time: 0.000020 s
+[Rank 6] Local SpMV time: 0.000021 s
+[Rank 14] Local SpMV time: 0.000018 s
+[Rank 12] Local SpMV time: 0.000026 s
+[Rank 36] Local SpMV time: 0.000023 s
+[Rank 38] Local SpMV time: 0.000026 s
+[Rank 16] Local SpMV time: 0.000026 s
+[Rank 22] Local SpMV time: 0.000026 s
+[Rank 24] Local SpMV time: 0.000021 s
+[Rank 34] Local SpMV time: 0.000021 s
+[Rank 28] Local SpMV time: 0.000021 s
+[Rank 30] Local SpMV time: 0.000023 s
+[Rank 42] Local SpMV time: 0.000021 s
+[Rank 40] Local SpMV time: 0.000023 s
+[Rank 48] Local SpMV time: 0.000028 s
+[Rank 20] Local SpMV time: 0.000028 s
+[Rank 44] Local SpMV time: 0.000023 s
+[Rank 46] Local SpMV time: 0.000023 s
+[Rank 56] Local SpMV time: 0.000021 s
+[Rank 18] Local SpMV time: 0.000024 s
+[Rank 26] Local SpMV time: 0.000023 s
+[Rank 50] Local SpMV time: 0.000022 s
+[Rank 58] Local SpMV time: 0.000025 s
+[Rank 52] Local SpMV time: 0.000021 s
+[Rank 54] Local SpMV time: 0.000022 s
+[Rank 60] Local SpMV time: 0.000019 s
+[Rank 62] Local SpMV time: 0.000022 s
+Global FLOPs per SpMV: 20374
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+ 64 |   0.0470 |   0.1 |  95.2 |     0.000 |    0.06 |   0.09 |     0.04 |      88 |    159.2 |     189
+
+----------------------------------------
+np = 128
+----------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=16x8 | pattern=0 symmetric=1
+[Rank 0] Matrix: 9506 x 9506, nnz=202157 | grid=16x8
+[Rank 0] Local SpMV time: 0.000034 s
+[Rank 32] Local SpMV time: 0.000030 s
+[Rank 48] Local SpMV time: 0.000028 s
+[Rank 56] Local SpMV time: 0.000023 s
+[Rank 80] Local SpMV time: 0.000019 s
+[Rank 96] Local SpMV time: 0.000029 s
+[Rank 104] Local SpMV time: 0.000017 s
+[Rank 112] Local SpMV time: 0.000019 s
+[Rank 120] Local SpMV time: 0.000018 s
+[Rank 5] Local SpMV time: 0.000041 s
+[Rank 7] Local SpMV time: 0.000033 s
+[Rank 15] Local SpMV time: 0.000033 s
+[Rank 17] Local SpMV time: 0.000034 s
+[Rank 21] Local SpMV time: 0.000029 s
+[Rank 23] Local SpMV time: 0.000025 s
+[Rank 25] Local SpMV time: 0.000031 s
+[Rank 47] Local SpMV time: 0.000025 s
+[Rank 53] Local SpMV time: 0.000026 s
+[Rank 57] Local SpMV time: 0.000025 s
+[Rank 69] Local SpMV time: 0.000037 s
+[Rank 77] Local SpMV time: 0.000025 s
+[Rank 81] Local SpMV time: 0.000026 s
+[Rank 87] Local SpMV time: 0.000031 s
+[Rank 89] Local SpMV time: 0.000021 s
+[Rank 105] Local SpMV time: 0.000020 s
+[Rank 1] Local SpMV time: 0.000032 s
+[Rank 3] Local SpMV time: 0.000119 s
+[Rank 9] Local SpMV time: 0.000035 s
+[Rank 11] Local SpMV time: 0.000024 s
+[Rank 13] Local SpMV time: 0.000034 s
+[Rank 19] Local SpMV time: 0.000025 s
+[Rank 27] Local SpMV time: 0.000057 s
+[Rank 29] Local SpMV time: 0.000037 s
+[Rank 31] Local SpMV time: 0.000035 s
+[Rank 33] Local SpMV time: 0.000028 s
+[Rank 35] Local SpMV time: 0.000052 s
+[Rank 37] Local SpMV time: 0.000031 s
+[Rank 39] Local SpMV time: 0.000124 s
+[Rank 41] Local SpMV time: 0.000021 s
+[Rank 43] Local SpMV time: 0.000042 s
+[Rank 45] Local SpMV time: 0.000044 s
+[Rank 49] Local SpMV time: 0.000039 s
+[Rank 51] Local SpMV time: 0.000044 s
+[Rank 55] Local SpMV time: 0.000086 s
+[Rank 59] Local SpMV time: 0.000034 s
+[Rank 61] Local SpMV time: 0.000059 s
+[Rank 63] Local SpMV time: 0.000063 s
+[Rank 65] Local SpMV time: 0.000041 s
+[Rank 67] Local SpMV time: 0.000120 s
+[Rank 71] Local SpMV time: 0.000030 s
+[Rank 73] Local SpMV time: 0.000025 s
+[Rank 75] Local SpMV time: 0.000127 s
+[Rank 79] Local SpMV time: 0.000025 s
+[Rank 83] Local SpMV time: 0.000032 s
+[Rank 85] Local SpMV time: 0.000074 s
+[Rank 16] Local SpMV time: 0.000026 s
+[Rank 91] Local SpMV time: 0.000037 s
+[Rank 93] Local SpMV time: 0.000021 s
+[Rank 95] Local SpMV time: 0.000021 s
+[Rank 97] Local SpMV time: 0.000027 s
+[Rank 99] Local SpMV time: 0.000033 s
+[Rank 101] Local SpMV time: 0.000021 s
+[Rank 103] Local SpMV time: 0.000023 s
+[Rank 107] Local SpMV time: 0.000066 s
+[Rank 109] Local SpMV time: 0.000129 s
+[Rank 111] Local SpMV time: 0.000125 s
+[Rank 113] Local SpMV time: 0.000042 s
+[Rank 115] Local SpMV time: 0.000037 s
+[Rank 117] Local SpMV time: 0.000022 s
+[Rank 119] Local SpMV time: 0.000034 s
+[Rank 121] Local SpMV time: 0.000079 s
+[Rank 125] Local SpMV time: 0.000030 s
+[Rank 127] Local SpMV time: 0.000033 s
+[Rank 123] Local SpMV time: 0.000043 s
+[Rank 8] Local SpMV time: 0.000029 s
+[Rank 24] Local SpMV time: 0.000019 s
+[Rank 4] Local SpMV time: 0.000018 s
+[Rank 6] Local SpMV time: 0.000019 s
+[Rank 14] Local SpMV time: 0.000023 s
+[Rank 22] Local SpMV time: 0.000022 s
+[Rank 68] Local SpMV time: 0.000024 s
+[Rank 70] Local SpMV time: 0.000024 s
+[Rank 86] Local SpMV time: 0.000018 s
+[Rank 20] Local SpMV time: 0.000025 s
+[Rank 64] Local SpMV time: 0.000024 s
+[Rank 40] Local SpMV time: 0.000024 s
+[Rank 72] Local SpMV time: 0.000023 s
+[Rank 84] Local SpMV time: 0.000020 s
+[Rank 2] Local SpMV time: 0.000018 s
+[Rank 66] Local SpMV time: 0.000016 s
+[Rank 74] Local SpMV time: 0.000019 s
+[Rank 82] Local SpMV time: 0.000023 s
+[Rank 98] Local SpMV time: 0.000023 s
+[Rank 106] Local SpMV time: 0.000020 s
+[Rank 102] Local SpMV time: 0.000020 s
+[Rank 110] Local SpMV time: 0.000017 s
+[Rank 118] Local SpMV time: 0.000020 s
+[Rank 126] Local SpMV time: 0.000021 s
+[Rank 36] Local SpMV time: 0.000015 s
+[Rank 44] Local SpMV time: 0.000019 s
+[Rank 52] Local SpMV time: 0.000021 s
+[Rank 60] Local SpMV time: 0.000019 s
+[Rank 100] Local SpMV time: 0.000025 s
+[Rank 88] Local SpMV time: 0.000018 s
+[Rank 90] Local SpMV time: 0.000019 s
+[Rank 38] Local SpMV time: 0.000019 s
+[Rank 10] Local SpMV time: 0.000024 s
+[Rank 30] Local SpMV time: 0.000020 s
+[Rank 12] Local SpMV time: 0.000019 s
+[Rank 34] Local SpMV time: 0.000020 s
+[Rank 42] Local SpMV time: 0.000020 s
+[Rank 116] Local SpMV time: 0.000020 s
+[Rank 46] Local SpMV time: 0.000020 s
+[Rank 76] Local SpMV time: 0.000020 s
+[Rank 108] Local SpMV time: 0.000024 s
+[Rank 114] Local SpMV time: 0.000025 s
+[Rank 124] Local SpMV time: 0.000025 s
+[Rank 28] Local SpMV time: 0.000017 s
+[Rank 50] Local SpMV time: 0.000019 s
+[Rank 92] Local SpMV time: 0.000018 s
+[Rank 78] Local SpMV time: 0.000024 s
+[Rank 54] Local SpMV time: 0.000018 s
+[Rank 62] Local SpMV time: 0.000018 s
+[Rank 94] Local SpMV time: 0.000022 s
+[Rank 18] Local SpMV time: 0.000024 s
+[Rank 26] Local SpMV time: 0.000019 s
+[Rank 58] Local SpMV time: 0.000019 s
+[Rank 122] Local SpMV time: 0.000021 s
+Global FLOPs per SpMV: 14132
+
+-----------------------------------------------------------------------------------------------
+  P |  Time(s) | Comp% | Comm% |  GFLOP/s | Speedup |  Eff% | Mem(MiB) | NNZ min | NNZ avg | NNZ max
+-----------------------------------------------------------------------------------------------
+128 |   0.0679 |   0.2 |  76.6 |     0.000 |    0.04 |   0.03 |     0.02 |      26 |     55.2 |      69
+

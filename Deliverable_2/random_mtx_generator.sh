@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: ./gen_random_mtx.sh N NNZ output.mtx
+# Usage: ./random_mtx_generator.sh N NNZ output.mtx
 
 N=$1
 NNZ=$2
@@ -10,21 +10,18 @@ if [ -z "$N" ] || [ -z "$NNZ" ] || [ -z "$OUT" ]; then
   exit 1
 fi
 
-echo "Generating random Matrix Market file:"
-echo "  Size: ${N} x ${N}"
-echo "  NNZ : ${NNZ}"
-echo "  File: ${OUT}"
+awk -v N="$N" -v NNZ="$NNZ" '
+BEGIN {
+  srand(12345);   # fixed seed → reproducibility
+  print "%%MatrixMarket matrix coordinate real general";
+  print "% Random matrix for weak scaling";
+  print N, N, NNZ;
 
-{
-  echo "%%MatrixMarket matrix coordinate real general"
-  echo "% Random matrix generated for weak scaling"
-  echo "${N} ${N} ${NNZ}"
-
-  for ((k=0; k<NNZ; k++)); do
-    i=$((RANDOM % N + 1))
-    j=$((RANDOM % N + 1))
-    # random value in (0,1)
-    val=$(awk -v seed=$RANDOM 'BEGIN{srand(seed); print rand()}')
-    echo "$i $j $val"
-  done
-} > "$OUT"
+  for (k=0; k<NNZ; k++) {
+    i = int(rand()*N) + 1;
+    j = int(rand()*N) + 1;
+    v = rand();
+    print i, j, v;
+  }
+}
+' > "$OUT"

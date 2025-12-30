@@ -1,8 +1,8 @@
 #!/bin/bash
 SRC=MPI_impl_2D_partitioning.c
 EXEC=./MPI_impl_2D_partitioning.out
-ROWS_PER_PROC=2000
-NNZ_PER_PROC=20000
+ROWS_PER_PROC=1000
+NNZ_PER_PROC=10000
 
 PROCS=(1 2 4 8 16 32 64 128)
 

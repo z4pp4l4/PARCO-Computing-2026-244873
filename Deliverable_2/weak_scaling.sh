@@ -1,8 +1,8 @@
 #!/bin/bash
-
-EXEC=./spmv_mpi_2d_parallelIO
+SRC=MPI_impl_2D_partitioning.c
+EXEC=./MPI_impl_2D_partitioning.out
 ROWS_PER_PROC=2000
-NNZ_PER_PROC=100
+NNZ_PER_PROC=20000
 
 PROCS=(1 2 4 8 16 32 64 128)
 
@@ -10,6 +10,16 @@ mkdir -p matrices
 echo "------------------------------"
 echo " Weak scaling (synthetic MTX)"
 echo "------------------------------"
+
+# Compilation
+echo "Compiling code..."
+mpicc ${SRC} -o ${EXEC} -std=c99 -fopenmp || exit 1
+if [ $? -ne 0 ]; then
+    echo "Compilation error"
+    exit 1
+fi
+echo "Compilation OK"
+echo
 
 for P in "${PROCS[@]}"; do
   N=$((ROWS_PER_PROC * P))

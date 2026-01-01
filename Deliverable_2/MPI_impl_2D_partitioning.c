@@ -310,7 +310,7 @@ static void coo_to_csr(
 int main(int argc, char **argv) {
     // Initialize MPI environment
     MPI_Init(&argc, &argv);
-    omp_set_num_threads(1); //set to 1 otherwise at np=128 it causes problems
+    //omp_set_num_threads(1);
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);  // This process's rank (0 to size-1)
     MPI_Comm_size(MPI_COMM_WORLD, &size);  // Total number of processes

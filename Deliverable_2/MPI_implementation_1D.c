@@ -6,7 +6,7 @@
 #include <omp.h>
 #include <time.h>
 
-#define DEBUG 1
+#define DEBUG 0
 #if DEBUG
   #define DPRINTF(...) printf(__VA_ARGS__)
 #else
@@ -260,7 +260,7 @@ static void coo_to_csr(
 
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
-    //omp_set_num_threads(1); 
+    omp_set_num_threads(1); 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -324,7 +324,6 @@ int main(int argc, char **argv) {
 
     // SpMV local
     double t1 = MPI_Wtime();
-    double start_time = MPI_Wtime();
     #pragma omp parallel for
     for (int r = 0; r < local_num_rows; r++) {
         double acc = 0.0;
@@ -335,7 +334,6 @@ int main(int argc, char **argv) {
         y_local[r] = acc;
     }
     t_comp += MPI_Wtime() - t1;
-    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, MPI_Wtime() - start_time);
     double t_total = MPI_Wtime() - t_total_start;
 
     // Gather y to rank 0 (rank-ordered / cyclic order)

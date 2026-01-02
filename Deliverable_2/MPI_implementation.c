@@ -325,7 +325,7 @@ int main(int argc, char **argv) {
     // SpMV local
     double t1 = MPI_Wtime();
     double start_time = MPI_Wtime();
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(static)
     for (int r = 0; r < local_num_rows; r++) {
         double acc = 0.0;
         for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {

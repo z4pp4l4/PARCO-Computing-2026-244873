@@ -260,7 +260,7 @@ static void coo_to_csr(
 
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
-    //omp_set_num_threads(1); 
+    omp_set_num_threads(1); 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -325,7 +325,7 @@ int main(int argc, char **argv) {
     // SpMV local
     double t1 = MPI_Wtime();
     double start_time = MPI_Wtime();
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for
     for (int r = 0; r < local_num_rows; r++) {
         double acc = 0.0;
         for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {

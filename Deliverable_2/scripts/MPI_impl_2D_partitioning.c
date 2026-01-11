@@ -402,6 +402,8 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&local_nnz_ll, &nnz_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 
     double nnz_avg = (size > 0) ? ((double)nnz_sum / (double)size) : 0.0;
+    // Load imbalance ratio (max/avg)
+    double load_imbalance = (nnz_avg > 0) ? ((double)nnz_max / nnz_avg) : 1.0;
     //  memory estimate per rank (MiB) 
     // NOTE: excludes MPI internals and temporary read buffer already freed.
     double mem_bytes =
@@ -418,6 +420,10 @@ int main(int argc, char **argv) {
     double mem_mib = bytes_to_mib(mem_bytes);
     double mem_mib_max = 0.0; // report worst rank
     MPI_Allreduce(&mem_mib, &mem_mib_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    // Also calculate average memory
+    double mem_mib_avg = 0.0;
+    MPI_Allreduce(&mem_mib, &mem_mib_avg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    mem_mib_avg /= size;
 
     double *x_local = (double*)malloc((size_t)local_num_cols * sizeof(double));
     double *y_partial = (double*)calloc((size_t)local_num_rows, sizeof(double));
@@ -446,27 +452,29 @@ int main(int argc, char **argv) {
     double t_comp = 0.0;
     double t_comm = 0.0;
 
+    // Track Bcast time separately
     double t0 = MPI_Wtime();
-    MPI_Bcast(x_local, local_num_cols, MPI_DOUBLE, pc, col_comm);
-    t_comm += MPI_Wtime() - t0;
+    MPI_Bcast(x_local, local_num_cols, MPI_DOUBLE, pc, row_comm);  // FIXED: row_comm not col_comm!
+    double t_bcast = MPI_Wtime() - t0;
+    t_comm += t_bcast;
 
+    // Track SpMV time separately
     double start_time = MPI_Wtime();
-    
-    //#pragma omp parallel for  // OpenMP parallelization (optional)
+
+    //#pragma omp parallel for
     for (int r = 0; r < local_num_rows; r++) {
         double acc = 0.0;
-        // Sum all non-zeros in row r
         for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {
-            int local_cols = col_idx[k]; // Local column index
+            int local_cols = col_idx[k];
             if (local_cols >= 0 && local_cols < local_num_cols) {
                 acc += vals[k] * x_local[local_cols];
             }
         }
         y_partial[r] = acc;
-    } 
-    //---------------------------------------------------
-    
-    t_comp += MPI_Wtime() - start_time;
+    }
+
+    double t_spmv = MPI_Wtime() - start_time;
+    t_comp += t_spmv;
     DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, MPI_Wtime() - start_time);
 
     // Count total FLOPs globally
@@ -478,10 +486,11 @@ int main(int argc, char **argv) {
     }
 
 
+    // Track Reduce time separately
     t0 = MPI_Wtime();
-    //use MPI_Reduce to collect results from all processes in the same row
     MPI_Reduce(y_partial, y_row_sum, local_num_rows, MPI_DOUBLE, MPI_SUM, 0, row_comm);
-    t_comm += MPI_Wtime() - t0;
+    double t_reduce = MPI_Wtime() - t0;
+    t_comm += t_reduce;
 
     double *y_global = NULL;
     int *recvcounts = NULL;
@@ -515,17 +524,25 @@ int main(int argc, char **argv) {
         accommodates scenarios where different processes contribute differing
         amounts of data. 
     */
-   t0 = MPI_Wtime();
+    // Track Gatherv time separately
+    t0 = MPI_Wtime();
     MPI_Gatherv(y_row_sum, sendcount, MPI_DOUBLE, y_global, recvcounts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    double t_gather = MPI_Wtime() - t0;
+    t_comm += t_gather;
     //After this Gatherv, the final result vector y is fully assembled and has the order of the elements which follow the ranks.
     double t_total = MPI_Wtime() - t_total_start;
 
-    //MAX among all ranks (worst-case performance)
+    // Collect timing statistics (max = worst case)
     double t_total_max, t_comp_max, t_comm_max;
+    double t_bcast_max, t_reduce_max, t_spmv_max, t_gather_max;
+
     MPI_Allreduce(&t_total, &t_total_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_comp,  &t_comp_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_comm,  &t_comm_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_bcast, &t_bcast_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_reduce, &t_reduce_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_spmv,  &t_spmv_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_gather, &t_gather_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     // percentage calculations
     double comp_pct = 100.0 * t_comp_max / t_total_max;
@@ -540,50 +557,81 @@ int main(int argc, char **argv) {
     double efficiency = (speedup > 0) ? speedup / size : -1.0;
 
     MPI_Barrier(MPI_COMM_WORLD);
+
     if (rank == 0) {
         printf("\n");
-        printf("-----------------------------------------------------------------------------------------------\n");
-        printf("  P |  Time(s) | Comp%% | Comm%% |  GFLOP/s | Speedup |  Eff%% | Mem(MiB) | NNZ min | NNZ avg | NNZ max\n");
-        printf("-----------------------------------------------------------------------------------------------\n");
-    }
-    if (rank == 0) {
-        printf(
-            "%3d | %8.4f | %5.1f | %5.1f | %9.3f | ",
-            size, t_total_max, comp_pct, comm_pct, gflops
-        );
-
+        printf("                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   \n");
+        printf("*******************************************************************************\n\n");
+        
+        printf("MATRIX INFORMATION:\n");
+        printf("  Matrix file:        %s\n", argv[1]);
+        printf("  Dimensions:         %d x %d\n", rows, cols);
+        printf("  Total NNZ:          %d\n", global_nnz);
+        printf("  Matrix type:        %s, %s\n", 
+            is_pattern ? "pattern" : "real", 
+            is_symmetric ? "symmetric" : "general");
+        printf("\n");
+        
+        printf("PARALLEL CONFIGURATION:\n");
+        printf("  Total processes:    %d\n", size);
+        printf("  Process grid:       %d x %d (Px x Py)\n", Px, Py);
+        printf("  Partitioning:       2D cyclic (modulo)\n");
+        printf("  Topology:           Cartesian communicator\n");
+        printf("\n");
+        
+        printf("LOAD BALANCE:\n");
+        printf("  NNZ per rank:       min=%d  avg=%.1f  max=%d\n", 
+            nnz_min, nnz_avg, nnz_max);
+        printf("  Imbalance ratio:    %.3f  (max/avg)\n", load_imbalance);
+        printf("\n");
+        
+        printf("MEMORY USAGE:\n");
+        printf("  Per-rank memory:    avg=%.2f MiB  max=%.2f MiB\n", 
+            mem_mib_avg, mem_mib_max);
+        printf("  Total memory:       %.2f MiB  (estimated)\n", 
+            mem_mib_avg * size);
+        printf("\n");
+        
+        printf("PERFORMANCE METRICS:\n");
+        printf("  Total time:         %.6f s\n", t_total_max);
+        printf("  Computation time:   %.6f s  (%.1f%%)\n", t_comp_max, comp_pct);
+        printf("    └─ Local SpMV:    %.6f s\n", t_spmv_max);
+        printf("  Communication time: %.6f s  (%.1f%%)\n", t_comm_max, comm_pct);
+        printf("    ├─ Bcast (x):     %.6f s\n", t_bcast_max);
+        printf("    ├─ Reduce (y):    %.6f s\n", t_reduce_max);
+        printf("    └─ Gatherv:       %.6f s\n", t_gather_max);
+        printf("\n");
+        
+        printf("COMPUTATIONAL INTENSITY:\n");
+        printf("  Total FLOPs:        %lld\n", global_flops);
+        printf("  GFLOP/s:            %.3f\n", gflops);
+        printf("\n");
+        
+        if (speedup > 0) {
+            printf("SCALABILITY:\n");
+            printf("  Baseline (T1):      %.6f s\n", T1);
+            printf("  Speedup:            %.2fx\n", speedup);
+            printf("  Efficiency:         %.2f%%\n", efficiency * 100.0);
+            printf("\n");
+        }
+        
+        printf("================================================================================\n");
+        printf("SUMMARY TABLE:\n");
+        printf("--------------------------------------------------------------------------------\n");
+        printf("  P | Grid  | Time(s) | Comp%% | Comm%% | GFLOP/s | Speedup |  Eff%%  | Imbal\n");
+        printf("--------------------------------------------------------------------------------\n");
+        printf("%3d | %2dx%-2d | %7.4f | %5.1f | %5.1f | %7.3f | ",
+            size, Px, Py, t_total_max, comp_pct, comm_pct, gflops);
+        
         if (speedup < 0) {
-            printf("   N/A   |   N/A  | ");
+            printf("  N/A   |  N/A  | ");
         } else {
-            printf("%7.2f | %6.2f | ", speedup, efficiency * 100.0);
+            printf("%7.2f | %5.1f | ", speedup, efficiency * 100.0);
         }
-
-        printf(
-            "%8.2f | %7d | %8.1f | %7d\n",
-            mem_mib_max, nnz_min, nnz_avg, nnz_max
-        );
-    }
-
-    // Rank 0 prints the final result
-    if (rank == 0) {
-        double *y_correct = malloc(rows * sizeof(double)); 
-        // Reorder from rank-based to row-based ordering
-        int pos = 0;
-        for (int rank_idx = 0; rank_idx < size; rank_idx++) {
-            if (recvcounts[rank_idx] > 0) {
-                int coords_tmp[2];
-                MPI_Cart_coords(grid_comm, rank_idx, 2, coords_tmp);
-                int pr_rank = coords_tmp[0];   // riga reale nella griglia
-
-                for (int local_i = 0; local_i < recvcounts[rank_idx]; local_i++) {
-                    int global_row = pr_rank + local_i * Px;
-                    y_correct[global_row] = y_global[pos++];
-                }
-            }
-        }
-
-        free(y_correct);
-        free(y_global);
+        
+        printf("%.3f\n", load_imbalance);
+        printf("--------------------------------------------------------------------------------\n");
+        printf("\n");
     }
 
     //Free all allocated memory

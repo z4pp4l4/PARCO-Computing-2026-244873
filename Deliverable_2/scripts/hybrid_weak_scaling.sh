@@ -1,15 +1,18 @@
 #!/bin/bash
 # Weak Scaling Script (Hybrid MPI + OpenMP)
 
-SRC=MPI_impl_2D_partitioning.c
+SRC=./MPI_impl_2D_partitioning.c
 EXEC=./MPI_impl_2D_partitioning.out
 
-ROWS_PER_PROC=1000
-NNZ_PER_PROC=10000
+# Better weak-scaling parameters
+ROWS_PER_PROC=20000
+NNZ_PER_PROC=200000
 
 PROCS=(1 2 4 8 16 32 64 128)
 
-mkdir -p matrices
+# Synthetic matrices stored here
+MATRIX_DIR=../src/matrices
+mkdir -p "${MATRIX_DIR}"
 
 # OpenMP affinity
 export OMP_PLACES=cores
@@ -21,37 +24,34 @@ echo "------------------------------"
 
 # Compilation
 echo "Compiling code..."
-mpicc ${SRC} -o ${EXEC} -std=c99 -fopenmp || exit 1
+mpicc "${SRC}" -o "${EXEC}" -std=c99 -fopenmp || exit 1
 echo "Compilation OK"
 echo
 
 for P in "${PROCS[@]}"; do
-  N=$((ROWS_PER_PROC * P))
-  NNZ=$((NNZ_PER_PROC * P))
-  MTX="matrices/random_ps${P}.mtx"
+    N=$((ROWS_PER_PROC * P))
+    NNZ=$((NNZ_PER_PROC * P))
+    MTX="${MATRIX_DIR}/random_ps${P}.mtx"
 
-  if [ ! -f "$MTX" ]; then
-    echo "Generating matrix for P=$P"
-    ./random_mtx_generator.sh "$N" "$NNZ" "$MTX"
-  fi
+    if [ ! -f "${MTX}" ]; then
+        echo "Generating matrix for P=${P}"
+        ./random_mtx_generator.sh "${N}" "${NNZ}" "${MTX}"
+    fi
 
-  OMP_THREADS=$((128 / P))
-  if [ "${OMP_THREADS}" -gt 64 ]; then
-      OMP_THREADS=64
-  fi
-  if [ "${OMP_THREADS}" -lt 1 ]; then
-      OMP_THREADS=1
-  fi
+    # Keep total cores roughly constant (≈128)
+    OMP_THREADS=$((128 / P))
+    [ "${OMP_THREADS}" -gt 64 ] && OMP_THREADS=64
+    [ "${OMP_THREADS}" -lt 1 ] && OMP_THREADS=1
 
-  export OMP_NUM_THREADS=${OMP_THREADS}
+    export OMP_NUM_THREADS=${OMP_THREADS}
 
-  echo
-  echo "--------------------------------"
-  echo "P = $P | Matrix = ${N} x ${N} | NNZ = ${NNZ}"
-  echo "OMP_NUM_THREADS = ${OMP_THREADS}"
-  echo "--------------------------------"
+    echo
+    echo "--------------------------------"
+    echo "P = ${P} | Matrix = ${N} x ${N} | NNZ = ${NNZ}"
+    echo "OMP_NUM_THREADS = ${OMP_THREADS}"
+    echo "--------------------------------"
 
-  mpirun -np $P $EXEC "$MTX"
+    mpirun -np "${P}" "${EXEC}" "${MTX}"
 done
 
-echo "Weak scaling completed."
+echo "Weak scaling (Hybrid) completed."

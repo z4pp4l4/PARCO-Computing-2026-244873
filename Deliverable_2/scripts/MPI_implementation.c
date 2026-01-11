@@ -379,6 +379,19 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&local_nnz_ll, &nnz_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
     double nnz_avg = (size > 0) ? ((double)nnz_sum / (double)size) : 0.0;
 
+
+    // Load imbalance ratio (max/avg)
+    double load_imbalance = (nnz_avg > 0) ? ((double)nnz_max / nnz_avg) : 1.0;
+
+    // Ghost stats for communication volume analysis
+    int ghost_min = 0, ghost_max = 0;
+    long long ghost_count_ll = (long long)ghost_count;
+    long long ghost_sum = 0;
+    MPI_Allreduce(&ghost_count, &ghost_min, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+    MPI_Allreduce(&ghost_count, &ghost_max, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&ghost_count_ll, &ghost_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+    double ghost_avg = (size > 0) ? ((double)ghost_sum / (double)size) : 0.0;
+
     // --------------------
     // Local x vector (cyclic ownership over columns)
     // --------------------
@@ -430,12 +443,13 @@ int main(int argc, char **argv) {
     }
     free(pos);
 
-    // Exchange counts
-    t0 = MPI_Wtime();
+   // Track Alltoall counts time
+    double t_alltoall1 = MPI_Wtime();
     MPI_Alltoall(send_counts, 1, MPI_INT,
                 recv_counts, 1, MPI_INT,
                 MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    double t_exchange_counts = MPI_Wtime() - t_alltoall1;
+    t_comm += t_exchange_counts;
 
     // Receive displs
     int tot_recv = 0;
@@ -447,11 +461,13 @@ int main(int argc, char **argv) {
     // Receive requested indices
     int *recv_idx = malloc(tot_recv * sizeof(int));
 
+    // Track Alltoallv indices time
     t0 = MPI_Wtime();
     MPI_Alltoallv(send_idx, send_counts, send_displs, MPI_INT,
                 recv_idx, recv_counts, recv_displs, MPI_INT,
                 MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    double t_exchange_indices = MPI_Wtime() - t0;
+    t_comm += t_exchange_indices;
 
     // Prepare values to send
     double *send_vals = malloc(tot_recv * sizeof(double));
@@ -463,9 +479,13 @@ int main(int argc, char **argv) {
     // Receive ghost values
     ghost_vals = malloc(ghost_count * sizeof(double));
 
+    // Track Alltoallv ghost values time (main halo exchange)
     t0 = MPI_Wtime();
-    MPI_Alltoallv(send_vals, recv_counts, recv_displs, MPI_DOUBLE, ghost_vals, send_counts, send_displs, MPI_DOUBLE, MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    MPI_Alltoallv(send_vals, recv_counts, recv_displs, MPI_DOUBLE, 
+                ghost_vals, send_counts, send_displs, MPI_DOUBLE, 
+                MPI_COMM_WORLD);
+    double t_ghost_exchange = MPI_Wtime() - t0;
+    t_comm += t_ghost_exchange;
 
     // Cleanup temp buffers
     free(send_idx);
@@ -477,8 +497,7 @@ int main(int argc, char **argv) {
     free(recv_displs);
 
 
-    // SpMV local
-    double t1 = MPI_Wtime();
+    // SpMV local computation
     double start_time = MPI_Wtime();
     //#pragma omp parallel for
     for (int r = 0; r < local_num_rows; r++) {
@@ -491,7 +510,6 @@ int main(int argc, char **argv) {
                 xj = x_local[ local_index_cyclic(j, size) ];
             } else {
                 int pos = bsearch_int(ghost_cols, ghost_count, j);
-                // pos should always be found
                 xj = ghost_vals[pos];
             }
 
@@ -499,8 +517,9 @@ int main(int argc, char **argv) {
         }
         y_local[r] = acc;
     }
-    t_comp += MPI_Wtime() - t1;
-    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, MPI_Wtime() - start_time);
+    double t_spmv = MPI_Wtime() - start_time;
+    t_comp += t_spmv;
+    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, t_spmv);
     double t_total = MPI_Wtime() - t_total_start;
 
     // Gather y to rank 0 (rank-ordered / cyclic order)
@@ -513,24 +532,33 @@ int main(int argc, char **argv) {
         displs     = (int*)malloc((size_t)size * sizeof(int));
         y_gather   = (double*)malloc((size_t)rows * sizeof(double));
     }
+   // Track Gather counts time
     t0 = MPI_Wtime();
     MPI_Gather(&sendcount, 1, MPI_INT, recvcounts, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    double t_gather_counts = MPI_Wtime() - t0;
+    t_comm += t_gather_counts;
 
     if (rank == 0) {
         displs[0] = 0;
         for (int i = 1; i < size; i++) displs[i] = displs[i-1] + recvcounts[i-1];
     }
 
+    // Track Gatherv result time
     t0 = MPI_Wtime();
     MPI_Gatherv(y_local, sendcount, MPI_DOUBLE, y_gather, recvcounts, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
+    double t_gatherv = MPI_Wtime() - t0;
+    t_comm += t_gatherv;
 
-    // Worst-rank timings
+    // Collect timing statistics (max = worst case)
     double t_total_max, t_comp_max, t_comm_max;
+    double t_ghost_max, t_spmv_max, t_gatherv_max;
+
     MPI_Allreduce(&t_total, &t_total_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_comp,  &t_comp_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_comm,  &t_comm_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_ghost_exchange, &t_ghost_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_spmv,  &t_spmv_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&t_gatherv, &t_gatherv_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     double comp_pct = 100.0 * t_comp_max / t_total_max;
     double comm_pct = 100.0 * t_comm_max / t_total_max;
@@ -556,28 +584,98 @@ int main(int argc, char **argv) {
 
     double mem_mib = bytes_to_mib(mem_bytes);
     double mem_mib_max = 0.0;
+    double mem_mib_avg = 0.0;
     MPI_Allreduce(&mem_mib, &mem_mib_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&mem_mib, &mem_mib_avg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    mem_mib_avg /= size;
+
+    MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0) {
         printf("\n");
-        printf("-----------------------------------------------------------------------------------------------\n");
-        printf("  P |  Time(s) | Comp%% | Comm%% |  GFLOP/s | Speedup |  Eff%% | Mem(MiB) | NNZ min | NNZ avg | NNZ max\n");
-        printf("-----------------------------------------------------------------------------------------------\n");
-        printf("%3d | %8.4f | %5.1f | %5.1f | %9.3f | ", size, t_total_max, comp_pct, comm_pct, gflops);
-
-        if (speedup < 0) printf("   N/A   |   N/A  | ");
-        else printf("%7.2f | %6.2f | ", speedup, efficiency * 100.0);
-
-        printf("%8.2f | %7d | %8.1f | %7d\n",mem_mib_max, nnz_min, nnz_avg, nnz_max);
-        if (global_flops > 0) {
-            printf("Global FLOPs per SpMV: %lld\n", global_flops);
+        printf("                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   \n");
+        printf("********************************************************************************\n\n");
+        
+        printf("MATRIX INFORMATION:\n");
+        printf("  Matrix file:        %s\n", argv[1]);
+        printf("  Dimensions:         %d x %d\n", rows, cols);
+        printf("  Total NNZ:          %d\n", global_nnz);
+        printf("  Matrix type:        %s, %s\n", 
+            is_pattern ? "pattern" : "real", 
+            is_symmetric ? "symmetric" : "general");
+        printf("\n");
+        
+        printf("PARALLEL CONFIGURATION:\n");
+        printf("  Total processes:    %d\n", size);
+        printf("  Partitioning:       1D cyclic (row-wise, modulo)\n");
+        printf("\n");
+        
+        printf("LOAD BALANCE:\n");
+        printf("  NNZ per rank:       min=%d  avg=%.1f  max=%d\n", 
+            nnz_min, nnz_avg, nnz_max);
+        printf("  Imbalance ratio:    %.3f  (max/avg)\n", load_imbalance);
+        printf("\n");
+        
+        printf("COMMUNICATION VOLUME:\n");
+        printf("  Ghost cols/rank:    min=%d  avg=%.1f  max=%d\n",
+            ghost_min, ghost_avg, ghost_max);
+        printf("  Total ghost cols:   %lld\n", ghost_sum);
+        printf("  Ghost ratio:        %.2f%%  (ghost/total NNZ)\n",
+            100.0 * ghost_sum / nnz_sum);
+        printf("\n");
+        
+        printf("MEMORY USAGE:\n");
+        printf("  Per-rank memory:    avg=%.2f MiB  max=%.2f MiB\n", 
+            mem_mib_avg, mem_mib_max);
+        printf("  Total memory:       %.2f MiB  (estimated)\n", 
+            mem_mib_avg * size);
+        printf("\n");
+        
+        printf("PERFORMANCE METRICS:\n");
+        printf("  Total time:         %.6f s\n", t_total_max);
+        printf("  Computation time:   %.6f s  (%.1f%%)\n", t_comp_max, comp_pct);
+        printf("    └─ Local SpMV:    %.6f s\n", t_spmv_max);
+        printf("  Communication time: %.6f s  (%.1f%%)\n", t_comm_max, comm_pct);
+        printf("    ├─ Ghost exchange: %.6f s\n", t_ghost_max);
+        printf("    └─ Gatherv:       %.6f s\n", t_gatherv_max);
+        printf("\n");
+        
+        printf("COMPUTATIONAL INTENSITY:\n");
+        printf("  Total FLOPs:        %lld\n", global_flops);
+        printf("  GFLOP/s:            %.3f\n", gflops);
+        printf("\n");
+        
+        if (speedup > 0) {
+            printf("SCALABILITY:\n");
+            printf("  Baseline (T1):      %.6f s\n", T1);
+            printf("  Speedup:            %.2fx\n", speedup);
+            printf("  Efficiency:         %.2f%%\n", efficiency * 100.0);
+            printf("\n");
         }
+        
+        printf("================================================================================\n");
+        printf("SUMMARY TABLE:\n");
+        printf("--------------------------------------------------------------------------------\n");
+        printf("  P | Time(s) | Comp%% | Comm%% | GFLOP/s | Speedup |  Eff%%  | Imbal | Ghost%%\n");
+        printf("--------------------------------------------------------------------------------\n");
+        printf("%3d | %7.4f | %5.1f | %5.1f | %7.3f | ",
+            size, t_total_max, comp_pct, comm_pct, gflops);
+        
+        if (speedup < 0) {
+            printf("  N/A   |  N/A  | ");
+        } else {
+            printf("%7.2f | %5.1f | ", speedup, efficiency * 100.0);
+        }
+        
+        printf("%.3f | %5.1f\n", load_imbalance, 100.0 * ghost_sum / nnz_sum);
+        printf("--------------------------------------------------------------------------------\n");
+        printf("\n");
 
-        // Reorder to true row order (since gathered by rank order)
+        // Reorder to true row order
         double *y_correct = (double*)malloc((size_t)rows * sizeof(double));
         int pos = 0;
         for (int rnk = 0; rnk < size; rnk++) {
             for (int li = 0; li < recvcounts[rnk]; li++) {
-                int global_row = rnk + li * size; // cyclic rows
+                int global_row = rnk + li * size;
                 y_correct[global_row] = y_gather[pos++];
             }
         }

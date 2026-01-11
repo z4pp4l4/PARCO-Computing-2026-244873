@@ -27,15 +27,12 @@ download_matrix () {
     fi
 
     echo "[DOWNLOAD] ${GROUP}/${NAME}"
-    wget -q --show-progress "${URL}"
+    wget "${URL}"
     tar -xzf "${TAR}"
     mv "${NAME}/${NAME}.mtx" .
     rm -rf "${NAME}" "${TAR}"
 }
 
-# =========================================================
-# Selected matrices for Deliverable 2 (FINAL SET)
-# =========================================================
 
 download_matrix PARSEC Ga41As41H72
 download_matrix Norris torso3

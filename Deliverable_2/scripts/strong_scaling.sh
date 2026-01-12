@@ -9,10 +9,13 @@ PROC_NUM=(1 2 4 8 16 32 64 128)
 # Matrices are stored in ../src/
 MATRIX_DIR=../src
 MATRICES=(
-  Journals.mtx
-  torso3.mtx
-  Ga41As41H72.mtx
   nemeth19.mtx
+  Trefethen_20000.mtx
+  webbase-1M.mtx
+  Flan_1565.mtx
+  #torso3.mtx
+  #Ga41As41H72.mtx
+  
 )
 
 RESULTS_DIR=../results/strong_scaling

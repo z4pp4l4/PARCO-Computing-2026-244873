@@ -498,43 +498,57 @@ int main(int argc, char **argv) {
     double t_reduce = MPI_Wtime() - t0;
     t_comm += t_reduce;
 
+    /* ================= SAFE GLOBAL GATHER ================= */
+
+    double t_gather = 0.0;
+
+    /* Only ranks with pc==0 contribute data, BUT ALL ranks call collectives */
+    int sendcount = (pc == 0) ? local_num_rows : 0;
+
+    /* Allocate only on rank 0 */
     double *y_global = NULL;
     int *recvcounts = NULL;
-    int *displacements = NULL;
+    int *displs = NULL;
+
     if (rank == 0) {
-        y_global = malloc(rows * sizeof(double));
+        y_global   = malloc(rows * sizeof(double));
         recvcounts = malloc(size * sizeof(int));
-        displacements = malloc(size * sizeof(int));
+        displs     = malloc(size * sizeof(int));
     }
-    int local_rows = local_num_rows;
-    // Only processes in column 0 (pc=0) have the reduced result
-    int sendcount = (pc == 0) ? local_rows : 0;
-    // Gather send counts from all processes
-    //use MPI_Gather to know how much data to collect: ech process tells rank 0 how much data it's sending
+
+    /* Step 1: gather sizes */
     t0 = MPI_Wtime();
-    MPI_Gather(&sendcount, 1, MPI_INT, recvcounts, 1, MPI_INT,0, MPI_COMM_WORLD);
+    MPI_Gather(&sendcount, 1, MPI_INT,
+            recvcounts, 1, MPI_INT,
+            0, MPI_COMM_WORLD);
     t_comm += MPI_Wtime() - t0;
 
-    // calculate displacements for Gatherv
+    /* Step 2: compute displacements */
     if (rank == 0) {
-        displacements[0] = 0;
+        displs[0] = 0;
         for (int i = 1; i < size; i++)
-            displacements[i] = displacements[i - 1] + recvcounts[i - 1];
+            displs[i] = displs[i - 1] + recvcounts[i - 1];
     }
-    //  Collect results from all row roots to rank 0 with MPI_Gatherv
-    /*
-        MPI_Gatherv collects variable-sized chunks of data from each 
-        participating process and assembles them into a contiguous buffer
-        on the root process. Unlike its simpler counterpart, MPI_Gather, 
-        which assumes equal data sizes from all processes, MPI_Gatherv 
-        accommodates scenarios where different processes contribute differing
-        amounts of data. 
-    */
-    // Track Gatherv time separately
+
+    /* Step 3: gather actual data */
     t0 = MPI_Wtime();
-    MPI_Gatherv(y_row_sum, sendcount, MPI_DOUBLE, y_global, recvcounts, displacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    double t_gather = MPI_Wtime() - t0;
+    MPI_Gatherv(
+        (pc == 0) ? y_row_sum : NULL,
+        sendcount, MPI_DOUBLE,
+        y_global, recvcounts, displs,
+        MPI_DOUBLE,
+        0, MPI_COMM_WORLD
+    );
+    t_gather = MPI_Wtime() - t0;
     t_comm += t_gather;
+
+    /* Cleanup */
+    if (rank == 0) {
+        free(y_global);
+        free(recvcounts);
+        free(displs);
+    }
+
     //After this Gatherv, the final result vector y is fully assembled and has the order of the elements which follow the ranks.
     double t_total = MPI_Wtime() - t_total_start;
 
@@ -561,8 +575,6 @@ int main(int argc, char **argv) {
     double T1 = env_double_or_neg("BASELINE_T1");
     double speedup = (T1 > 0) ? T1 / t_total_max : -1.0;
     double efficiency = (speedup > 0) ? speedup / size : -1.0;
-
-    MPI_Barrier(MPI_COMM_WORLD);
 
     if (rank == 0) {
         printf("\n");

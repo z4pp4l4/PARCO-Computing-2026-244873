@@ -38,7 +38,8 @@ download_matrix PARSEC Ga41As41H72
 download_matrix Norris torso3
 download_matrix Nemeth nemeth19
 download_matrix JGD_Trefethen Trefethen_20000
-
+download_matrix Janna Flan_1565
+download_matrix Williams webbase-1M
 echo "----------------------------------------"
 echo "All matrices downloaded successfully!"
 echo "----------------------------------------"

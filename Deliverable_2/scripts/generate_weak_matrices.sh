@@ -9,7 +9,7 @@ PROCS=(1 2 4 8 16 32 64 128)
 OUTDIR=../src/matrices
 mkdir -p "${OUTDIR}"
 
-GEN=./generate_weak_mtx
+GEN=./generate_weak_mtx.out
 
 for P in "${PROCS[@]}"; do
     N=$((ROWS_PER_PROC * P))

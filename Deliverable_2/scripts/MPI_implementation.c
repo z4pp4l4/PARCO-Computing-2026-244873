@@ -496,7 +496,11 @@ int main(int argc, char **argv) {
     free(send_displs);
     free(recv_displs);
 
-
+    int *ghost_map = malloc(cols * sizeof(int));
+    memset(ghost_map, -1, cols * sizeof(int));
+    for (int i = 0; i < ghost_count; i++)
+        ghost_map[ghost_cols[i]] = i;
+ 
     // SpMV local computation
     double start_time = MPI_Wtime();
     //#pragma omp parallel for
@@ -509,8 +513,8 @@ int main(int argc, char **argv) {
             if (owner_cyclic(j, size) == rank) {
                 xj = x_local[ local_index_cyclic(j, size) ];
             } else {
-                int pos = bsearch_int(ghost_cols, ghost_count, j);
-                xj = ghost_vals[pos];
+                xj = ghost_vals[ ghost_map[j] ];
+
             }
 
             acc += vals[k] * xj;
@@ -619,8 +623,11 @@ int main(int argc, char **argv) {
         printf("  Ghost cols/rank:    min=%d  avg=%.1f  max=%d\n",
             ghost_min, ghost_avg, ghost_max);
         printf("  Total ghost cols:   %lld\n", ghost_sum);
-        printf("  Ghost ratio:        %.2f%%  (ghost/total NNZ)\n",
-            100.0 * ghost_sum / nnz_sum);
+        double ghost_ratio = (nnz_sum > 0)
+            ? 100.0 * ghost_sum / nnz_sum
+            : 0.0;
+
+        printf("  Ghost ratio:        %.2f%%  (ghost/total NNZ)\n", ghost_ratio);
         printf("\n");
         
         printf("MEMORY USAGE:\n");
@@ -666,7 +673,7 @@ int main(int argc, char **argv) {
             printf("%7.2f | %5.1f | ", speedup, efficiency * 100.0);
         }
         
-        printf("%.3f | %5.1f\n", load_imbalance, 100.0 * ghost_sum / nnz_sum);
+        printf("%.3f | %5.1f\n", load_imbalance, ghost_ratio);
         printf("--------------------------------------------------------------------------------\n");
         printf("\n");
 

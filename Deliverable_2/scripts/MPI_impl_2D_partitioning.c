@@ -310,7 +310,7 @@ static void coo_to_csr(
 int main(int argc, char **argv) {
     // Initialize MPI environment
     MPI_Init(&argc, &argv);
-    omp_set_num_threads(1);
+    //omp_set_num_threads(1);
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);  // This process's rank (0 to size-1)
     MPI_Comm_size(MPI_COMM_WORLD, &size);  // Total number of processes
@@ -425,7 +425,10 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&mem_mib, &mem_mib_avg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     mem_mib_avg /= size;
 
-    double *x_local = (double*)malloc((size_t)local_num_cols * sizeof(double));
+    int max_local_cols;
+    MPI_Allreduce(&local_num_cols, &max_local_cols, 1, MPI_INT, MPI_MAX, row_comm);
+
+    double *x_local = (double*)malloc((size_t)max_local_cols * sizeof(double));
     double *y_partial = (double*)calloc((size_t)local_num_rows, sizeof(double));
     double *y_row_sum = (double*)calloc((size_t)local_num_rows, sizeof(double));
     /*
@@ -443,20 +446,25 @@ int main(int argc, char **argv) {
     // (they all use the same seed, so they compute identically)
     // RANDOM VECTOR GENERATION INSIDE EACH PROCESS
     if (!x_local) MPI_Abort(MPI_COMM_WORLD, 1);
+
     if (pr == 0) {
         srand(12345 + pc);                 // colonna diversa -> blocco diverso
         for (int j = 0; j < local_num_cols; j++)
             x_local[j] = (double)rand() / RAND_MAX;
+        
+        // opzionale ma pulito
+        for (int j = local_num_cols; j < max_local_cols; j++)
+            x_local[j] = 0.0;
     }
     double t_total_start = MPI_Wtime();
     double t_comp = 0.0;
     double t_comm = 0.0;
 
-    // Track Bcast time separately
     double t0 = MPI_Wtime();
-    MPI_Bcast(x_local, local_num_cols, MPI_DOUBLE, pc, row_comm);  // FIXED: row_comm not col_comm!
+    MPI_Bcast(x_local, max_local_cols, MPI_DOUBLE, pc, row_comm);
     double t_bcast = MPI_Wtime() - t0;
     t_comm += t_bcast;
+
 
     // Track SpMV time separately
     double start_time = MPI_Wtime();
@@ -465,10 +473,8 @@ int main(int argc, char **argv) {
     for (int r = 0; r < local_num_rows; r++) {
         double acc = 0.0;
         for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {
-            int local_cols = col_idx[k];
-            if (local_cols >= 0 && local_cols < local_num_cols) {
-                acc += vals[k] * x_local[local_cols];
-            }
+            int jloc = col_idx[k];
+            acc += vals[k] * x_local[jloc];
         }
         y_partial[r] = acc;
     }

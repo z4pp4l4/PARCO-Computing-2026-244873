@@ -3,8 +3,9 @@
 
 EXEC1=./MPI_impl_2D_partitioning.out
 SRC1=./MPI_impl_2D_partitioning.c
+
 EXEC2=./MPI_implementation.out
-SRC2=./MPI_implementation.c
+SRC1=./MPI_implementation.c
 
 PROCS=(1 2 4 8 16 32 64 128)
 
@@ -31,7 +32,7 @@ for MATRIX in "${MATRICES[@]}"; do
     fi
 
     echo "*********************************************"
-    echo "STRONG SCALING 2D: ${MATRIX}"
+    echo "STRONG SCALING 2D pragma omp schedule(static): ${MATRIX}"
     echo "*********************************************"
     echo
 
@@ -71,6 +72,7 @@ for MATRIX in "${MATRICES[@]}"; do
     unset BASELINE_T1
     echo
 done
+
 for MATRIX in "${MATRICES[@]}"; do
     MTX="${MATRIX_DIR}/${MATRIX}"
 
@@ -78,12 +80,10 @@ for MATRIX in "${MATRICES[@]}"; do
         echo "[ERROR] Missing matrix ${MTX}"
         continue
     fi
-
     echo "*********************************************"
-    echo "STRONG SCALING 1D: ${MATRIX}"
+    echo "STRONG SCALING 1D schedule(static): ${MATRIX}"
     echo "*********************************************"
     echo
-
     # BASELINE P=1
     echo "---------------------------------------------"
     echo "P=1 | Matrix=${MATRIX} (BASELINE)"
@@ -101,7 +101,6 @@ for MATRIX in "${MATRICES[@]}"; do
     echo ">> BASELINE_T1 = ${BASELINE_T1} s"
     export BASELINE_T1
     echo
-
     for P in "${PROCS[@]}"; do
         if [ "${P}" -eq 1 ]; then
             continue
@@ -113,7 +112,6 @@ for MATRIX in "${MATRICES[@]}"; do
         mpirun -np "${P}" "${EXEC2}" "${MTX}"
         echo
     done
-
     unset BASELINE_T1
     echo
 done

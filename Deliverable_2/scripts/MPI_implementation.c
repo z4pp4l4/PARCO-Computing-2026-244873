@@ -6,12 +6,6 @@
 #include <omp.h>
 #include <time.h>
 
-#define DEBUG 1
-#if DEBUG
-  #define DPRINTF(...) printf(__VA_ARGS__)
-#else
-  #define DPRINTF(...)
-#endif
 
 typedef struct {
     int row;
@@ -522,7 +516,6 @@ int main(int argc, char **argv) {
     }
     double t_spmv = MPI_Wtime() - start_time;
     t_comp += t_spmv;
-    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, t_spmv);
     double t_total = MPI_Wtime() - t_total_start;
 
     // Gather y to rank 0 (rank-ordered / cyclic order)

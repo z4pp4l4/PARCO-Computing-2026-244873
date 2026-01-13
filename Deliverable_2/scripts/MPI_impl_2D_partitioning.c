@@ -7,13 +7,6 @@
 #include <time.h>
 
 
-#define DEBUG 1
-#if DEBUG
-  #define DPRINTF(...) printf(__VA_ARGS__)  // Debug print macro (prints if DEBUG=1)
-#else
-  #define DPRINTF(...)                       // Silent if DEBUG=0
-#endif
-
 typedef struct {
     int row;
     int col;
@@ -140,37 +133,40 @@ static void read_header_mtx(
 
 static void read_and_distribute_2D(
     const char *filename, int rank, int size, MPI_Comm grid_comm,
-    int Px, int Py, int pr, int pc, int *rows, int *cols, int *global_nnz,
-    int *is_pattern, int *is_symmetric, int *local_nnz, int **coo_r_local, int **coo_c_local, double **coo_v
+    int Px, int Py, int pr, int pc,
+    int *rows, int *cols, int *global_nnz,
+    int *is_pattern, int *is_symmetric,
+    int *local_nnz,
+    int **coo_r_local, int **coo_c_local, double **coo_v
 ) {
     MPI_File fh;
     MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
     MPI_Offset file_size;
     MPI_File_get_size(fh, &file_size);
 
-    MPI_Offset data_offset = 0;
-    read_header_mtx( fh, rank, rows, cols, global_nnz, is_pattern, is_symmetric, &data_offset);
+    MPI_Offset data_offset;
+    read_header_mtx(fh, rank, rows, cols, global_nnz, is_pattern, is_symmetric, &data_offset);
+
     MPI_Offset data_size = file_size - data_offset;
     MPI_Offset chunk = data_size / size;
 
     MPI_Offset start = data_offset + rank * chunk;
     MPI_Offset end   = (rank == size - 1)
-                        ? file_size
-                        : data_offset + (rank + 1) * chunk;
+                     ? file_size
+                     : data_offset + (rank + 1) * chunk;
 
-    const MPI_Offset OVERLAP = 1 << 16; // 64 KB
-    MPI_Offset read_end = end + OVERLAP;
-    if (read_end > file_size) read_end = file_size;
-
+    const MPI_Offset OVERLAP = 4096;
+    MPI_Offset read_end = (end + OVERLAP < file_size) ? end + OVERLAP : file_size;
     MPI_Offset read_size = read_end - start;
 
-    char *buffer = malloc((size_t)read_size + 1);
-    MPI_File_read_at_all(
-        fh, start, buffer, (int)read_size, MPI_CHAR, MPI_STATUS_IGNORE
-    );
+    char *buffer = malloc(read_size + 1);
+    MPI_File_read_at_all(fh, start, buffer, read_size, MPI_CHAR, MPI_STATUS_IGNORE);
     buffer[read_size] = '\0';
 
-    //Adjust parsing window 
+    MPI_File_close(&fh);
+
+    /* ---- align lines ---- */
     char *p = buffer;
     char *q = buffer + read_size;
 
@@ -182,77 +178,133 @@ static void read_and_distribute_2D(
         while (q > p && *(q - 1) != '\n') q--;
     }
 
-    /* Allocate local COO */
+    /* ---- PHASE A: parse all entries ---- */
     int cap = 4096;
-    int *local_rows = malloc(cap * sizeof(int));
-    int *local_cols = malloc(cap * sizeof(int));
-    double *local_vals = malloc(cap * sizeof(double));
     int count = 0;
+    COO_entry *parsed = malloc(cap * sizeof(COO_entry));
 
     char *ptr = p;
-    while (ptr < q && *ptr) {
-        int r1, c1;
+    while (ptr < q) {
+        int r, c;
         double v = 1.0;
-        int ok = 0;
-        if (*is_pattern) {
-            if (sscanf(ptr, "%d %d", &r1, &c1) == 2) ok = 1;
-        } else {
-            if (sscanf(ptr, "%d %d %lf", &r1, &c1, &v) == 3) ok = 1;
-        }
 
-        if (ok) {
-            int i = r1 - 1;
-            int j = c1 - 1;
-            if (i % Px == pr && j % Py == pc) {
-                if (count == cap) {
-                    cap *= 2;
-                    local_rows = realloc(local_rows, cap * sizeof(int));
-                    local_cols = realloc(local_cols, cap * sizeof(int));
-                    local_vals = realloc(local_vals, cap * sizeof(double));
-                    if (!local_rows || !local_cols || !local_vals) {
-                        fprintf(stderr, "[Rank %d] realloc failed\n", rank);
-                        MPI_Abort(MPI_COMM_WORLD, 1);
-                    }
+        char *p2, *p3;
+        r = (int)strtol(ptr, &p2, 10);
+        c = (int)strtol(p2, &p3, 10);
+
+        if (p2 != ptr && p3 != p2) {
+            if (!(*is_pattern))
+                v = strtod(p3, NULL);
+
+            if (count >= cap) {
+                cap *= 2;
+                parsed = realloc(parsed, cap * sizeof(COO_entry));
+                if (!parsed) {
+                    fprintf(stderr, "realloc failed\n");
+                    MPI_Abort(MPI_COMM_WORLD, 1);
                 }
-                local_rows[count] = i / Px;
-                local_cols[count] = j / Py;
-                local_vals[count] = v;
-                count++;
             }
-            //if is symmetric 
-            if (*is_symmetric && i != j) {
-                int ti = j;
-                int tj = i;
-                if (ti % Px == pr && tj % Py == pc) {
-                    if (count == cap) {
-                        cap *= 2;
-                        local_rows = realloc(local_rows, cap * sizeof(int));
-                        local_cols = realloc(local_cols, cap * sizeof(int));
-                        local_vals = realloc(local_vals, cap * sizeof(double));
-                        if (!local_rows || !local_cols || !local_vals) {
-                            fprintf(stderr, "[Rank %d] realloc failed\n", rank);
-                            MPI_Abort(MPI_COMM_WORLD, 1);
-                        }
-                    }
-                    local_rows[count] = ti / Px;
-                    local_cols[count] = tj / Py;
-                    local_vals[count] = v;
-                    count++;
+
+            parsed[count++] = (COO_entry){r - 1, c - 1, v};
+
+            if (*is_symmetric && r != c) {
+                if (count >= cap) {
+                    cap *= 2;
+                    parsed = realloc(parsed, cap * sizeof(COO_entry));
+                    if (!parsed) MPI_Abort(MPI_COMM_WORLD, 1);
                 }
+                parsed[count++] = (COO_entry){c - 1, r - 1, v};
             }
         }
 
         while (ptr < q && *ptr != '\n') ptr++;
-        if (ptr < q && *ptr == '\n') ptr++;
+        if (ptr < q) ptr++;
     }
 
     free(buffer);
-    MPI_File_close(&fh);
-    *local_nnz    = count;
-    *coo_r_local = local_rows;
-    *coo_c_local = local_cols;
-    *coo_v       = local_vals;
+
+    /* ---- PHASE B: redistribute 2D ---- */
+    int *send_cnt = calloc(size, sizeof(int));
+    for (int k = 0; k < count; k++) {
+        int i = parsed[k].row;
+        int j = parsed[k].col;
+        int owner_r = i % Px;   // CYCLIC
+        int owner_c = j % Py;   // CYCLIC
+        send_cnt[owner_r * Py + owner_c]++;
+    }
+
+    int *recv_cnt = calloc(size, sizeof(int));
+    MPI_Alltoall(send_cnt, 1, MPI_INT,
+                 recv_cnt, 1, MPI_INT, MPI_COMM_WORLD);
+
+    int *sdisp = calloc(size, sizeof(int));
+    int *rdisp = calloc(size, sizeof(int));
+    for (int i = 1; i < size; i++) {
+        sdisp[i] = sdisp[i-1] + send_cnt[i-1];
+        rdisp[i] = rdisp[i-1] + recv_cnt[i-1];
+    }
+
+    int total_recv = rdisp[size-1] + recv_cnt[size-1];
+    COO_entry *sendbuf = malloc(count * sizeof(COO_entry));
+    COO_entry *local   = malloc(total_recv * sizeof(COO_entry));
+
+    int *tmp = calloc(size, sizeof(int));
+    for (int k = 0; k < count; k++) {
+        int i = parsed[k].row;
+        int j = parsed[k].col;
+        int owner_r = i % Px;     // CYCLIC
+        int owner_c = j % Py;     // CYCLIC
+        int owner   = owner_r * Py + owner_c;
+
+
+        sendbuf[sdisp[owner] + tmp[owner]++] = parsed[k];
+    }
+    for (int i = 0; i < size; i++) {
+        send_cnt[i] *= sizeof(COO_entry);
+        recv_cnt[i] *= sizeof(COO_entry);
+        sdisp[i]    *= sizeof(COO_entry);
+        rdisp[i]    *= sizeof(COO_entry);
+    }
+
+
+    MPI_Alltoallv(sendbuf, send_cnt, sdisp, MPI_BYTE, local,   recv_cnt, rdisp, MPI_BYTE,MPI_COMM_WORLD);
+    /* ---- output ---- */
+    *local_nnz = total_recv;
+    long long check;
+    long long l = *local_nnz;
+    MPI_Allreduce(&l, &check, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+    if (rank == 0)
+        printf("CHECK NNZ: %lld (expected %d)\n", check, *global_nnz);
+
+    *coo_r_local = malloc(total_recv * sizeof(int));
+    *coo_c_local = malloc(total_recv * sizeof(int));
+    *coo_v       = malloc(total_recv * sizeof(double));
+
+    for (int k = 0; k < total_recv; k++) {
+        int i = local[k].row;
+        // check di sicurezza
+        if (i % Px != pr) {
+            fprintf(stderr,
+                "[Rank %d] ERROR: wrong row ownership i=%d pr=%d Px=%d\n",
+                rank, i, pr, Px);
+            MPI_Abort(MPI_COMM_WORLD, 1);
+        }
+        // GLOBAL → LOCAL row index
+        local[k].row = i / Px;
+    }
+    for (int k = 0; k < total_recv; k++) {
+        (*coo_r_local)[k] = local[k].row;
+        (*coo_c_local)[k] = local[k].col;
+        (*coo_v)[k]       = local[k].val;
+    }
+
+    free(parsed);
+    free(sendbuf);
+    free(local);
+    free(send_cnt); free(recv_cnt);
+    free(sdisp); free(rdisp); free(tmp);
 }
+
 
 
 static void coo_to_csr(
@@ -350,7 +402,7 @@ int main(int argc, char **argv) {
     MPI_Comm col_comm;
     MPI_Comm_split(grid_comm, pr, pc, &row_comm); // Same row, ordered by column
     MPI_Comm_split(grid_comm, pc, pr, &col_comm); // Same column, ordered by row
-
+    
     // Variables to hold matrix data
     int rows = 0, cols = 0, global_nnz = 0;
     int local_nnz = 0;
@@ -362,6 +414,7 @@ int main(int argc, char **argv) {
         argv[1], rank, size, grid_comm, Px, Py, pr, pc,
         &rows, &cols, &global_nnz, &is_pattern, &is_symmetric, &local_nnz, &coo_r, &coo_c, &coo_v
     );
+
     if (rank == 0) {
         printf("[Rank 0] Matrix: %d x %d, nnz=%d | grid=%dx%d | pattern=%d symmetric=%d\n",
             rows, cols, global_nnz, Px, Py, is_pattern, is_symmetric);
@@ -428,7 +481,8 @@ int main(int argc, char **argv) {
     int max_local_cols;
     MPI_Allreduce(&local_num_cols, &max_local_cols, 1, MPI_INT, MPI_MAX, row_comm);
 
-    double *x_local = (double*)malloc((size_t)max_local_cols * sizeof(double));
+    double *x_panel = (double*)malloc((size_t)max_local_cols * sizeof(double));
+    double *x_local = malloc(local_num_cols * sizeof(double));
     double *y_partial = (double*)calloc((size_t)local_num_rows, sizeof(double));
     double *y_row_sum = (double*)calloc((size_t)local_num_rows, sizeof(double));
     /*
@@ -437,7 +491,7 @@ int main(int argc, char **argv) {
         row-wise reductions, respectively. This allocation ensures each MPI process manages only its 
         subset of the data, promoting scalability in distributed memory systems.
     */
-    if (!x_local || !y_partial || !y_row_sum) {
+    if (!x_panel||!x_local || !y_partial || !y_row_sum) {
         fprintf(stderr, "[Rank %d] ERROR: x/y allocation failed\n", rank);
         MPI_Abort(MPI_COMM_WORLD, 1);
     }   
@@ -452,36 +506,62 @@ int main(int argc, char **argv) {
         for (int j = 0; j < local_num_cols; j++)
             x_local[j] = (double)rand() / RAND_MAX;
         
-        // opzionale ma pulito
-        for (int j = local_num_cols; j < max_local_cols; j++)
-            x_local[j] = 0.0;
     }
+    double t_bcast = 0.0, t_reduce = 0.0, t_spmv = 0.0;
     double t_total_start = MPI_Wtime();
     double t_comp = 0.0;
     double t_comm = 0.0;
 
+    MPI_Barrier(MPI_COMM_WORLD);
     double t0 = MPI_Wtime();
-    MPI_Bcast(x_local, max_local_cols, MPI_DOUBLE, pc, row_comm);
-    double t_bcast = MPI_Wtime() - t0;
-    t_comm += t_bcast;
 
+    memset(y_partial, 0, local_num_rows * sizeof(double));
 
-    // Track SpMV time separately
-    double start_time = MPI_Wtime();
+    for (int pc_iter = 0; pc_iter < Py; pc_iter++) {
 
-    //#pragma omp parallel for
-    for (int r = 0; r < local_num_rows; r++) {
-        double acc = 0.0;
-        for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {
-            int jloc = col_idx[k];
-            acc += vals[k] * x_local[jloc];
+        int panel_cols = local_cyclic_size(cols, Py, pc_iter);
+        /* solo la colonna pc_iter possiede il blocco corretto di x */
+        if (pc == pc_iter) {
+            memcpy(x_panel, x_local, panel_cols * sizeof(double));
         }
-        y_partial[r] = acc;
+
+        double tb = MPI_Wtime();
+        MPI_Bcast(x_panel, panel_cols, MPI_DOUBLE, pc_iter, row_comm);
+        tb = MPI_Wtime() - tb;
+
+        t_bcast += tb;
+        t_comm  += tb;
+
+        /* SpMV locale (SUMMA corretto) */
+        double tc = MPI_Wtime();
+
+        for (int r = 0; r < local_num_rows; r++) {
+            double acc = y_partial[r];
+            for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {
+                int j = col_idx[k];
+                if (j % Py == pc_iter) {
+                    acc += vals[k] * x_panel[j / Py];
+                }
+            }
+            y_partial[r] = acc;
+        }
+        tc = MPI_Wtime() - tc;
+        t_spmv += tc;
+        t_comp += tc;
+
     }
 
-    double t_spmv = MPI_Wtime() - start_time;
-    t_comp += t_spmv;
-    DPRINTF("[Rank %d] Local SpMV time: %.6f s\n", rank, MPI_Wtime() - start_time);
+    double tr = MPI_Wtime();
+    MPI_Reduce(y_partial, y_row_sum, local_num_rows, MPI_DOUBLE, MPI_SUM, 0, row_comm);
+    tr = MPI_Wtime() - tr;
+    t_reduce += tr;
+    t_comm   += tr;
+
+
+    double global_time;
+    double local_time = MPI_Wtime() - t0;
+    MPI_Allreduce(&local_time, &global_time,
+                1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     // Count total FLOPs globally
     long long global_flops;
@@ -492,69 +572,11 @@ int main(int argc, char **argv) {
     }
 
 
-    // Track Reduce time separately
-    t0 = MPI_Wtime();
-    MPI_Reduce(y_partial, y_row_sum, local_num_rows, MPI_DOUBLE, MPI_SUM, 0, row_comm);
-    double t_reduce = MPI_Wtime() - t0;
-    t_comm += t_reduce;
-
-    /* ================= SAFE GLOBAL GATHER ================= */
-
-    double t_gather = 0.0;
-
-    /* Only ranks with pc==0 contribute data, BUT ALL ranks call collectives */
-    int sendcount = (pc == 0) ? local_num_rows : 0;
-
-    /* Allocate only on rank 0 */
-    double *y_global = NULL;
-    int *recvcounts = NULL;
-    int *displs = NULL;
-
-    if (rank == 0) {
-        y_global   = malloc(rows * sizeof(double));
-        recvcounts = malloc(size * sizeof(int));
-        displs     = malloc(size * sizeof(int));
-    }
-
-    /* Step 1: gather sizes */
-    t0 = MPI_Wtime();
-    MPI_Gather(&sendcount, 1, MPI_INT,
-            recvcounts, 1, MPI_INT,
-            0, MPI_COMM_WORLD);
-    t_comm += MPI_Wtime() - t0;
-
-    /* Step 2: compute displacements */
-    if (rank == 0) {
-        displs[0] = 0;
-        for (int i = 1; i < size; i++)
-            displs[i] = displs[i - 1] + recvcounts[i - 1];
-    }
-
-    /* Step 3: gather actual data */
-    t0 = MPI_Wtime();
-    MPI_Gatherv(
-        (pc == 0) ? y_row_sum : NULL,
-        sendcount, MPI_DOUBLE,
-        y_global, recvcounts, displs,
-        MPI_DOUBLE,
-        0, MPI_COMM_WORLD
-    );
-    t_gather = MPI_Wtime() - t0;
-    t_comm += t_gather;
-
-    /* Cleanup */
-    if (rank == 0) {
-        free(y_global);
-        free(recvcounts);
-        free(displs);
-    }
-
-    //After this Gatherv, the final result vector y is fully assembled and has the order of the elements which follow the ranks.
     double t_total = MPI_Wtime() - t_total_start;
 
     // Collect timing statistics (max = worst case)
     double t_total_max, t_comp_max, t_comm_max;
-    double t_bcast_max, t_reduce_max, t_spmv_max, t_gather_max;
+    double t_bcast_max, t_reduce_max, t_spmv_max;
 
     MPI_Allreduce(&t_total, &t_total_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_comp,  &t_comp_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
@@ -562,7 +584,6 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&t_bcast, &t_bcast_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_reduce, &t_reduce_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_spmv,  &t_spmv_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce(&t_gather, &t_gather_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     // percentage calculations
     double comp_pct = 100.0 * t_comp_max / t_total_max;
@@ -617,7 +638,6 @@ int main(int argc, char **argv) {
         printf("  Communication time: %.6f s  (%.1f%%)\n", t_comm_max, comm_pct);
         printf("    ├─ Bcast (x):     %.6f s\n", t_bcast_max);
         printf("    ├─ Reduce (y):    %.6f s\n", t_reduce_max);
-        printf("    └─ Gatherv:       %.6f s\n", t_gather_max);
         printf("\n");
         
         printf("COMPUTATIONAL INTENSITY:\n");

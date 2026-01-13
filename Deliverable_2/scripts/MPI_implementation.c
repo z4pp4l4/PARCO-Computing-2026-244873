@@ -196,20 +196,19 @@ static void read_and_distribute_1D(
     int *lc = malloc(cap * sizeof(int));
     double *lv = malloc(cap * sizeof(double));
     char *ptr = p;
-    while (ptr < q && *ptr) {
-        int r1, c1;
+    while (ptr < q) {
+        char *p2, *p3;
+        int r1 = (int)strtol(ptr, &p2, 10);
+        int c1 = (int)strtol(p2, &p3, 10);
         double v = 1.0;
-        int ok = 0;
-        if (*is_pattern) {
-            if (sscanf(ptr, "%d %d", &r1, &c1) == 2) 
-                ok = 1;
-        } else {
-            if (sscanf(ptr, "%d %d %lf", &r1, &c1, &v) == 3) 
-                ok = 1;
-        }
-        if (ok) {
+
+        if (p2 != ptr && p3 != p2) {
+            if (!(*is_pattern))
+                v = strtod(p3, NULL);
+
             int i = r1 - 1;
             int j = c1 - 1;
+
             if ((i % size) == rank) {
                 if (count == cap) {
                     cap *= 2;
@@ -236,9 +235,11 @@ static void read_and_distribute_1D(
                 count++;
             }
         }
+
         while (ptr < q && *ptr != '\n') ptr++;
         if (ptr < q) ptr++;
     }
+
 
     free(buffer);
     MPI_File_close(&fh);
@@ -496,11 +497,6 @@ int main(int argc, char **argv) {
     free(send_displs);
     free(recv_displs);
 
-    int *ghost_map = malloc(cols * sizeof(int));
-    memset(ghost_map, -1, cols * sizeof(int));
-    for (int i = 0; i < ghost_count; i++)
-        ghost_map[ghost_cols[i]] = i;
- 
     // SpMV local computation
     double start_time = MPI_Wtime();
     //#pragma omp parallel for
@@ -513,10 +509,13 @@ int main(int argc, char **argv) {
             if (owner_cyclic(j, size) == rank) {
                 xj = x_local[ local_index_cyclic(j, size) ];
             } else {
-                xj = ghost_vals[ ghost_map[j] ];
-
+                int idx = bsearch_int(ghost_cols, ghost_count, j);
+                if (idx < 0) {
+                    fprintf(stderr, "[Rank %d] ERROR: ghost column %d not found\n", rank, j);
+                    MPI_Abort(MPI_COMM_WORLD, 1);
+                }
+                xj = ghost_vals[idx];
             }
-
             acc += vals[k] * xj;
         }
         y_local[r] = acc;
@@ -640,10 +639,10 @@ int main(int argc, char **argv) {
         printf("PERFORMANCE METRICS:\n");
         printf("  Total time:         %.6f s\n", t_total_max);
         printf("  Computation time:   %.6f s  (%.1f%%)\n", t_comp_max, comp_pct);
-        printf("    └─ Local SpMV:    %.6f s\n", t_spmv_max);
+        printf("    └─| Local SpMV:    %.6f s\n", t_spmv_max);
         printf("  Communication time: %.6f s  (%.1f%%)\n", t_comm_max, comm_pct);
-        printf("    ├─ Ghost exchange: %.6f s\n", t_ghost_max);
-        printf("    └─ Gatherv:       %.6f s\n", t_gatherv_max);
+        printf("    ├─| Ghost exchange: %.6f s\n", t_ghost_max);
+        printf("    └─| Gatherv:       %.6f s\n", t_gatherv_max);
         printf("\n");
         
         printf("COMPUTATIONAL INTENSITY:\n");
@@ -659,7 +658,7 @@ int main(int argc, char **argv) {
             printf("\n");
         }
         
-        printf("================================================================================\n");
+        printf("********************************************************************************\n");
         printf("SUMMARY TABLE:\n");
         printf("--------------------------------------------------------------------------------\n");
         printf("  P | Time(s) | Comp%% | Comm%% | GFLOP/s | Speedup |  Eff%%  | Imbal | Ghost%%\n");

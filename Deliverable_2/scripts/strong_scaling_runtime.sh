@@ -1,13 +1,11 @@
 #!/bin/bash
-# Strong Scaling Script (SuiteSparse matrices)
+# Strong Scaling - Hybrid MPI + OpenMP (schedule(runtime), no oversubscription)
 
-EXEC1=./MPI_impl_2D_partitioning.out
-SRC1=./MPI_impl_2D_partitioning.c
+SRC_2D=./MPI_impl_2D_partitioning.c
+EXEC_2D=./MPI_impl_2D_partitioning.out
 
-EXEC2=./MPI_implementation.out
-SRC1=./MPI_implementation.c
-
-PROCS=(1 2 4 8 16 32 64 128)
+SRC_1D=./MPI_implementation.c
+EXEC_1D=./MPI_implementation.out
 
 MATRIX_DIR=../src
 MATRICES=(
@@ -17,103 +15,106 @@ MATRICES=(
   Ga41As41H72.mtx
 )
 
+# Total cores available on the node
+TOTAL_CORES=128
+
+# (MPI ranks, OMP threads)
+CONFIGS=(
+  "1 128"
+  "2 64"
+  "4 32"
+  "8 16"
+  "16 8"
+  "32 4"
+  "64 2"
+  "128 1"
+)
+
 echo "Compiling code..."
-mpicc -O3 "${SRC1}" -o "${EXEC1}" -std=c99 -fopenmp || exit 1
-mpicc -O3 "${SRC2}" -o "${EXEC2}" -std=c99 -fopenmp || exit 1
+mpicc -O3 -std=c99 -fopenmp "${SRC_2D}" -o "${EXEC_2D}" || exit 1
+mpicc -O3 -std=c99 -fopenmp "${SRC_1D}" -o "${EXEC_1D}" || exit 1
 echo "Compilation OK"
 echo
 
+# OpenMP runtime configuration
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+export OMP_SCHEDULE=runtime
+
+#####################################
+# STRONG SCALING 2D
+#####################################
 for MATRIX in "${MATRICES[@]}"; do
     MTX="${MATRIX_DIR}/${MATRIX}"
+    [ ! -f "${MTX}" ] && continue
 
-    if [ ! -f "${MTX}" ]; then
-        echo "[ERROR] Missing matrix ${MTX}"
-        continue
-    fi
+    echo "**************************************************"
+    echo "STRONG SCALING 2D | schedule(runtime) | ${MATRIX}"
+    echo "**************************************************"
 
-    echo "*********************************************"
-    echo "STRONG SCALING 2D pragma omp schedule(runtime): ${MATRIX}"
-    echo "*********************************************"
-    echo
-
-    # BASELINE P=1
-    echo "---------------------------------------------"
-    echo "P=1 | Matrix=${MATRIX} (BASELINE)"
-    echo "---------------------------------------------"
-
-    BASELINE_T1=$(mpirun -np 1 "${EXEC1}" "${MTX}" \
-        | grep "Total time:" \
-        | awk '{print $3}')
-
-    if [ -z "${BASELINE_T1}" ]; then
-        echo "[ERROR] Failed to extract BASELINE_T1"
-        exit 1
-    fi
-
-    echo ">> BASELINE_T1 = ${BASELINE_T1} s"
+    # Baseline: P=1, T=128
+    export OMP_NUM_THREADS=128
+    BASELINE_T1=$(mpirun -np 1 "${EXEC_2D}" "${MTX}" \
+        | grep "Total time:" | awk '{print $3}')
     export BASELINE_T1
+
+    echo "Baseline T1 = ${BASELINE_T1}s"
     echo
 
-    # -------------------------
-    # STRONG SCALING
-    # -------------------------
-    for P in "${PROCS[@]}"; do
-        if [ "${P}" -eq 1 ]; then
-            continue
-        fi
+    for cfg in "${CONFIGS[@]}"; do
+        set -- $cfg
+        P=$1
+        T=$2
+
+        export OMP_NUM_THREADS=$T
 
         echo "---------------------------------------------"
-        echo "P=${P} | Matrix=${MATRIX}"
+        echo "MPI ranks = ${P}, OMP threads = ${T}"
         echo "---------------------------------------------"
-        mpirun -np "${P}" "${EXEC1}" "${MTX}"
+
+        mpirun -np "${P}" "${EXEC_2D}" "${MTX}"
         echo
     done
 
     unset BASELINE_T1
-    echo
 done
 
+#####################################
+# STRONG SCALING 1D
+#####################################
 for MATRIX in "${MATRICES[@]}"; do
     MTX="${MATRIX_DIR}/${MATRIX}"
+    [ ! -f "${MTX}" ] && continue
 
-    if [ ! -f "${MTX}" ]; then
-        echo "[ERROR] Missing matrix ${MTX}"
-        continue
-    fi
-    echo "*********************************************"
-    echo "STRONG SCALING 1D schedule(runtime): ${MATRIX}"
-    echo "*********************************************"
-    echo
-    # BASELINE P=1
-    echo "---------------------------------------------"
-    echo "P=1 | Matrix=${MATRIX} (BASELINE)"
-    echo "---------------------------------------------"
+    echo "*************************************************"
+    echo "STRONG SCALING 1D | schedule(runtime) | ${MATRIX}"
+    echo "*************************************************"
 
-    BASELINE_T1=$(mpirun -np 1 "${EXEC2}" "${MTX}" \
-        | grep "Total time:" \
-        | awk '{print $3}')
-
-    if [ -z "${BASELINE_T1}" ]; then
-        echo "[ERROR] Failed to extract BASELINE_T1"
-        exit 1
-    fi
-
-    echo ">> BASELINE_T1 = ${BASELINE_T1} s"
+    # Baseline: P=1, T=128
+    export OMP_NUM_THREADS=128
+    BASELINE_T1=$(mpirun -np 1 "${EXEC_1D}" "${MTX}" \
+        | grep "Total time:" | awk '{print $3}')
     export BASELINE_T1
+
+    echo "Baseline T1 = ${BASELINE_T1}s"
     echo
-    for P in "${PROCS[@]}"; do
-        if [ "${P}" -eq 1 ]; then
-            continue
-        fi
+
+    for cfg in "${CONFIGS[@]}"; do
+        set -- $cfg
+        P=$1
+        T=$2
+
+        export OMP_NUM_THREADS=$T
 
         echo "---------------------------------------------"
-        echo "P=${P} | Matrix=${MATRIX}"
+        echo "MPI ranks = ${P}, OMP threads = ${T}"
         echo "---------------------------------------------"
-        mpirun -np "${P}" "${EXEC2}" "${MTX}"
+
+        mpirun -np "${P}" "${EXEC_1D}" "${MTX}"
         echo
     done
+
     unset BASELINE_T1
-    echo
 done
 
 echo "Strong scaling completed!"

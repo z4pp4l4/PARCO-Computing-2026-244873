@@ -1,0 +1,820 @@
+
+****************WEAK SCALING 2D*********************
+
+---------------------------------------------
+P=1 | Matrix=weak_ps1.mtx
+---------------------------------------------
+CHECK NNZ: 200000 (expected 200000)
+[Rank 0] Matrix: 20000 x 20000, nnz=200000 | grid=1x1 | pattern=0 symmetric=0
+[Rank 0] Matrix: 20000 x 20000, nnz=200000 | grid=1x1
+Global FLOPs per SpMV: 400000
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps1.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          200000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=200000  avg=200000.0  max=200000
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=5.87 MiB  max=5.87 MiB
+  Total memory:       5.87 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.000567 s
+  Computation time:   0.000522 s  (92.0%)
+    └─ Local SpMV:    0.000522 s
+  Communication time: 0.000023 s  (4.1%)
+    ├─ Bcast (x):     0.000001 s
+    ├─ Reduce (y):    0.000022 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        400000
+  GFLOP/s:            0.705
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0006 |  92.0 |   4.1 |   0.705 |   N/A   |  N/A  | 1.000
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=2 | Matrix=weak_ps2.mtx
+---------------------------------------------
+CHECK NNZ: 400197 (expected 400000)
+[Rank 0] Matrix: 40000 x 40000, nnz=400000 | grid=2x1 | pattern=0 symmetric=0
+[Rank 0] Matrix: 40000 x 40000, nnz=400000 | grid=2x1
+Global FLOPs per SpMV: 800394
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps2.mtx
+  Dimensions:         40000 x 40000
+  Total NNZ:          400000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Process grid:       2 x 1 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=200097  avg=200098.5  max=200100
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=6.03 MiB  max=6.03 MiB
+  Total memory:       12.06 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.005580 s
+  Computation time:   0.005217 s  (93.5%)
+    └─ Local SpMV:    0.005217 s
+  Communication time: 0.000021 s  (0.4%)
+    ├─ Bcast (x):     0.000002 s
+    ├─ Reduce (y):    0.000019 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        800394
+  GFLOP/s:            0.143
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  2 |  2x1  |  0.0056 |  93.5 |   0.4 |   0.143 |   N/A   |  N/A  | 1.000
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=4 | Matrix=weak_ps4.mtx
+---------------------------------------------
+CHECK NNZ: 800585 (expected 800000)
+[Rank 0] Matrix: 80000 x 80000, nnz=800000 | grid=2x2 | pattern=0 symmetric=0
+[Rank 0] Matrix: 80000 x 80000, nnz=800000 | grid=2x2
+Global FLOPs per SpMV: 1601170
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps4.mtx
+  Dimensions:         80000 x 80000
+  Total NNZ:          800000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Process grid:       2 x 2 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199777  avg=200146.2  max=200520
+  Imbalance ratio:    1.002  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=6.41 MiB  max=6.42 MiB
+  Total memory:       25.65 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.012143 s
+  Computation time:   0.006525 s  (53.7%)
+    └─ Local SpMV:    0.006525 s
+  Communication time: 0.005619 s  (46.3%)
+    ├─ Bcast (x):     0.005236 s
+    ├─ Reduce (y):    0.004839 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1601170
+  GFLOP/s:            0.132
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  4 |  2x2  |  0.0121 |  53.7 |  46.3 |   0.132 |   N/A   |  N/A  | 1.002
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=8 | Matrix=weak_ps8.mtx
+---------------------------------------------
+CHECK NNZ: 1601315 (expected 1600000)
+[Rank 0] Matrix: 160000 x 160000, nnz=1600000 | grid=4x2 | pattern=0 symmetric=0
+[Rank 0] Matrix: 160000 x 160000, nnz=1600000 | grid=4x2
+Global FLOPs per SpMV: 3202630
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps8.mtx
+  Dimensions:         160000 x 160000
+  Total NNZ:          1600000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Process grid:       4 x 2 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199681  avg=200164.4  max=200650
+  Imbalance ratio:    1.002  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=6.72 MiB  max=6.73 MiB
+  Total memory:       53.75 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.015034 s
+  Computation time:   0.006772 s  (45.0%)
+    └─ Local SpMV:    0.006772 s
+  Communication time: 0.007977 s  (53.1%)
+    ├─ Bcast (x):     0.007519 s
+    ├─ Reduce (y):    0.005078 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        3202630
+  GFLOP/s:            0.213
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  8 |  4x2  |  0.0150 |  45.0 |  53.1 |   0.213 |   N/A   |  N/A  | 1.002
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=16 | Matrix=weak_ps16.mtx
+---------------------------------------------
+CHECK NNZ: 3202731 (expected 3200000)
+[Rank 0] Matrix: 320000 x 320000, nnz=3200000 | grid=4x4 | pattern=0 symmetric=0
+[Rank 0] Matrix: 320000 x 320000, nnz=3200000 | grid=4x4
+Global FLOPs per SpMV: 6405462
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps16.mtx
+  Dimensions:         320000 x 320000
+  Total NNZ:          3200000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Process grid:       4 x 4 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199546  avg=200170.7  max=200610
+  Imbalance ratio:    1.002  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=7.48 MiB  max=7.49 MiB
+  Total memory:       119.70 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.027876 s
+  Computation time:   0.009060 s  (32.5%)
+    └─ Local SpMV:    0.009060 s
+  Communication time: 0.018330 s  (65.8%)
+    ├─ Bcast (x):     0.016863 s
+    ├─ Reduce (y):    0.006172 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        6405462
+  GFLOP/s:            0.230
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 16 |  4x4  |  0.0279 |  32.5 |  65.8 |   0.230 |   N/A   |  N/A  | 1.002
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=32 | Matrix=weak_ps32.mtx
+---------------------------------------------
+CHECK NNZ: 6405562 (expected 6400000)
+[Rank 0] Matrix: 640000 x 640000, nnz=6400000 | grid=8x4 | pattern=0 symmetric=0
+[Rank 0] Matrix: 640000 x 640000, nnz=6400000 | grid=8x4
+Global FLOPs per SpMV: 12811124
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps32.mtx
+  Dimensions:         640000 x 640000
+  Total NNZ:          6400000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Process grid:       8 x 4 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199506  avg=200173.8  max=200763
+  Imbalance ratio:    1.003  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=8.09 MiB  max=8.11 MiB
+  Total memory:       258.94 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.045822 s
+  Computation time:   0.010365 s  (22.6%)
+    └─ Local SpMV:    0.010365 s
+  Communication time: 0.035163 s  (76.7%)
+    ├─ Bcast (x):     0.033911 s
+    ├─ Reduce (y):    0.007441 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        12811124
+  GFLOP/s:            0.280
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 32 |  8x4  |  0.0458 |  22.6 |  76.7 |   0.280 |   N/A   |  N/A  | 1.003
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=64 | Matrix=weak_ps64.mtx
+---------------------------------------------
+CHECK NNZ: 12811016 (expected 12800000)
+[Rank 0] Matrix: 1280000 x 1280000, nnz=12800000 | grid=8x8 | pattern=0 symmetric=0
+[Rank 0] Matrix: 1280000 x 1280000, nnz=12800000 | grid=8x8
+Global FLOPs per SpMV: 25622032
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps64.mtx
+  Dimensions:         1280000 x 1280000
+  Total NNZ:          12800000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Process grid:       8 x 8 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199218  avg=200172.1  max=201529
+  Imbalance ratio:    1.007  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=9.62 MiB  max=9.65 MiB
+  Total memory:       615.53 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.301558 s
+  Computation time:   0.018056 s  (6.0%)
+    └─ Local SpMV:    0.018056 s
+  Communication time: 0.282201 s  (93.6%)
+    ├─ Bcast (x):     0.277232 s
+    ├─ Reduce (y):    0.026793 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        25622032
+  GFLOP/s:            0.085
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 64 |  8x8  |  0.3016 |   6.0 |  93.6 |   0.085 |   N/A   |  N/A  | 1.007
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=128 | Matrix=weak_ps128.mtx
+---------------------------------------------
+CHECK NNZ: 25621431 (expected 25600000)
+[Rank 0] Matrix: 2560000 x 2560000, nnz=25600000 | grid=16x8 | pattern=0 symmetric=0
+[Rank 0] Matrix: 2560000 x 2560000, nnz=25600000 | grid=16x8
+Global FLOPs per SpMV: 51242862
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps128.mtx
+  Dimensions:         2560000 x 2560000
+  Total NNZ:          25600000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Process grid:       16 x 8 (Px x Py)
+  Partitioning:       2D cyclic (modulo)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=199265  avg=200167.4  max=201322
+  Imbalance ratio:    1.006  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=10.84 MiB  max=10.87 MiB
+  Total memory:       1387.29 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         1.129728 s
+  Computation time:   0.024956 s  (2.2%)
+    └─ Local SpMV:    0.024956 s
+  Communication time: 1.107604 s  (98.0%)
+    ├─ Bcast (x):     1.100834 s
+    ├─ Reduce (y):    0.203410 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        51242862
+  GFLOP/s:            0.045
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+128 | 16x8  |  1.1297 |   2.2 |  98.0 |   0.045 |   N/A   |  N/A  | 1.006
+--------------------------------------------------------------------------------
+
+
+****************WEAK SCALING 1D*********************
+---------------------------------------------
+P=1 | Matrix=weak_ps1.mtx
+---------------------------------------------
+[Rank 0] Matrix: 20000 x 20000, nnz=200000 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps1.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          200000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=200000  avg=200000.0  max=200000
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=5.72 MiB  max=5.72 MiB
+  Total memory:       5.72 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.000583 s
+  Computation time:   0.000546 s  (93.7%)
+    └─| Local SpMV:    0.000546 s
+  Communication time: 0.000050 s  (8.6%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.000013 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        400000
+  GFLOP/s:            0.686
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0006 |  93.7 |   8.6 |   0.686 |   N/A   |  N/A  | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=2 | Matrix=weak_ps2.mtx
+---------------------------------------------
+[Rank 0] Matrix: 40000 x 40000, nnz=400000 | 1D cyclic rows over P=2
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps2.mtx
+  Dimensions:         40000 x 40000
+  Total NNZ:          400000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=98667  avg=100793.5  max=102920
+  Imbalance ratio:    1.021  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=18301  avg=18388.0  max=18475
+  Total ghost cols:   36776
+  Ghost ratio:        18.24%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=3.28 MiB  max=3.34 MiB
+  Total memory:       6.57 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.005444 s
+  Computation time:   0.004728 s  (86.8%)
+    └─| Local SpMV:    0.004728 s
+  Communication time: 0.001107 s  (20.3%)
+    ├─| Ghost exchange: 0.000409 s
+    └─| Gatherv:       0.000461 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        403174
+  GFLOP/s:            0.074
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  2 |  0.0054 |  86.8 |  20.3 |   0.074 |   N/A   |  N/A  | 1.021 |  18.2
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=4 | Matrix=weak_ps4.mtx
+---------------------------------------------
+[Rank 0] Matrix: 80000 x 80000, nnz=800000 | 1D cyclic rows over P=4
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps4.mtx
+  Dimensions:         80000 x 80000
+  Total NNZ:          800000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=49670  avg=50588.5  max=51789
+  Imbalance ratio:    1.024  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=27586  avg=28100.8  max=28518
+  Total ghost cols:   112403
+  Ghost ratio:        55.55%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=2.05 MiB  max=2.09 MiB
+  Total memory:       8.22 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004402 s
+  Computation time:   0.003490 s  (79.3%)
+    └─| Local SpMV:    0.003490 s
+  Communication time: 0.001281 s  (29.1%)
+    ├─| Ghost exchange: 0.000419 s
+    └─| Gatherv:       0.000589 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        404708
+  GFLOP/s:            0.092
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  4 |  0.0044 |  79.3 |  29.1 |   0.092 |   N/A   |  N/A  | 1.024 |  55.5
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=8 | Matrix=weak_ps8.mtx
+---------------------------------------------
+[Rank 0] Matrix: 160000 x 160000, nnz=1600000 | 1D cyclic rows over P=8
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps8.mtx
+  Dimensions:         160000 x 160000
+  Total NNZ:          1600000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=24221  avg=25330.1  max=26400
+  Imbalance ratio:    1.042  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=19527  avg=20481.9  max=21297
+  Total ghost cols:   163855
+  Ghost ratio:        80.86%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=1.29 MiB  max=1.33 MiB
+  Total memory:       10.34 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.003504 s
+  Computation time:   0.001860 s  (53.1%)
+    └─| Local SpMV:    0.001860 s
+  Communication time: 0.002961 s  (84.5%)
+    ├─| Ghost exchange: 0.000480 s
+    └─| Gatherv:       0.001527 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        405282
+  GFLOP/s:            0.116
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  8 |  0.0035 |  53.1 |  84.5 |   0.116 |   N/A   |  N/A  | 1.042 |  80.9
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=16 | Matrix=weak_ps16.mtx
+---------------------------------------------
+[Rank 0] Matrix: 320000 x 320000, nnz=3200000 | 1D cyclic rows over P=16
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps16.mtx
+  Dimensions:         320000 x 320000
+  Total NNZ:          3200000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=12310  avg=12672.2  max=13390
+  Imbalance ratio:    1.057  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=11356  avg=11651.2  max=12342
+  Total ghost cols:   186420
+  Ghost ratio:        91.94%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.85 MiB  max=0.88 MiB
+  Total memory:       13.65 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.003871 s
+  Computation time:   0.001105 s  (28.6%)
+    └─| Local SpMV:    0.001105 s
+  Communication time: 0.005018 s  (129.6%)
+    ├─| Ghost exchange: 0.000621 s
+    └─| Gatherv:       0.002325 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        405512
+  GFLOP/s:            0.105
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 16 |  0.0039 |  28.6 | 129.6 |   0.105 |   N/A   |  N/A  | 1.057 |  91.9
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=32 | Matrix=weak_ps32.mtx
+---------------------------------------------
+[Rank 0] Matrix: 640000 x 640000, nnz=6400000 | 1D cyclic rows over P=32
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps32.mtx
+  Dimensions:         640000 x 640000
+  Total NNZ:          6400000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=6210  avg=6337.5  max=6740
+  Imbalance ratio:    1.064  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=5974  avg=6109.7  max=6507
+  Total ghost cols:   195511
+  Ghost ratio:        96.41%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.62 MiB  max=0.64 MiB
+  Total memory:       19.86 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.010469 s
+  Computation time:   0.000593 s  (5.7%)
+    └─| Local SpMV:    0.000593 s
+  Communication time: 0.014715 s  (140.6%)
+    ├─| Ghost exchange: 0.001393 s
+    └─| Gatherv:       0.004856 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        405600
+  GFLOP/s:            0.039
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 32 |  0.0105 |   5.7 | 140.6 |   0.039 |   N/A   |  N/A  | 1.064 |  96.4
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=64 | Matrix=weak_ps64.mtx
+---------------------------------------------
+[Rank 0] Matrix: 1280000 x 1280000, nnz=12800000 | 1D cyclic rows over P=64
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps64.mtx
+  Dimensions:         1280000 x 1280000
+  Total NNZ:          12800000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=3020  avg=3168.3  max=3410
+  Imbalance ratio:    1.076  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=2969  avg=3113.6  max=3357
+  Total ghost cols:   199269
+  Ghost ratio:        98.27%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.50 MiB  max=0.51 MiB
+  Total memory:       32.11 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.019912 s
+  Computation time:   0.000358 s  (1.8%)
+    └─| Local SpMV:    0.000358 s
+  Communication time: 0.027816 s  (139.7%)
+    ├─| Ghost exchange: 0.001040 s
+    └─| Gatherv:       0.008395 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        405548
+  GFLOP/s:            0.020
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 64 |  0.0199 |   1.8 | 139.7 |   0.020 |   N/A   |  N/A  | 1.076 |  98.3
+--------------------------------------------------------------------------------
+
+---------------------------------------------
+P=128 | Matrix=weak_ps128.mtx
+---------------------------------------------
+[Rank 0] Matrix: 2560000 x 2560000, nnz=25600000 | 1D cyclic rows over P=128
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/matrices/weak_ps128.mtx
+  Dimensions:         2560000 x 2560000
+  Total NNZ:          25600000
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=1540  avg=1582.9  max=1740
+  Imbalance ratio:    1.099  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=1525  avg=1569.4  max=1730
+  Total ghost cols:   200885
+  Ghost ratio:        99.15%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.44 MiB  max=0.45 MiB
+  Total memory:       56.54 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.091567 s
+  Computation time:   0.000328 s  (0.4%)
+    └─| Local SpMV:    0.000328 s
+  Communication time: 0.104689 s  (114.3%)
+    ├─| Ghost exchange: 0.004450 s
+    └─| Gatherv:       0.013228 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        405224
+  GFLOP/s:            0.004
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+128 |  0.0916 |   0.4 | 114.3 |   0.004 |   N/A   |  N/A  | 1.099 |  99.1
+--------------------------------------------------------------------------------

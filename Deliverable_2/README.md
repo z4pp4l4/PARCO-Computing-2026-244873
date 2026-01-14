@@ -9,7 +9,6 @@ The project focuses on **Distributed Sparse Matrix–Vector Multiplication (SpMV
 - **hybrid MPI + OpenMP analysis results**
 
 The implementation follows **Foster’s Design Methodology** (Partitioning, Communication, Aggregation, Mapping) and evaluates scalability up to **128 MPI processes**.
-
 ---
 
 ## Repository structure
@@ -52,6 +51,11 @@ module load gcc91
 module load mpich-3.2.1--gcc-9.1.0
 module load perf
 ```
+Since the maximum number of processes that can be used within the code is 128, it is necessary to allocate the resources on the cluster.
+```bash
+qsub -I -q short_cpuQ -l select=2:ncpus=64:mem=64gb,walltime=01:00:00
+```
+
 
 ---
 

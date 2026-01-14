@@ -114,8 +114,8 @@ Where;
     <matrix> = path to the Matrix Market file
 '''
 #examples:
-mpirun -np 8 MPI_implementation.out src/nemeth19.mtx
-mpirun -np 32 MPI_implementation.out src/torso3.mtx
+mpirun -np 8 MPI_implementation.out ../src/nemeth19.mtx
+mpirun -np 32 MPI_implementation.out ../src/torso3.mtx
 ```
 MPI 2D SpMV
 
@@ -124,8 +124,8 @@ Run the **2D MPI implementation using a Cartesian process grid**:
 ```bash
 mpirun -np <P> MPI_impl_2D_partitioning.out <matrix>
 #examples:
-mpirun -np 16 MPI_impl_2D_partitioning.out src/Trefethen_20000.mtx
-mpirun -np 64 MPI_impl_2D_partitioning.out src/torso3.mtx
+mpirun -np 16 MPI_impl_2D_partitioning.out ../src/Trefethen_20000.mtx
+mpirun -np 64 MPI_impl_2D_partitioning.out ../src/torso3.mtx
 ```
 
 STRONG SCALING:

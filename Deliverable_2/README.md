@@ -41,6 +41,11 @@ Deliverable_2/
 
 ## Requirements
 
+Since the maximum number of processes that can be used within the code is 128, it is necessary to allocate the resources on the cluster.
+```bash
+qsub -I -q short_cpuQ -l select=2:ncpus=64:mem=64gb,walltime=01:00:00
+```
+
 - MPI implementation (MPICH)
 - C compiler with MPI support (`mpicc`)
 - Linux-based environment (tested on HPC clusters)
@@ -51,11 +56,6 @@ module load gcc91
 module load mpich-3.2.1--gcc-9.1.0
 module load perf
 ```
-Since the maximum number of processes that can be used within the code is 128, it is necessary to allocate the resources on the cluster.
-```bash
-qsub -I -q short_cpuQ -l select=2:ncpus=64:mem=64gb,walltime=01:00:00
-```
-
 
 ---
 
@@ -96,9 +96,9 @@ Generate also synthetic matrices for weak scaling (to see weak scaling)
 Compile the MPI programs
 1D SpMV (cyclic row partitioning)
 ```bash
-mpicc -O3 -std=c99 -fopenmp scripts/MPI_implementation.c -o scripts/MPI_implementation.out
+mpicc -O3 -std=c99 -fopenmp MPI_implementation.c -o MPI_implementation.out
 
-mpicc -O3 -std=c99 -fopenmp scripts/MPI_impl_2D_partitioning.c -o scripts/MPI_impl_2D_partitioning.out
+mpicc -O3 -std=c99 -fopenmp MPI_impl_2D_partitioning.c -o MPI_impl_2D_partitioning.out
 ```
 #### Execution
 
@@ -107,32 +107,32 @@ MPI 1D SpMV
 Run the **1D cyclic row-wise MPI implementation**:
 
 ```bash
-mpirun -np <P> scripts/MPI_implementation.out <matrix>
+mpirun -np <P> MPI_implementation.out <matrix>
 '''
 Where; 
     <P> = number of MPI processes; 
     <matrix> = path to the Matrix Market file
 '''
 #examples:
-mpirun -np 8 scripts/MPI_implementation.out src/nemeth19.mtx
-mpirun -np 32 scripts/MPI_implementation.out src/torso3.mtx
+mpirun -np 8 MPI_implementation.out src/nemeth19.mtx
+mpirun -np 32 MPI_implementation.out src/torso3.mtx
 ```
 MPI 2D SpMV
 
 Run the **2D MPI implementation using a Cartesian process grid**:
 
 ```bash
-mpirun -np <P> scripts/MPI_impl_2D_partitioning.out <matrix>
+mpirun -np <P> MPI_impl_2D_partitioning.out <matrix>
 #examples:
-mpirun -np 16 scripts/MPI_impl_2D_partitioning.out src/Trefethen_20000.mtx
-mpirun -np 64 scripts/MPI_impl_2D_partitioning.out src/torso3.mtx
+mpirun -np 16 MPI_impl_2D_partitioning.out src/Trefethen_20000.mtx
+mpirun -np 64 MPI_impl_2D_partitioning.out src/torso3.mtx
 ```
 
 STRONG SCALING:
 
 Runs the same matrix while increasing the number of MPI processes.
 ```bash
-./scripts/strong_scaling.sh
+./strong_scaling.sh
 ```
 Available variants: runtime - static - omp parallel for
 ```bash
@@ -149,7 +149,7 @@ WEAK SCALING
 Increases the matrix size proportionally to the number of processes.
 
 ```bash
-./scripts/weak_scaling.sh
+./weak_scaling.sh
 ```
 Available variants: runtime - static - omp parallel for
 ```bash

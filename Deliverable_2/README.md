@@ -96,9 +96,13 @@ Generate also synthetic matrices for weak scaling (to see weak scaling)
 Compile the MPI programs
 1D SpMV (cyclic row partitioning)
 ```bash
+mpicc -O3 -std=c99 -fopenmp MPI_1D_base.c -o MPI_1D_base.out
+
 mpicc -O3 -std=c99 -fopenmp MPI_implementation.c -o MPI_implementation.out
 
 mpicc -O3 -std=c99 -fopenmp MPI_impl_2D_partitioning.c -o MPI_impl_2D_partitioning.out
+
+
 ```
 #### Execution
 
@@ -114,6 +118,8 @@ Where;
     <matrix> = path to the Matrix Market file
 '''
 #examples:
+#base 1D:
+mpirun -np 16 ./MPI_1D_base.out ../src/nemeth19.mtx
 mpirun -np 8 ./MPI_implementation.out ../src/nemeth19.mtx
 mpirun -np 32 ./MPI_implementation.out ../src/torso3.mtx
 ```

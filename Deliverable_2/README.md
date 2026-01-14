@@ -9,7 +9,6 @@ The project focuses on **Distributed Sparse Matrix–Vector Multiplication (SpMV
 - **hybrid MPI + OpenMP analysis results**
 
 The implementation follows **Foster’s Design Methodology** (Partitioning, Communication, Aggregation, Mapping) and evaluates scalability up to **128 MPI processes**.
-
 ---
 
 ## Repository structure

@@ -39,7 +39,7 @@ echo
 # OpenMP runtime configuration
 export OMP_PLACES=cores
 export OMP_PROC_BIND=close
-export OMP_SCHEDULE=runtime
+#export OMP_SCHEDULE=runtime
 
 #####################################
 # STRONG SCALING 2D

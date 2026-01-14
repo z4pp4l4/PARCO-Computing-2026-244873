@@ -6,7 +6,6 @@
 #include <omp.h>
 #include <time.h>
 
-
 typedef struct {
     int row;
     int col;
@@ -16,7 +15,6 @@ typedef struct {
 static int compare_coo_entries(const void *a, const void *b) {
     const COO_entry *ea = (const COO_entry *)a;
     const COO_entry *eb = (const COO_entry *)b;
-
     if (ea->row != eb->row)
         return ea->row - eb->row;
     return ea->col - eb->col;
@@ -33,17 +31,61 @@ static double env_double_or_neg(const char *name) {
 
 static double bytes_to_mib(double bytes) {
     return bytes / (1024.0 * 1024.0);
-
 }
+
 /* 
-   In cyclic distribution across P processors with stride P,
-   a processor at offset gets elements: offset, offset+P, offset+2P, ...
-   Returns how many such elements fit in range [0, N)
+   BLOCK PARTITIONING: Processor pr owns rows [start_row, end_row)
 */
-static int local_cyclic_size(int N, int stride, int offset) {
-    if (offset >= N) 
-        return 0;
-    return (N - offset + stride - 1) / stride;
+static void get_block_row_range(int N, int Px, int pr, int *start, int *end) {
+    int base_size = N / Px;
+    int remainder = N % Px;
+    
+    if (pr < remainder) {
+        *start = pr * (base_size + 1);
+        *end = *start + base_size + 1;
+    } else {
+        *start = pr * base_size + remainder;
+        *end = *start + base_size;
+    }
+}
+
+static void get_block_col_range(int N, int Py, int pc, int *start, int *end) {
+    int base_size = N / Py;
+    int remainder = N % Py;
+    
+    if (pc < remainder) {
+        *start = pc * (base_size + 1);
+        *end = *start + base_size + 1;
+    } else {
+        *start = pc * base_size + remainder;
+        *end = *start + base_size;
+    }
+}
+
+/* Returns the owner processor for a given global row in block distribution */
+static int get_row_owner(int global_row, int N, int Px) {
+    int base_size = N / Px;
+    int remainder = N % Px;
+    int threshold = remainder * (base_size + 1);
+    
+    if (global_row < threshold) {
+        return global_row / (base_size + 1);
+    } else {
+        return remainder + (global_row - threshold) / base_size;
+    }
+}
+
+/* Returns the owner processor for a given global col in block distribution */
+static int get_col_owner(int global_col, int N, int Py) {
+    int base_size = N / Py;
+    int remainder = N % Py;
+    int threshold = remainder * (base_size + 1);
+    
+    if (global_col < threshold) {
+        return global_col / (base_size + 1);
+    } else {
+        return remainder + (global_col - threshold) / base_size;
+    }
 }
 
 static void read_header_mtx(
@@ -58,7 +100,6 @@ static void read_header_mtx(
             char ch;
             MPI_Status st;
 
-            // read a line
             while (1) {
                 MPI_File_read_at(fh, off, &ch, 1, MPI_CHAR, &st);
                 off += 1;
@@ -69,11 +110,7 @@ static void read_header_mtx(
 
             if (pos == 0) continue;
 
-            // Banner typically starts with "%%MatrixMarket"
             if (strncmp(line, "%%MatrixMarket", 14) == 0) {
-                // Example:
-                // %%MatrixMarket matrix coordinate real general
-                // %%MatrixMarket matrix coordinate pattern symmetric
                 char object[64], format[64], field[64], symmetry[64];
                 int n = sscanf(line, "%%%%MatrixMarket %63s %63s %63s %63s",
                                object, format, field, symmetry);
@@ -119,19 +156,17 @@ static void read_header_mtx(
         }
     }
 
-    // Broadcast header info
     MPI_Bcast(rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(nnz,  1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data_offset, 1, MPI_OFFSET, 0, MPI_COMM_WORLD);
-
     MPI_Bcast(&pattern, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&symmetric, 1, MPI_INT, 0, MPI_COMM_WORLD);
     *is_pattern = pattern;
     *is_symmetric = symmetric;
 }
 
-static void read_and_distribute_2D(
+static void read_and_distribute_2D_block(
     const char *filename, int rank, int size, MPI_Comm grid_comm,
     int Px, int Py, int pr, int pc,
     int *rows, int *cols, int *global_nnz,
@@ -166,7 +201,6 @@ static void read_and_distribute_2D(
 
     MPI_File_close(&fh);
 
-    /* ---- align lines ---- */
     char *p = buffer;
     char *q = buffer + read_size;
 
@@ -178,7 +212,7 @@ static void read_and_distribute_2D(
         while (q > p && *(q - 1) != '\n') q--;
     }
 
-    /* ---- PHASE A: parse all entries ---- */
+    /* PHASE A: parse all entries */
     int cap = 4096;
     int count = 0;
     COO_entry *parsed = malloc(cap * sizeof(COO_entry));
@@ -223,13 +257,13 @@ static void read_and_distribute_2D(
 
     free(buffer);
 
-    /* ---- PHASE B: redistribute 2D ---- */
+    /* PHASE B: redistribute 2D BLOCK */
     int *send_cnt = calloc(size, sizeof(int));
     for (int k = 0; k < count; k++) {
         int i = parsed[k].row;
         int j = parsed[k].col;
-        int owner_r = i % Px;   // CYCLIC
-        int owner_c = j % Py;   // CYCLIC
+        int owner_r = get_row_owner(i, *rows, Px);  // BLOCK
+        int owner_c = get_col_owner(j, *cols, Py);  // BLOCK
         send_cnt[owner_r * Py + owner_c]++;
     }
 
@@ -252,13 +286,13 @@ static void read_and_distribute_2D(
     for (int k = 0; k < count; k++) {
         int i = parsed[k].row;
         int j = parsed[k].col;
-        int owner_r = i % Px;     // CYCLIC
-        int owner_c = j % Py;     // CYCLIC
+        int owner_r = get_row_owner(i, *rows, Px);  // BLOCK
+        int owner_c = get_col_owner(j, *cols, Py);  // BLOCK
         int owner   = owner_r * Py + owner_c;
-
 
         sendbuf[sdisp[owner] + tmp[owner]++] = parsed[k];
     }
+    
     for (int i = 0; i < size; i++) {
         send_cnt[i] *= sizeof(COO_entry);
         recv_cnt[i] *= sizeof(COO_entry);
@@ -266,9 +300,9 @@ static void read_and_distribute_2D(
         rdisp[i]    *= sizeof(COO_entry);
     }
 
+    MPI_Alltoallv(sendbuf, send_cnt, sdisp, MPI_BYTE, 
+                  local,   recv_cnt, rdisp, MPI_BYTE, MPI_COMM_WORLD);
 
-    MPI_Alltoallv(sendbuf, send_cnt, sdisp, MPI_BYTE, local,   recv_cnt, rdisp, MPI_BYTE,MPI_COMM_WORLD);
-    /* ---- output ---- */
     *local_nnz = total_recv;
     long long check;
     long long l = *local_nnz;
@@ -280,18 +314,23 @@ static void read_and_distribute_2D(
     *coo_c_local = malloc(total_recv * sizeof(int));
     *coo_v       = malloc(total_recv * sizeof(double));
 
+    // Get this processor's row range for BLOCK partitioning
+    int row_start, row_end;
+    get_block_row_range(*rows, Px, pr, &row_start, &row_end);
+
     for (int k = 0; k < total_recv; k++) {
         int i = local[k].row;
-        // check di sicurezza
-        if (i % Px != pr) {
+        // Safety check
+        if (i < row_start || i >= row_end) {
             fprintf(stderr,
-                "[Rank %d] ERROR: wrong row ownership i=%d pr=%d Px=%d\n",
-                rank, i, pr, Px);
+                "[Rank %d] ERROR: wrong row ownership i=%d not in [%d,%d)\n",
+                rank, i, row_start, row_end);
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
         // GLOBAL → LOCAL row index
-        local[k].row = i / Px;
+        local[k].row = i - row_start;
     }
+    
     for (int k = 0; k < total_recv; k++) {
         (*coo_r_local)[k] = local[k].row;
         (*coo_c_local)[k] = local[k].col;
@@ -304,8 +343,6 @@ static void read_and_distribute_2D(
     free(send_cnt); free(recv_cnt);
     free(sdisp); free(rdisp); free(tmp);
 }
-
-
 
 static void coo_to_csr(
     int local_nnz, int local_rows,
@@ -323,10 +360,9 @@ static void coo_to_csr(
         entries[k].col = coo_c[k];
         entries[k].val = coo_v[k];
     }
-    //sort COO entries by (row, col) 
+    
     qsort(entries, local_nnz, sizeof(COO_entry), compare_coo_entries);
 
-    //CSR building
     *row_ptr = calloc(local_rows + 1, sizeof(int));
     *col_idx = malloc(local_nnz * sizeof(int));
     *vals    = malloc(local_nnz * sizeof(double));
@@ -344,7 +380,6 @@ static void coo_to_csr(
     for (int r = 0; r < local_rows; r++)
         (*row_ptr)[r + 1] += (*row_ptr)[r];
 
-    // fill CSR col_idx and vals
     int *cursor = malloc(local_rows * sizeof(int));
     memcpy(cursor, *row_ptr, local_rows * sizeof(int));
 
@@ -360,92 +395,74 @@ static void coo_to_csr(
 }
 
 int main(int argc, char **argv) {
-    // Initialize MPI environment
     MPI_Init(&argc, &argv);
-    //omp_set_num_threads(1);
+    
     int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);  // This process's rank (0 to size-1)
-    MPI_Comm_size(MPI_COMM_WORLD, &size);  // Total number of processes
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if (argc < 2) {
         if (rank == 0) {
-            //printf("Usage: %s matrix.mtx\n", argv[0]);
+            printf("Usage: %s matrix.mtx\n", argv[0]);
         }
         MPI_Finalize();
         return 0;
     }
 
-    /* 
-       CREATING 2D PROCESS GRID TOPOLOGY
-    */
     int dims[2] = {0, 0};
-    MPI_Dims_create(size, 2, dims);  // Automatically factor 'size' into 2D grid
+    MPI_Dims_create(size, 2, dims);
     int Px = dims[0];
     int Py = dims[1];
 
-    // Create Cartesian communicator (allows neighbor-based communication)
-    int periods[2] = {0, 0};  // No wraparound (non-periodic)
+    int periods[2] = {0, 0};
     MPI_Comm grid_comm;
     MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, 0, &grid_comm);
 
-    // Get this rank's coordinates in the grid
     int coords[2];
     MPI_Cart_coords(grid_comm, rank, 2, coords);
-    int pr = coords[0];  // Row in grid
-    int pc = coords[1];  // Column in grid
-    /* 
-       row_comm: all processes with same pr (same row in grid)
-       col_comm: all processes with same pc (same column in grid)
-       Used for reduction operations along rows/columns.
-    */
-    MPI_Comm row_comm;
-    MPI_Comm col_comm;
-    MPI_Comm_split(grid_comm, pr, pc, &row_comm); // Same row, ordered by column
-    MPI_Comm_split(grid_comm, pc, pr, &col_comm); // Same column, ordered by row
+    int pr = coords[0];
+    int pc = coords[1];
+
+    MPI_Comm row_comm, col_comm;
+    MPI_Comm_split(grid_comm, pr, pc, &row_comm);
+    MPI_Comm_split(grid_comm, pc, pr, &col_comm);
     
-    // Variables to hold matrix data
     int rows = 0, cols = 0, global_nnz = 0;
     int local_nnz = 0;
     int *coo_r = NULL, *coo_c = NULL;
     double *coo_v = NULL;
     int is_pattern = 0, is_symmetric = 0;
 
-    read_and_distribute_2D(
+    read_and_distribute_2D_block(
         argv[1], rank, size, grid_comm, Px, Py, pr, pc,
-        &rows, &cols, &global_nnz, &is_pattern, &is_symmetric, &local_nnz, &coo_r, &coo_c, &coo_v
+        &rows, &cols, &global_nnz, &is_pattern, &is_symmetric, 
+        &local_nnz, &coo_r, &coo_c, &coo_v
     );
 
     if (rank == 0) {
         printf("[Rank 0] Matrix: %d x %d, nnz=%d | grid=%dx%d | pattern=%d symmetric=%d\n",
             rows, cols, global_nnz, Px, Py, is_pattern, is_symmetric);
+        printf("[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)\n");
     }
 
-
-    // Calculate local matrix dimensions
-    int local_num_rows = local_cyclic_size(rows, Px, pr);
-    int local_num_cols = local_cyclic_size(cols, Py, pc);
+    // Calculate local dimensions for BLOCK partitioning
+    int row_start, row_end, col_start, col_end;
+    get_block_row_range(rows, Px, pr, &row_start, &row_end);
+    get_block_col_range(cols, Py, pc, &col_start, &col_end);
     
+    int local_num_rows = row_end - row_start;
+    int local_num_cols = col_end - col_start;
 
-    if (rank == 0) {
-        printf("[Rank 0] Matrix: %d x %d, nnz=%d | grid=%dx%d\n", rows, cols, global_nnz, Px, Py);
-    }
-
-    // Verify total non-zeros read (should match global_nnz if no truncation)
     int sum_local_nnz = 0;
     MPI_Reduce(&local_nnz, &sum_local_nnz, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-    /*
-    if (rank == 0) {
-        printf("[Rank 0] Sum of local nnz (after 2D filter) = %d (can be <= global_nnz if file parsing cuts some boundary lines)\n",
-               sum_local_nnz);
-    } */
 
-    // Convert from COO to CSR format (more efficient for SpMV)
-    int *row_ptr = NULL, *col_idx = NULL; double *vals = NULL;
-    coo_to_csr(local_nnz, local_num_rows, coo_r, coo_c, coo_v, &row_ptr, &col_idx, &vals);
-    // For performance measurement (count FLOPs: each non-zero = 2 FLOPs in SpMV)
-    long long local_flops = 2LL * local_nnz;   //CHECK FLOPS CALCULATION
+    int *row_ptr = NULL, *col_idx = NULL; 
+    double *vals = NULL;
+    coo_to_csr(local_nnz, local_num_rows, coo_r, coo_c, coo_v, 
+               &row_ptr, &col_idx, &vals);
+    
+    long long local_flops = 2LL * local_nnz;
 
-    //  NNZ stats across ranks (min/avg/max) 
     int nnz_min = 0, nnz_max = 0;
     MPI_Allreduce(&local_nnz, &nnz_min, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
     MPI_Allreduce(&local_nnz, &nnz_max, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
@@ -455,25 +472,23 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&local_nnz_ll, &nnz_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 
     double nnz_avg = (size > 0) ? ((double)nnz_sum / (double)size) : 0.0;
-    // Load imbalance ratio (max/avg)
     double load_imbalance = (nnz_avg > 0) ? ((double)nnz_max / nnz_avg) : 1.0;
-    //  memory estimate per rank (MiB) 
-    // NOTE: excludes MPI internals and temporary read buffer already freed.
+
     double mem_bytes =
-        (double)local_nnz * sizeof(int)        // coo_r
-        + (double)local_nnz * sizeof(int)        // coo_c
-        + (double)local_nnz * sizeof(double)     // coo_v
-        + (double)(local_num_rows + 1) * sizeof(int) // row_ptr
-        + (double)local_nnz * sizeof(int)        // col_idx
-        + (double)local_nnz * sizeof(double)     // vals
-        + (double)local_num_cols * sizeof(double)    // x_local
-        + (double)local_num_rows * sizeof(double)    // y_partial
-        + (double)local_num_rows * sizeof(double);   // y_row_sum
+        (double)local_nnz * sizeof(int) +
+        (double)local_nnz * sizeof(int) +
+        (double)local_nnz * sizeof(double) +
+        (double)(local_num_rows + 1) * sizeof(int) +
+        (double)local_nnz * sizeof(int) +
+        (double)local_nnz * sizeof(double) +
+        (double)local_num_cols * sizeof(double) +
+        (double)local_num_rows * sizeof(double) +
+        (double)local_num_rows * sizeof(double);
 
     double mem_mib = bytes_to_mib(mem_bytes);
-    double mem_mib_max = 0.0; // report worst rank
+    double mem_mib_max = 0.0;
     MPI_Allreduce(&mem_mib, &mem_mib_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    // Also calculate average memory
+    
     double mem_mib_avg = 0.0;
     MPI_Allreduce(&mem_mib, &mem_mib_avg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     mem_mib_avg /= size;
@@ -485,28 +500,18 @@ int main(int argc, char **argv) {
     double *x_local = malloc(local_num_cols * sizeof(double));
     double *y_partial = (double*)calloc((size_t)local_num_rows, sizeof(double));
     double *y_row_sum = (double*)calloc((size_t)local_num_rows, sizeof(double));
-    /*
-        y_partial and y_row_sum are both sized by local_num_rows (the local rows owned by the process) 
-        and are initialized to zero, as they accumulate partial results from the SpMV computation and 
-        row-wise reductions, respectively. This allocation ensures each MPI process manages only its 
-        subset of the data, promoting scalability in distributed memory systems.
-    */
-    if (!x_panel||!x_local || !y_partial || !y_row_sum) {
+
+    if (!x_panel || !x_local || !y_partial || !y_row_sum) {
         fprintf(stderr, "[Rank %d] ERROR: x/y allocation failed\n", rank);
         MPI_Abort(MPI_COMM_WORLD, 1);
     }   
-    
-    // Each process column owns a distinct block of x (SUMMA-style distribution)
-    // (they all use the same seed, so they compute identically)
-    // RANDOM VECTOR GENERATION INSIDE EACH PROCESS
-    if (!x_local) MPI_Abort(MPI_COMM_WORLD, 1);
 
     if (pr == 0) {
-        srand(12345 + pc);                 // colonna diversa -> blocco diverso
+        srand(12345 + pc);
         for (int j = 0; j < local_num_cols; j++)
             x_local[j] = (double)rand() / RAND_MAX;
-        
     }
+    
     double t_bcast = 0.0, t_reduce = 0.0, t_spmv = 0.0;
     double t_total_start = MPI_Wtime();
     double t_comp = 0.0;
@@ -517,10 +522,12 @@ int main(int argc, char **argv) {
 
     memset(y_partial, 0, local_num_rows * sizeof(double));
 
+    // SUMMA algorithm with BLOCK partitioning
     for (int pc_iter = 0; pc_iter < Py; pc_iter++) {
+        int iter_col_start, iter_col_end;
+        get_block_col_range(cols, Py, pc_iter, &iter_col_start, &iter_col_end);
+        int panel_cols = iter_col_end - iter_col_start;
 
-        int panel_cols = local_cyclic_size(cols, Py, pc_iter);
-        /* solo la colonna pc_iter possiede il blocco corretto di x */
         if (pc == pc_iter) {
             memcpy(x_panel, x_local, panel_cols * sizeof(double));
         }
@@ -532,23 +539,25 @@ int main(int argc, char **argv) {
         t_bcast += tb;
         t_comm  += tb;
 
-        /* SpMV locale (SUMMA corretto) */
         double tc = MPI_Wtime();
-
+        #pragma omp parallel for
         for (int r = 0; r < local_num_rows; r++) {
-            double acc = y_partial[r];
+            double acc = 0.0;
             for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {
-                int j = col_idx[k];
-                if (j % Py == pc_iter) {
-                    acc += vals[k] * x_panel[j / Py];
+                int j = col_idx[k];  // global column index
+                
+                // Check if this column belongs to the current panel
+                if (j >= iter_col_start && j < iter_col_end) {
+                    int local_j = j - iter_col_start;
+                    acc += vals[k] * x_panel[local_j];
                 }
             }
-            y_partial[r] = acc;
+            y_partial[r] += acc;
         }
+        
         tc = MPI_Wtime() - tc;
         t_spmv += tc;
         t_comp += tc;
-
     }
 
     double tr = MPI_Wtime();
@@ -557,24 +566,19 @@ int main(int argc, char **argv) {
     t_reduce += tr;
     t_comm   += tr;
 
-
     double global_time;
     double local_time = MPI_Wtime() - t0;
-    MPI_Allreduce(&local_time, &global_time,
-                1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&local_time, &global_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-    // Count total FLOPs globally
     long long global_flops;
-    MPI_Reduce(&local_flops, &global_flops, 1,MPI_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_flops, &global_flops, 1, MPI_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
         printf("Global FLOPs per SpMV: %lld\n", global_flops);
     }
 
-
     double t_total = MPI_Wtime() - t_total_start;
 
-    // Collect timing statistics (max = worst case)
     double t_total_max, t_comp_max, t_comm_max;
     double t_bcast_max, t_reduce_max, t_spmv_max;
 
@@ -585,14 +589,11 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&t_reduce, &t_reduce_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&t_spmv,  &t_spmv_max,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-    // percentage calculations
     double comp_pct = 100.0 * t_comp_max / t_total_max;
     double comm_pct = 100.0 * t_comm_max / t_total_max;
 
-    // GFLOP/s
     double gflops = (2.0 * nnz_sum) / (t_total_max * 1e9);
 
-    // Speedup & efficiency (external baseline)
     double T1 = env_double_or_neg("BASELINE_T1");
     double speedup = (T1 > 0) ? T1 / t_total_max : -1.0;
     double efficiency = (speedup > 0) ? speedup / size : -1.0;
@@ -614,7 +615,7 @@ int main(int argc, char **argv) {
         printf("PARALLEL CONFIGURATION:\n");
         printf("  Total processes:    %d\n", size);
         printf("  Process grid:       %d x %d (Px x Py)\n", Px, Py);
-        printf("  Partitioning:       2D cyclic (modulo)\n");
+        printf("  Partitioning:       2D BLOCK (contiguous)\n");
         printf("  Topology:           Cartesian communicator\n");
         printf("\n");
         
@@ -637,7 +638,7 @@ int main(int argc, char **argv) {
         printf("    └─ Local SpMV:    %.6f s\n", t_spmv_max);
         printf("  Communication time: %.6f s  (%.1f%%)\n", t_comm_max, comm_pct);
         printf("    ├─ Bcast (x):     %.6f s\n", t_bcast_max);
-        printf("    ├─ Reduce (y):    %.6f s\n", t_reduce_max);
+        printf("    └─ Reduce (y):    %.6f s\n", t_reduce_max);
         printf("\n");
         
         printf("COMPUTATIONAL INTENSITY:\n");
@@ -672,7 +673,6 @@ int main(int argc, char **argv) {
         printf("\n");
     }
 
-    //Free all allocated memory
     free(coo_r);
     free(coo_c);
     free(coo_v);
@@ -680,14 +680,14 @@ int main(int argc, char **argv) {
     free(col_idx);
     free(vals);
     free(x_local);
+    free(x_panel);
     free(y_partial);
     free(y_row_sum);
 
-    // Free communicators
     MPI_Comm_free(&row_comm);
     MPI_Comm_free(&col_comm);
     MPI_Comm_free(&grid_comm);
-    // Finalize MPI
+    
     MPI_Finalize();
     return 0;
 }

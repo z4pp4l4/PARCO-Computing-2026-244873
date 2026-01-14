@@ -1,17 +1,70 @@
 Compiling code...
 Compilation OK
 
-*********************************************
-STRONG SCALING 2D: nemeth19.mtx
-*********************************************
+*************************************************
+STRONG SCALING 2D | Matrix = nemeth19.mtx
+*************************************************
+Baseline T1 = 0.004449s
 
 ---------------------------------------------
-P=1 | Matrix=nemeth19.mtx (BASELINE)
+MPI ranks = 1, OMP threads = 128
 ---------------------------------------------
->> BASELINE_T1 = 0.001131 s
+CHECK NNZ: 818302 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1636604
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=818302  avg=818302.0  max=818302
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=22.10 MiB  max=22.10 MiB
+  Total memory:       22.10 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004641 s
+  Computation time:   0.004587 s  (98.8%)
+    └─ Local SpMV:    0.004587 s
+  Communication time: 0.000029 s  (0.6%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000027 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1636604
+  GFLOP/s:            0.353
+
+SCALABILITY:
+  Baseline (T1):      0.004449 s
+  Speedup:            0.96x
+  Efficiency:         95.86%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0046 |  98.8 |   0.6 |   0.353 |    0.96 |  95.9 | 1.000
+--------------------------------------------------------------------------------
+
 
 ---------------------------------------------
-P=2 | Matrix=nemeth19.mtx
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 CHECK NNZ: 818557 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=2x1 | pattern=0 symmetric=1
@@ -42,33 +95,33 @@ MEMORY USAGE:
   Total memory:       22.18 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.008823 s
-  Computation time:   0.008669 s  (98.3%)
-    └─ Local SpMV:    0.008669 s
-  Communication time: 0.000011 s  (0.1%)
-    ├─ Bcast (x):     0.000001 s
-    └─ Reduce (y):    0.000010 s
+  Total time:         0.002054 s
+  Computation time:   0.001916 s  (93.3%)
+    └─ Local SpMV:    0.001916 s
+  Communication time: 0.000016 s  (0.8%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000015 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1637114
-  GFLOP/s:            0.186
+  GFLOP/s:            0.797
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.13x
-  Efficiency:         6.41%
+  Baseline (T1):      0.004449 s
+  Speedup:            2.17x
+  Efficiency:         108.30%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  2 |  2x1  |  0.0088 |  98.3 |   0.1 |   0.186 |    0.13 |   6.4 | 1.009
+  2 |  2x1  |  0.0021 |  93.3 |   0.8 |   0.797 |    2.17 | 108.3 | 1.009
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=nemeth19.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 CHECK NNZ: 819071 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=2x2 | pattern=0 symmetric=1
@@ -99,33 +152,33 @@ MEMORY USAGE:
   Total memory:       22.38 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.008880 s
-  Computation time:   0.008489 s  (95.6%)
-    └─ Local SpMV:    0.008489 s
-  Communication time: 0.008735 s  (98.4%)
-    ├─ Bcast (x):     0.000637 s
-    └─ Reduce (y):    0.008097 s
+  Total time:         0.130663 s
+  Computation time:   0.050605 s  (38.7%)
+    └─ Local SpMV:    0.050605 s
+  Communication time: 0.035371 s  (27.1%)
+    ├─ Bcast (x):     0.000142 s
+    └─ Reduce (y):    0.035229 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1638142
-  GFLOP/s:            0.184
+  GFLOP/s:            0.013
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.13x
-  Efficiency:         3.18%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.03x
+  Efficiency:         0.85%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  4 |  2x2  |  0.0089 |  95.6 |  98.4 |   0.184 |    0.13 |   3.2 | 2.012
+  4 |  2x2  |  0.1307 |  38.7 |  27.1 |   0.013 |    0.03 |   0.9 | 2.012
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=nemeth19.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 CHECK NNZ: 820095 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=4x2 | pattern=0 symmetric=1
@@ -156,33 +209,33 @@ MEMORY USAGE:
   Total memory:       22.55 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.005231 s
-  Computation time:   0.004876 s  (93.2%)
-    └─ Local SpMV:    0.004876 s
-  Communication time: 0.005095 s  (97.4%)
-    ├─ Bcast (x):     0.000603 s
-    └─ Reduce (y):    0.004523 s
+  Total time:         0.313148 s
+  Computation time:   0.070650 s  (22.6%)
+    └─ Local SpMV:    0.070650 s
+  Communication time: 0.113726 s  (36.3%)
+    ├─ Bcast (x):     0.043443 s
+    └─ Reduce (y):    0.083554 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1640190
-  GFLOP/s:            0.314
+  GFLOP/s:            0.005
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.22x
-  Efficiency:         2.70%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.01x
+  Efficiency:         0.18%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  8 |  4x2  |  0.0052 |  93.2 |  97.4 |   0.314 |    0.22 |   2.7 | 2.022
+  8 |  4x2  |  0.3131 |  22.6 |  36.3 |   0.005 |    0.01 |   0.2 | 2.022
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=nemeth19.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 CHECK NNZ: 822160 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=4x4 | pattern=0 symmetric=1
@@ -213,33 +266,33 @@ MEMORY USAGE:
   Total memory:       22.97 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.006410 s
-  Computation time:   0.005682 s  (88.6%)
-    └─ Local SpMV:    0.005682 s
-  Communication time: 0.006311 s  (98.4%)
-    ├─ Bcast (x):     0.004703 s
-    └─ Reduce (y):    0.005281 s
+  Total time:         1.231961 s
+  Computation time:   0.278998 s  (22.6%)
+    └─ Local SpMV:    0.278998 s
+  Communication time: 0.604528 s  (49.1%)
+    ├─ Bcast (x):     0.568673 s
+    └─ Reduce (y):    0.176004 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1644320
-  GFLOP/s:            0.257
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.18x
-  Efficiency:         1.10%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 16 |  4x4  |  0.0064 |  88.6 |  98.4 |   0.257 |    0.18 |   1.1 | 4.024
+ 16 |  4x4  |  1.2320 |  22.6 |  49.1 |   0.001 |    0.00 |   0.0 | 4.024
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=nemeth19.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 CHECK NNZ: 826289 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=8x4 | pattern=0 symmetric=1
@@ -270,33 +323,33 @@ MEMORY USAGE:
   Total memory:       23.37 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.003852 s
-  Computation time:   0.002953 s  (76.7%)
-    └─ Local SpMV:    0.002953 s
-  Communication time: 0.003733 s  (96.9%)
-    ├─ Bcast (x):     0.003239 s
-    └─ Reduce (y):    0.002695 s
+  Total time:         2.813972 s
+  Computation time:   0.554119 s  (19.7%)
+    └─ Local SpMV:    0.554119 s
+  Communication time: 1.046996 s  (37.2%)
+    ├─ Bcast (x):     0.957715 s
+    └─ Reduce (y):    0.361007 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1652578
-  GFLOP/s:            0.429
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.29x
-  Efficiency:         0.92%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 32 |  8x4  |  0.0039 |  76.7 |  96.9 |   0.429 |    0.29 |   0.9 | 4.033
+ 32 |  8x4  |  2.8140 |  19.7 |  37.2 |   0.001 |    0.00 |   0.0 | 4.033
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=nemeth19.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 CHECK NNZ: 834539 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=8x8 | pattern=0 symmetric=1
@@ -327,33 +380,33 @@ MEMORY USAGE:
   Total memory:       24.32 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.004083 s
-  Computation time:   0.003677 s  (90.0%)
-    └─ Local SpMV:    0.003677 s
-  Communication time: 0.003935 s  (96.4%)
-    ├─ Bcast (x):     0.003774 s
-    └─ Reduce (y):    0.002977 s
+  Total time:         8.466983 s
+  Computation time:   1.457542 s  (17.2%)
+    └─ Local SpMV:    1.457542 s
+  Communication time: 4.217386 s  (49.8%)
+    ├─ Bcast (x):     3.699770 s
+    └─ Reduce (y):    1.406940 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1669078
-  GFLOP/s:            0.409
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.28x
-  Efficiency:         0.43%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 64 |  8x8  |  0.0041 |  90.0 |  96.4 |   0.409 |    0.28 |   0.4 | 7.982
+ 64 |  8x8  |  8.4670 |  17.2 |  49.8 |   0.000 |    0.00 |   0.0 | 7.982
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=nemeth19.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 CHECK NNZ: 851088 (expected 413904)
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=16x8 | pattern=0 symmetric=1
@@ -384,43 +437,95 @@ MEMORY USAGE:
   Total memory:       25.34 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.002638 s
-  Computation time:   0.002025 s  (76.8%)
-    └─ Local SpMV:    0.002025 s
-  Communication time: 0.002495 s  (94.6%)
-    ├─ Bcast (x):     0.002257 s
-    └─ Reduce (y):    0.001564 s
+  Total time:         18.289979 s
+  Computation time:   0.002272 s  (0.0%)
+    └─ Local SpMV:    0.002272 s
+  Communication time: 8.375946 s  (45.8%)
+    ├─ Bcast (x):     6.325879 s
+    └─ Reduce (y):    2.120988 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1702176
-  GFLOP/s:            0.645
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001131 s
-  Speedup:            0.43x
-  Efficiency:         0.33%
+  Baseline (T1):      0.004449 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-128 | 16x8  |  0.0026 |  76.8 |  94.6 |   0.645 |    0.43 |   0.3 | 7.983
+128 | 16x8  | 18.2900 |   0.0 |  45.8 |   0.000 |    0.00 |   0.0 | 7.983
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 2D: Trefethen_20000.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=Trefethen_20000.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.000609 s
+*************************************************
+STRONG SCALING 2D | Matrix = Trefethen_20000.mtx
+*************************************************
+Baseline T1 = 0.004402s
 
 ---------------------------------------------
-P=2 | Matrix=Trefethen_20000.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 554466 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1108932
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=554466  avg=554466.0  max=554466
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=15.34 MiB  max=15.34 MiB
+  Total memory:       15.34 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004008 s
+  Computation time:   0.003933 s  (98.1%)
+    └─ Local SpMV:    0.003933 s
+  Communication time: 0.000043 s  (1.1%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000041 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1108932
+  GFLOP/s:            0.277
+
+SCALABILITY:
+  Baseline (T1):      0.004402 s
+  Speedup:            1.10x
+  Efficiency:         109.83%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0040 |  98.1 |   1.1 |   0.277 |    1.10 | 109.8 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 CHECK NNZ: 555017 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=2x1 | pattern=0 symmetric=1
@@ -451,33 +556,33 @@ MEMORY USAGE:
   Total memory:       15.51 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.005746 s
-  Computation time:   0.005558 s  (96.7%)
-    └─ Local SpMV:    0.005558 s
-  Communication time: 0.000013 s  (0.2%)
-    ├─ Bcast (x):     0.000001 s
-    └─ Reduce (y):    0.000012 s
+  Total time:         0.001867 s
+  Computation time:   0.001665 s  (89.2%)
+    └─ Local SpMV:    0.001665 s
+  Communication time: 0.000036 s  (1.9%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000033 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1110034
-  GFLOP/s:            0.193
+  GFLOP/s:            0.594
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.11x
-  Efficiency:         5.30%
+  Baseline (T1):      0.004402 s
+  Speedup:            2.36x
+  Efficiency:         117.87%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  2 |  2x1  |  0.0057 |  96.7 |   0.2 |   0.193 |    0.11 |   5.3 | 1.001
+  2 |  2x1  |  0.0019 |  89.2 |   1.9 |   0.594 |    2.36 | 117.9 | 1.001
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=Trefethen_20000.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 CHECK NNZ: 556204 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=2x2 | pattern=0 symmetric=1
@@ -508,33 +613,33 @@ MEMORY USAGE:
   Total memory:       15.92 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.006437 s
-  Computation time:   0.005768 s  (89.6%)
-    └─ Local SpMV:    0.005768 s
-  Communication time: 0.005828 s  (90.5%)
-    ├─ Bcast (x):     0.000313 s
-    └─ Reduce (y):    0.005603 s
+  Total time:         0.078062 s
+  Computation time:   0.016507 s  (21.1%)
+    └─ Local SpMV:    0.016507 s
+  Communication time: 0.003568 s  (4.6%)
+    ├─ Bcast (x):     0.000705 s
+    └─ Reduce (y):    0.003019 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1112408
-  GFLOP/s:            0.173
+  GFLOP/s:            0.014
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.09x
-  Efficiency:         2.37%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.06x
+  Efficiency:         1.41%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  4 |  2x2  |  0.0064 |  89.6 |  90.5 |   0.173 |    0.09 |   2.4 | 1.858
+  4 |  2x2  |  0.0781 |  21.1 |   4.6 |   0.014 |    0.06 |   1.4 | 1.858
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=Trefethen_20000.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 CHECK NNZ: 558575 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=4x2 | pattern=0 symmetric=1
@@ -565,33 +670,33 @@ MEMORY USAGE:
   Total memory:       16.29 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.003379 s
-  Computation time:   0.002910 s  (86.1%)
-    └─ Local SpMV:    0.002910 s
-  Communication time: 0.002939 s  (87.0%)
-    ├─ Bcast (x):     0.001239 s
-    └─ Reduce (y):    0.002481 s
+  Total time:         0.363876 s
+  Computation time:   0.098938 s  (27.2%)
+    └─ Local SpMV:    0.098938 s
+  Communication time: 0.110720 s  (30.4%)
+    ├─ Bcast (x):     0.028096 s
+    └─ Reduce (y):    0.109722 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1117150
-  GFLOP/s:            0.331
+  GFLOP/s:            0.003
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.18x
-  Efficiency:         2.25%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.01x
+  Efficiency:         0.15%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  8 |  4x2  |  0.0034 |  86.1 |  87.0 |   0.331 |    0.18 |   2.3 | 1.864
+  8 |  4x2  |  0.3639 |  27.2 |  30.4 |   0.003 |    0.01 |   0.2 | 1.864
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=Trefethen_20000.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 CHECK NNZ: 563318 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=4x4 | pattern=0 symmetric=1
@@ -622,33 +727,33 @@ MEMORY USAGE:
   Total memory:       17.18 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.004818 s
-  Computation time:   0.003309 s  (68.7%)
-    └─ Local SpMV:    0.003309 s
-  Communication time: 0.004537 s  (94.2%)
-    ├─ Bcast (x):     0.003062 s
-    └─ Reduce (y):    0.003104 s
+  Total time:         1.319958 s
+  Computation time:   0.363176 s  (27.5%)
+    └─ Local SpMV:    0.363176 s
+  Communication time: 0.607274 s  (46.0%)
+    ├─ Bcast (x):     0.542417 s
+    └─ Reduce (y):    0.176005 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1126636
-  GFLOP/s:            0.234
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.13x
-  Efficiency:         0.79%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 16 |  4x4  |  0.0048 |  68.7 |  94.2 |   0.234 |    0.13 |   0.8 | 3.435
+ 16 |  4x4  |  1.3200 |  27.5 |  46.0 |   0.001 |    0.00 |   0.0 | 3.435
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=Trefethen_20000.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 CHECK NNZ: 572892 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=8x4 | pattern=0 symmetric=1
@@ -679,33 +784,33 @@ MEMORY USAGE:
   Total memory:       18.04 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.003378 s
-  Computation time:   0.001733 s  (51.3%)
-    └─ Local SpMV:    0.001733 s
-  Communication time: 0.003209 s  (95.0%)
-    ├─ Bcast (x):     0.002255 s
-    └─ Reduce (y):    0.001588 s
+  Total time:         2.776952 s
+  Computation time:   0.525021 s  (18.9%)
+    └─ Local SpMV:    0.525021 s
+  Communication time: 1.043466 s  (37.6%)
+    ├─ Bcast (x):     0.881747 s
+    └─ Reduce (y):    0.352005 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1145784
-  GFLOP/s:            0.339
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.18x
-  Efficiency:         0.56%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 32 |  8x4  |  0.0034 |  51.3 |  95.0 |   0.339 |    0.18 |   0.6 | 3.440
+ 32 |  8x4  |  2.7770 |  18.9 |  37.6 |   0.000 |    0.00 |   0.0 | 3.440
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=Trefethen_20000.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 CHECK NNZ: 591948 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=8x8 | pattern=0 symmetric=1
@@ -736,33 +841,33 @@ MEMORY USAGE:
   Total memory:       20.08 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.003159 s
-  Computation time:   0.002143 s  (67.8%)
-    └─ Local SpMV:    0.002143 s
-  Communication time: 0.003009 s  (95.2%)
-    ├─ Bcast (x):     0.002831 s
-    └─ Reduce (y):    0.001341 s
+  Total time:         8.252974 s
+  Computation time:   0.262114 s  (3.2%)
+    └─ Local SpMV:    0.262114 s
+  Communication time: 4.232332 s  (51.3%)
+    ├─ Bcast (x):     3.548208 s
+    └─ Reduce (y):    1.064780 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1183896
-  GFLOP/s:            0.375
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.19x
-  Efficiency:         0.30%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 64 |  8x8  |  0.0032 |  67.8 |  95.2 |   0.375 |    0.19 |   0.3 | 6.304
+ 64 |  8x8  |  8.2530 |   3.2 |  51.3 |   0.000 |    0.00 |   0.0 | 6.304
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=Trefethen_20000.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 CHECK NNZ: 630127 (expected 287233)
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=16x8 | pattern=0 symmetric=1
@@ -793,43 +898,95 @@ MEMORY USAGE:
   Total memory:       22.32 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.002989 s
-  Computation time:   0.001433 s  (47.9%)
-    └─ Local SpMV:    0.001433 s
-  Communication time: 0.002685 s  (89.8%)
-    ├─ Bcast (x):     0.002406 s
-    └─ Reduce (y):    0.000971 s
+  Total time:         19.710039 s
+  Computation time:   0.001432 s  (0.0%)
+    └─ Local SpMV:    0.001432 s
+  Communication time: 9.794905 s  (49.7%)
+    ├─ Bcast (x):     7.675929 s
+    └─ Reduce (y):    2.813947 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1260254
-  GFLOP/s:            0.422
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.000609 s
-  Speedup:            0.20x
-  Efficiency:         0.16%
+  Baseline (T1):      0.004402 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-128 | 16x8  |  0.0030 |  47.9 |  89.8 |   0.422 |    0.20 |   0.2 | 6.331
+128 | 16x8  | 19.7100 |   0.0 |  49.7 |   0.000 |    0.00 |   0.0 | 6.331
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 2D: torso3.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=torso3.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.007418 s
+*************************************************
+STRONG SCALING 2D | Matrix = torso3.mtx
+*************************************************
+Baseline T1 = 0.007840s
 
 ---------------------------------------------
-P=2 | Matrix=torso3.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 4429042 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=1x1 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8858084
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=4429042  avg=4429042.0  max=4429042
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=125.19 MiB  max=125.19 MiB
+  Total memory:       125.19 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.008217 s
+  Computation time:   0.005945 s  (72.4%)
+    └─ Local SpMV:    0.005945 s
+  Communication time: 0.001767 s  (21.5%)
+    ├─ Bcast (x):     0.000003 s
+    └─ Reduce (y):    0.001764 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8858084
+  GFLOP/s:            1.078
+
+SCALABILITY:
+  Baseline (T1):      0.007840 s
+  Speedup:            0.95x
+  Efficiency:         95.41%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0082 |  72.4 |  21.5 |   1.078 |    0.95 |  95.4 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 CHECK NNZ: 4429158 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=2x1 | pattern=0 symmetric=0
@@ -860,33 +1017,33 @@ MEMORY USAGE:
   Total memory:       127.17 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.008271 s
-  Computation time:   0.002829 s  (34.2%)
-    └─ Local SpMV:    0.002829 s
-  Communication time: 0.000683 s  (8.3%)
-    ├─ Bcast (x):     0.000002 s
-    └─ Reduce (y):    0.000681 s
+  Total time:         0.009484 s
+  Computation time:   0.002716 s  (28.6%)
+    └─ Local SpMV:    0.002716 s
+  Communication time: 0.000784 s  (8.3%)
+    ├─ Bcast (x):     0.000005 s
+    └─ Reduce (y):    0.000782 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8858316
-  GFLOP/s:            1.071
+  GFLOP/s:            0.934
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.90x
-  Efficiency:         44.84%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.83x
+  Efficiency:         41.33%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  2 |  2x1  |  0.0083 |  34.2 |   8.3 |   1.071 |    0.90 |  44.8 | 1.001
+  2 |  2x1  |  0.0095 |  28.6 |   8.3 |   0.934 |    0.83 |  41.3 | 1.001
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=torso3.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 CHECK NNZ: 4429403 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=2x2 | pattern=0 symmetric=0
@@ -917,33 +1074,33 @@ MEMORY USAGE:
   Total memory:       132.12 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.051427 s
-  Computation time:   0.045580 s  (88.6%)
-    └─ Local SpMV:    0.045580 s
-  Communication time: 0.048682 s  (94.7%)
-    ├─ Bcast (x):     0.003896 s
-    └─ Reduce (y):    0.044786 s
+  Total time:         0.205832 s
+  Computation time:   0.039830 s  (19.4%)
+    └─ Local SpMV:    0.039830 s
+  Communication time: 0.138808 s  (67.4%)
+    ├─ Bcast (x):     0.132911 s
+    └─ Reduce (y):    0.026838 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8858806
-  GFLOP/s:            0.172
+  GFLOP/s:            0.043
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.14x
-  Efficiency:         3.61%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.04x
+  Efficiency:         0.95%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  4 |  2x2  |  0.0514 |  88.6 |  94.7 |   0.172 |    0.14 |   3.6 | 1.967
+  4 |  2x2  |  0.2058 |  19.4 |  67.4 |   0.043 |    0.04 |   1.0 | 1.967
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=torso3.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 CHECK NNZ: 4429881 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=4x2 | pattern=0 symmetric=0
@@ -974,33 +1131,33 @@ MEMORY USAGE:
   Total memory:       136.09 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.036810 s
-  Computation time:   0.025329 s  (68.8%)
-    └─ Local SpMV:    0.025329 s
-  Communication time: 0.034687 s  (94.2%)
-    ├─ Bcast (x):     0.032857 s
-    └─ Reduce (y):    0.022892 s
+  Total time:         0.428930 s
+  Computation time:   0.050417 s  (11.8%)
+    └─ Local SpMV:    0.050417 s
+  Communication time: 0.189084 s  (44.1%)
+    ├─ Bcast (x):     0.186729 s
+    └─ Reduce (y):    0.082623 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8859762
-  GFLOP/s:            0.241
+  GFLOP/s:            0.021
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.20x
-  Efficiency:         2.52%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.02x
+  Efficiency:         0.23%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  8 |  4x2  |  0.0368 |  68.8 |  94.2 |   0.241 |    0.20 |   2.5 | 1.979
+  8 |  4x2  |  0.4289 |  11.8 |  44.1 |   0.021 |    0.02 |   0.2 | 1.979
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=torso3.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 CHECK NNZ: 4430839 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=4x4 | pattern=0 symmetric=0
@@ -1031,33 +1188,33 @@ MEMORY USAGE:
   Total memory:       146.00 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.017016 s
-  Computation time:   0.004837 s  (28.4%)
-    └─ Local SpMV:    0.004837 s
-  Communication time: 0.014858 s  (87.3%)
-    ├─ Bcast (x):     0.012861 s
-    └─ Reduce (y):    0.003238 s
+  Total time:         2.285064 s
+  Computation time:   0.180624 s  (7.9%)
+    └─ Local SpMV:    0.180624 s
+  Communication time: 1.671401 s  (73.1%)
+    ├─ Bcast (x):     1.230129 s
+    └─ Reduce (y):    0.444006 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8861678
-  GFLOP/s:            0.521
+  GFLOP/s:            0.004
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.44x
-  Efficiency:         2.72%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 16 |  4x4  |  0.0170 |  28.4 |  87.3 |   0.521 |    0.44 |   2.7 | 3.909
+ 16 |  4x4  |  2.2851 |   7.9 |  73.1 |   0.004 |    0.00 |   0.0 | 3.909
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=torso3.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 CHECK NNZ: 4432753 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=8x4 | pattern=0 symmetric=0
@@ -1088,33 +1245,33 @@ MEMORY USAGE:
   Total memory:       153.96 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.026555 s
-  Computation time:   0.016492 s  (62.1%)
-    └─ Local SpMV:    0.016492 s
-  Communication time: 0.025701 s  (96.8%)
-    ├─ Bcast (x):     0.024250 s
-    └─ Reduce (y):    0.015484 s
+  Total time:         5.274546 s
+  Computation time:   0.074768 s  (1.4%)
+    └─ Local SpMV:    0.074768 s
+  Communication time: 3.343065 s  (63.4%)
+    ├─ Bcast (x):     2.653612 s
+    └─ Reduce (y):    0.703891 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8865506
-  GFLOP/s:            0.334
+  GFLOP/s:            0.002
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.28x
-  Efficiency:         0.87%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 32 |  8x4  |  0.0266 |  62.1 |  96.8 |   0.334 |    0.28 |   0.9 | 3.974
+ 32 |  8x4  |  5.2745 |   1.4 |  63.4 |   0.002 |    0.00 |   0.0 | 3.974
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=torso3.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 CHECK NNZ: 4436573 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=8x8 | pattern=0 symmetric=0
@@ -1145,33 +1302,33 @@ MEMORY USAGE:
   Total memory:       173.83 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.028469 s
-  Computation time:   0.018991 s  (66.7%)
-    └─ Local SpMV:    0.018991 s
-  Communication time: 0.027790 s  (97.6%)
-    ├─ Bcast (x):     0.025709 s
-    └─ Reduce (y):    0.012491 s
+  Total time:         17.214702 s
+  Computation time:   0.393940 s  (2.3%)
+    └─ Local SpMV:    0.393940 s
+  Communication time: 12.800741 s  (74.4%)
+    ├─ Bcast (x):     11.064288 s
+    └─ Reduce (y):    1.768897 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8873146
-  GFLOP/s:            0.312
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.26x
-  Efficiency:         0.41%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 64 |  8x8  |  0.0285 |  66.7 |  97.6 |   0.312 |    0.26 |   0.4 | 7.831
+ 64 |  8x8  | 17.2147 |   2.3 |  74.4 |   0.001 |    0.00 |   0.0 | 7.831
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=torso3.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 CHECK NNZ: 4444218 (expected 4429042)
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=16x8 | pattern=0 symmetric=0
@@ -1202,43 +1359,95 @@ MEMORY USAGE:
   Total memory:       189.85 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.033207 s
-  Computation time:   0.010480 s  (31.6%)
-    └─ Local SpMV:    0.010480 s
-  Communication time: 0.032477 s  (97.8%)
-    ├─ Bcast (x):     0.026952 s
-    └─ Reduce (y):    0.007998 s
+  Total time:         32.738741 s
+  Computation time:   0.460756 s  (1.4%)
+    └─ Local SpMV:    0.460756 s
+  Communication time: 23.933670 s  (73.1%)
+    ├─ Bcast (x):     22.530652 s
+    └─ Reduce (y):    2.120946 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        8888436
-  GFLOP/s:            0.268
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.007418 s
-  Speedup:            0.22x
-  Efficiency:         0.17%
+  Baseline (T1):      0.007840 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-128 | 16x8  |  0.0332 |  31.6 |  97.8 |   0.268 |    0.22 |   0.2 | 8.026
+128 | 16x8  | 32.7387 |   1.4 |  73.1 |   0.000 |    0.00 |   0.0 | 8.026
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 2D: Ga41As41H72.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=Ga41As41H72.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.025305 s
+*************************************************
+STRONG SCALING 2D | Matrix = Ga41As41H72.mtx
+*************************************************
+Baseline T1 = 0.010711s
 
 ---------------------------------------------
-P=2 | Matrix=Ga41As41H72.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 18488476 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36976952
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=18488476  avg=18488476.0  max=18488476
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=500.85 MiB  max=500.85 MiB
+  Total memory:       500.85 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.010976 s
+  Computation time:   0.009707 s  (88.4%)
+    └─ Local SpMV:    0.009707 s
+  Communication time: 0.000532 s  (4.8%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000530 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36976952
+  GFLOP/s:            3.369
+
+SCALABILITY:
+  Baseline (T1):      0.010711 s
+  Speedup:            0.98x
+  Efficiency:         97.59%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0110 |  88.4 |   4.8 |   3.369 |    0.98 |  97.6 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 CHECK NNZ: 18488723 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=2x1 | pattern=0 symmetric=1
@@ -1269,33 +1478,33 @@ MEMORY USAGE:
   Total memory:       502.91 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.202965 s
-  Computation time:   0.198961 s  (98.0%)
-    └─ Local SpMV:    0.198961 s
-  Communication time: 0.000229 s  (0.1%)
+  Total time:         0.017623 s
+  Computation time:   0.013400 s  (76.0%)
+    └─ Local SpMV:    0.013400 s
+  Communication time: 0.000316 s  (1.8%)
     ├─ Bcast (x):     0.000002 s
-    └─ Reduce (y):    0.000227 s
+    └─ Reduce (y):    0.000314 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        36977446
-  GFLOP/s:            0.182
+  GFLOP/s:            2.098
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.12x
-  Efficiency:         6.23%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.61x
+  Efficiency:         30.39%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  2 |  2x1  |  0.2030 |  98.0 |   0.1 |   0.182 |    0.12 |   6.2 | 1.008
+  2 |  2x1  |  0.0176 |  76.0 |   1.8 |   2.098 |    0.61 |  30.4 | 1.008
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=Ga41As41H72.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 CHECK NNZ: 18489226 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=2x2 | pattern=0 symmetric=1
@@ -1326,33 +1535,33 @@ MEMORY USAGE:
   Total memory:       508.03 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.194257 s
-  Computation time:   0.185945 s  (95.7%)
-    └─ Local SpMV:    0.185945 s
-  Communication time: 0.181879 s  (93.6%)
-    ├─ Bcast (x):     0.012131 s
-    └─ Reduce (y):    0.180077 s
+  Total time:         0.212914 s
+  Computation time:   0.037332 s  (17.5%)
+    └─ Local SpMV:    0.037332 s
+  Communication time: 0.111056 s  (52.2%)
+    ├─ Bcast (x):     0.082633 s
+    └─ Reduce (y):    0.046508 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        36978452
-  GFLOP/s:            0.190
+  GFLOP/s:            0.174
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.13x
-  Efficiency:         3.26%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.05x
+  Efficiency:         1.26%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  4 |  2x2  |  0.1943 |  95.7 |  93.6 |   0.190 |    0.13 |   3.3 | 1.915
+  4 |  2x2  |  0.2129 |  17.5 |  52.2 |   0.174 |    0.05 |   1.3 | 1.915
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=Ga41As41H72.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 CHECK NNZ: 18490211 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=4x2 | pattern=0 symmetric=1
@@ -1383,33 +1592,33 @@ MEMORY USAGE:
   Total memory:       512.15 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.027599 s
-  Computation time:   0.012767 s  (46.3%)
-    └─ Local SpMV:    0.012767 s
-  Communication time: 0.015688 s  (56.8%)
-    ├─ Bcast (x):     0.014747 s
-    └─ Reduce (y):    0.008322 s
+  Total time:         0.417473 s
+  Computation time:   0.111530 s  (26.7%)
+    └─ Local SpMV:    0.111530 s
+  Communication time: 0.194617 s  (46.6%)
+    ├─ Bcast (x):     0.138625 s
+    └─ Reduce (y):    0.086926 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        36980422
-  GFLOP/s:            1.340
+  GFLOP/s:            0.089
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.92x
-  Efficiency:         11.46%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.03x
+  Efficiency:         0.32%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-  8 |  4x2  |  0.0276 |  46.3 |  56.8 |   1.340 |    0.92 |  11.5 | 2.397
+  8 |  4x2  |  0.4175 |  26.7 |  46.6 |   0.089 |    0.03 |   0.3 | 2.397
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=Ga41As41H72.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 CHECK NNZ: 18492150 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=4x4 | pattern=0 symmetric=1
@@ -1440,33 +1649,33 @@ MEMORY USAGE:
   Total memory:       522.43 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.136246 s
-  Computation time:   0.125873 s  (92.4%)
-    └─ Local SpMV:    0.125873 s
-  Communication time: 0.135072 s  (99.1%)
-    ├─ Bcast (x):     0.131057 s
-    └─ Reduce (y):    0.114948 s
+  Total time:         3.079427 s
+  Computation time:   0.116895 s  (3.8%)
+    └─ Local SpMV:    0.116895 s
+  Communication time: 2.551014 s  (82.8%)
+    ├─ Bcast (x):     1.935125 s
+    └─ Reduce (y):    0.791752 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        36984300
-  GFLOP/s:            0.271
+  GFLOP/s:            0.012
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.19x
-  Efficiency:         1.16%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 16 |  4x4  |  0.1362 |  92.4 |  99.1 |   0.271 |    0.19 |   1.2 | 4.554
+ 16 |  4x4  |  3.0794 |   3.8 |  82.8 |   0.012 |    0.00 |   0.0 | 4.554
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=Ga41As41H72.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 CHECK NNZ: 18496034 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=8x4 | pattern=0 symmetric=1
@@ -1497,33 +1706,33 @@ MEMORY USAGE:
   Total memory:       530.71 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.065579 s
-  Computation time:   0.055048 s  (83.9%)
-    └─ Local SpMV:    0.055048 s
-  Communication time: 0.064693 s  (98.6%)
-    ├─ Bcast (x):     0.054262 s
-    └─ Reduce (y):    0.050770 s
+  Total time:         6.159490 s
+  Computation time:   0.199460 s  (3.2%)
+    └─ Local SpMV:    0.199460 s
+  Communication time: 4.570341 s  (74.2%)
+    ├─ Bcast (x):     3.786512 s
+    └─ Reduce (y):    1.054899 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        36992068
-  GFLOP/s:            0.564
+  GFLOP/s:            0.006
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.39x
-  Efficiency:         1.21%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 32 |  8x4  |  0.0656 |  83.9 |  98.6 |   0.564 |    0.39 |   1.2 | 4.678
+ 32 |  8x4  |  6.1595 |   3.2 |  74.2 |   0.006 |    0.00 |   0.0 | 4.678
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=Ga41As41H72.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 CHECK NNZ: 18503861 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=8x8 | pattern=0 symmetric=1
@@ -1554,33 +1763,33 @@ MEMORY USAGE:
   Total memory:       551.38 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.074727 s
-  Computation time:   0.067626 s  (90.5%)
-    └─ Local SpMV:    0.067626 s
-  Communication time: 0.074021 s  (99.1%)
-    ├─ Bcast (x):     0.072210 s
-    └─ Reduce (y):    0.005428 s
+  Total time:         29.609700 s
+  Computation time:   0.916502 s  (3.1%)
+    └─ Local SpMV:    0.916502 s
+  Communication time: 25.770227 s  (87.0%)
+    ├─ Bcast (x):     22.616023 s
+    └─ Reduce (y):    3.170859 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        37007722
-  GFLOP/s:            0.495
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.34x
-  Efficiency:         0.53%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
- 64 |  8x8  |  0.0747 |  90.5 |  99.1 |   0.495 |    0.34 |   0.5 | 8.259
+ 64 |  8x8  | 29.6097 |   3.1 |  87.0 |   0.001 |    0.00 |   0.0 | 8.259
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=Ga41As41H72.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 CHECK NNZ: 18519530 (expected 9378286)
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=16x8 | pattern=0 symmetric=1
@@ -1611,43 +1820,95 @@ MEMORY USAGE:
   Total memory:       568.16 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.054335 s
-  Computation time:   0.041878 s  (77.1%)
-    └─ Local SpMV:    0.041878 s
-  Communication time: 0.053702 s  (98.8%)
-    ├─ Bcast (x):     0.052025 s
-    └─ Reduce (y):    0.020815 s
+  Total time:         59.572589 s
+  Computation time:   2.071491 s  (3.5%)
+    └─ Local SpMV:    2.071491 s
+  Communication time: 49.999538 s  (83.9%)
+    ├─ Bcast (x):     46.679067 s
+    └─ Reduce (y):    4.141975 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        37039060
-  GFLOP/s:            0.682
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.025305 s
-  Speedup:            0.47x
-  Efficiency:         0.36%
+  Baseline (T1):      0.010711 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ================================================================================
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
 --------------------------------------------------------------------------------
-128 | 16x8  |  0.0543 |  77.1 |  98.8 |   0.682 |    0.47 |   0.4 | 8.472
+128 | 16x8  | 59.5726 |   3.5 |  83.9 |   0.001 |    0.00 |   0.0 | 8.472
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 1D: nemeth19.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=nemeth19.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.002316 s
+*************************************************
+STRONG SCALING 1D | Matrix = nemeth19.mtx
+*************************************************
+Baseline T1 = 0.005052s
 
 ---------------------------------------------
-P=2 | Matrix=nemeth19.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=818302  avg=818302.0  max=818302
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=22.03 MiB  max=22.03 MiB
+  Total memory:       22.03 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004128 s
+  Computation time:   0.004072 s  (98.6%)
+    └─| Local SpMV:    0.004072 s
+  Communication time: 0.000093 s  (2.2%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.000026 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1636604
+  GFLOP/s:            0.396
+
+SCALABILITY:
+  Baseline (T1):      0.005052 s
+  Speedup:            1.22x
+  Efficiency:         122.38%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0041 |  98.6 |   2.2 |   0.396 |    1.22 | 122.4 | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=2
 
@@ -1678,33 +1939,33 @@ MEMORY USAGE:
   Total memory:       11.21 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.002616 s
-  Computation time:   0.002459 s  (94.0%)
-    └─| Local SpMV:    0.002459 s
-  Communication time: 0.000427 s  (16.3%)
-    ├─| Ghost exchange: 0.000115 s
-    └─| Gatherv:       0.000269 s
+  Total time:         0.001853 s
+  Computation time:   0.001658 s  (89.5%)
+    └─| Local SpMV:    0.001658 s
+  Communication time: 0.000264 s  (14.2%)
+    ├─| Ghost exchange: 0.000112 s
+    └─| Gatherv:       0.000025 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        822138
-  GFLOP/s:            0.314
+  GFLOP/s:            0.444
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            0.89x
-  Efficiency:         44.27%
+  Baseline (T1):      0.005052 s
+  Speedup:            2.73x
+  Efficiency:         136.30%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  2 |  0.0026 |  94.0 |  16.3 |   0.314 |    0.89 |  44.3 | 1.013 |   1.2
+  2 |  0.0019 |  89.5 |  14.2 |   0.444 |    2.73 | 136.3 | 1.013 |   1.2
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=nemeth19.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=4
 
@@ -1735,33 +1996,33 @@ MEMORY USAGE:
   Total memory:       5.81 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.001191 s
-  Computation time:   0.000988 s  (83.0%)
-    └─| Local SpMV:    0.000988 s
-  Communication time: 0.000410 s  (34.4%)
-    ├─| Ghost exchange: 0.000100 s
-    └─| Gatherv:       0.000214 s
+  Total time:         0.055777 s
+  Computation time:   0.018377 s  (32.9%)
+    └─| Local SpMV:    0.018377 s
+  Communication time: 0.076199 s  (136.6%)
+    ├─| Ghost exchange: 0.026977 s
+    └─| Gatherv:       0.000018 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        415258
-  GFLOP/s:            0.349
+  GFLOP/s:            0.007
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            1.95x
-  Efficiency:         48.63%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.09x
+  Efficiency:         2.26%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  4 |  0.0012 |  83.0 |  34.4 |   0.349 |    1.95 |  48.6 | 1.027 |   3.5
+  4 |  0.0558 |  32.9 | 136.6 |   0.007 |    0.09 |   2.3 | 1.027 |   3.5
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=nemeth19.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=8
 
@@ -1792,33 +2053,33 @@ MEMORY USAGE:
   Total memory:       3.11 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.001637 s
-  Computation time:   0.000532 s  (32.5%)
-    └─| Local SpMV:    0.000532 s
-  Communication time: 0.001350 s  (82.4%)
-    ├─| Ghost exchange: 0.000331 s
-    └─| Gatherv:       0.000020 s
+  Total time:         0.220155 s
+  Computation time:   0.044165 s  (20.1%)
+    └─| Local SpMV:    0.044165 s
+  Communication time: 0.176064 s  (80.0%)
+    ├─| Ghost exchange: 0.043989 s
+    └─| Gatherv:       0.000023 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        211944
-  GFLOP/s:            0.129
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            1.41x
-  Efficiency:         17.68%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.02x
+  Efficiency:         0.29%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  8 |  0.0016 |  32.5 |  82.4 |   0.129 |    1.41 |  17.7 | 1.057 |   8.4
+  8 |  0.2202 |  20.1 |  80.0 |   0.001 |    0.02 |   0.3 | 1.057 |   8.4
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=nemeth19.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=16
 
@@ -1849,33 +2110,33 @@ MEMORY USAGE:
   Total memory:       1.77 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.002657 s
-  Computation time:   0.000124 s  (4.7%)
-    └─| Local SpMV:    0.000124 s
-  Communication time: 0.002626 s  (98.8%)
-    ├─| Ghost exchange: 0.000567 s
-    └─| Gatherv:       0.000086 s
+  Total time:         0.530005 s
+  Computation time:   0.088005 s  (16.6%)
+    └─| Local SpMV:    0.088005 s
+  Communication time: 0.694414 s  (131.0%)
+    ├─| Ghost exchange: 0.197921 s
+    └─| Gatherv:       0.000046 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        110178
-  GFLOP/s:            0.041
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            0.87x
-  Efficiency:         5.45%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.01x
+  Efficiency:         0.06%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 16 |  0.0027 |   4.7 |  98.8 |   0.041 |    0.87 |   5.4 | 1.090 |  18.3
+ 16 |  0.5300 |  16.6 | 131.0 |   0.000 |    0.01 |   0.1 | 1.090 |  18.3
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=nemeth19.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=32
 
@@ -1906,33 +2167,33 @@ MEMORY USAGE:
   Total memory:       1.11 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.009631 s
-  Computation time:   0.000042 s  (0.4%)
-    └─| Local SpMV:    0.000042 s
-  Communication time: 0.009896 s  (102.8%)
-    ├─| Ghost exchange: 0.001174 s
-    └─| Gatherv:       0.000326 s
+  Total time:         1.592996 s
+  Computation time:   0.351994 s  (22.1%)
+    └─| Local SpMV:    0.351994 s
+  Communication time: 2.105992 s  (132.2%)
+    ├─| Ghost exchange: 0.388094 s
+    └─| Gatherv:       0.942543 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        59350
-  GFLOP/s:            0.006
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            0.24x
-  Efficiency:         0.75%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 32 |  0.0096 |   0.4 | 102.8 |   0.006 |    0.24 |   0.8 | 1.119 |  38.6
+ 32 |  1.5930 |  22.1 | 132.2 |   0.000 |    0.00 |   0.0 | 1.119 |  38.6
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=nemeth19.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=64
 
@@ -1963,33 +2224,33 @@ MEMORY USAGE:
   Total memory:       0.78 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.022946 s
-  Computation time:   0.000033 s  (0.1%)
-    └─| Local SpMV:    0.000033 s
-  Communication time: 0.023340 s  (101.7%)
-    ├─| Ghost exchange: 0.001130 s
-    └─| Gatherv:       0.000417 s
+  Total time:         3.542012 s
+  Computation time:   0.362959 s  (10.2%)
+    └─| Local SpMV:    0.362959 s
+  Communication time: 4.583455 s  (129.4%)
+    ├─| Ghost exchange: 0.931942 s
+    └─| Gatherv:       1.702352 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        33880
-  GFLOP/s:            0.001
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            0.10x
-  Efficiency:         0.16%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 64 |  0.0229 |   0.1 | 101.7 |   0.001 |    0.10 |   0.2 | 1.224 |  77.0
+ 64 |  3.5420 |  10.2 | 129.4 |   0.000 |    0.00 |   0.0 | 1.224 |  77.0
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=nemeth19.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 [Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=128
 
@@ -2020,43 +2281,95 @@ MEMORY USAGE:
   Total memory:       0.59 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.077925 s
-  Computation time:   0.000018 s  (0.0%)
-    └─| Local SpMV:    0.000018 s
-  Communication time: 0.078410 s  (100.6%)
-    ├─| Ghost exchange: 0.005542 s
-    └─| Gatherv:       0.003925 s
+  Total time:         12.025027 s
+  Computation time:   0.000054 s  (0.0%)
+    └─| Local SpMV:    0.000054 s
+  Communication time: 14.186006 s  (118.0%)
+    ├─| Ghost exchange: 3.583999 s
+    └─| Gatherv:       3.083885 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        21350
   GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.002316 s
-  Speedup:            0.03x
-  Efficiency:         0.02%
+  Baseline (T1):      0.005052 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-128 |  0.0779 |   0.0 | 100.6 |   0.000 |    0.03 |   0.0 | 1.715 |  98.8
+128 | 12.0250 |   0.0 | 118.0 |   0.000 |    0.00 |   0.0 | 1.715 |  98.8
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 1D: Trefethen_20000.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=Trefethen_20000.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.001566 s
+*************************************************
+STRONG SCALING 1D | Matrix = Trefethen_20000.mtx
+*************************************************
+Baseline T1 = 0.004582s
 
 ---------------------------------------------
-P=2 | Matrix=Trefethen_20000.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=554466  avg=554466.0  max=554466
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=15.19 MiB  max=15.19 MiB
+  Total memory:       15.19 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.003882 s
+  Computation time:   0.003829 s  (98.7%)
+    └─| Local SpMV:    0.003829 s
+  Communication time: 0.000090 s  (2.3%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.000036 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1108932
+  GFLOP/s:            0.286
+
+SCALABILITY:
+  Baseline (T1):      0.004582 s
+  Speedup:            1.18x
+  Efficiency:         118.04%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0039 |  98.7 |   2.3 |   0.286 |    1.18 | 118.0 | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=2
 
@@ -2087,33 +2400,33 @@ MEMORY USAGE:
   Total memory:       8.02 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.001282 s
-  Computation time:   0.000864 s  (67.4%)
-    └─| Local SpMV:    0.000864 s
-  Communication time: 0.000495 s  (38.6%)
-    ├─| Ghost exchange: 0.000277 s
-    └─| Gatherv:       0.000103 s
+  Total time:         0.002162 s
+  Computation time:   0.001683 s  (77.9%)
+    └─| Local SpMV:    0.001683 s
+  Communication time: 0.000493 s  (22.8%)
+    ├─| Ghost exchange: 0.000344 s
+    └─| Gatherv:       0.000041 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        563338
-  GFLOP/s:            0.440
+  GFLOP/s:            0.261
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            1.22x
-  Efficiency:         61.09%
+  Baseline (T1):      0.004582 s
+  Speedup:            2.12x
+  Efficiency:         105.99%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  2 |  0.0013 |  67.4 |  38.6 |   0.440 |    1.22 |  61.1 | 1.098 |   3.6
+  2 |  0.0022 |  77.9 |  22.8 |   0.261 |    2.12 | 106.0 | 1.098 |   3.6
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=Trefethen_20000.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=4
 
@@ -2144,33 +2457,33 @@ MEMORY USAGE:
   Total memory:       4.45 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.000659 s
-  Computation time:   0.000392 s  (59.5%)
-    └─| Local SpMV:    0.000392 s
-  Communication time: 0.000446 s  (67.6%)
-    ├─| Ghost exchange: 0.000097 s
-    └─| Gatherv:       0.000187 s
+  Total time:         0.055603 s
+  Computation time:   0.016239 s  (29.2%)
+    └─| Local SpMV:    0.016239 s
+  Communication time: 0.052015 s  (93.5%)
+    ├─| Ghost exchange: 0.025702 s
+    └─| Gatherv:       0.000036 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        291228
-  GFLOP/s:            0.442
+  GFLOP/s:            0.005
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            2.38x
-  Efficiency:         59.39%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.08x
+  Efficiency:         2.06%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  4 |  0.0007 |  59.5 |  67.6 |   0.442 |    2.38 |  59.4 | 1.125 |  10.8
+  4 |  0.0556 |  29.2 |  93.5 |   0.005 |    0.08 |   2.1 | 1.125 |  10.8
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=Trefethen_20000.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=8
 
@@ -2201,33 +2514,33 @@ MEMORY USAGE:
   Total memory:       2.61 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.000794 s
-  Computation time:   0.000129 s  (16.3%)
-    └─| Local SpMV:    0.000129 s
-  Communication time: 0.000892 s  (112.3%)
-    ├─| Ghost exchange: 0.000126 s
-    └─| Gatherv:       0.000220 s
+  Total time:         0.262985 s
+  Computation time:   0.088995 s  (33.8%)
+    └─| Local SpMV:    0.088995 s
+  Communication time: 0.174085 s  (66.2%)
+    ├─| Ghost exchange: 0.056967 s
+    └─| Gatherv:       0.000066 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        155082
-  GFLOP/s:            0.195
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            1.97x
-  Efficiency:         24.64%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.02x
+  Efficiency:         0.22%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  8 |  0.0008 |  16.3 | 112.3 |   0.195 |    1.97 |  24.6 | 1.154 |  18.0
+  8 |  0.2630 |  33.8 |  66.2 |   0.001 |    0.02 |   0.2 | 1.154 |  18.0
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=Trefethen_20000.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=16
 
@@ -2258,33 +2571,33 @@ MEMORY USAGE:
   Total memory:       1.67 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.000804 s
-  Computation time:   0.000051 s  (6.4%)
-    └─| Local SpMV:    0.000051 s
-  Communication time: 0.000941 s  (117.0%)
-    ├─| Ghost exchange: 0.000105 s
-    └─| Gatherv:       0.000147 s
+  Total time:         0.440006 s
+  Computation time:   0.098927 s  (22.5%)
+    └─| Local SpMV:    0.098927 s
+  Communication time: 0.609419 s  (138.5%)
+    ├─| Ghost exchange: 0.128000 s
+    └─| Gatherv:       0.000096 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        87196
-  GFLOP/s:            0.108
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            1.95x
-  Efficiency:         12.17%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.01x
+  Efficiency:         0.07%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 16 |  0.0008 |   6.4 | 117.0 |   0.108 |    1.95 |  12.2 | 1.204 |  25.2
+ 16 |  0.4400 |  22.5 | 138.5 |   0.000 |    0.01 |   0.1 | 1.204 |  25.2
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=Trefethen_20000.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=32
 
@@ -2315,33 +2628,33 @@ MEMORY USAGE:
   Total memory:       1.19 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.000822 s
-  Computation time:   0.000032 s  (3.9%)
-    └─| Local SpMV:    0.000032 s
-  Communication time: 0.001158 s  (140.8%)
-    ├─| Ghost exchange: 0.000143 s
-    └─| Gatherv:       0.000326 s
+  Total time:         1.253021 s
+  Computation time:   0.187022 s  (14.9%)
+    └─| Local SpMV:    0.187022 s
+  Communication time: 1.747925 s  (139.5%)
+    ├─| Ghost exchange: 0.302029 s
+    └─| Gatherv:       0.876869 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        53082
-  GFLOP/s:            0.065
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            1.90x
-  Efficiency:         5.95%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 32 |  0.0008 |   3.9 | 140.8 |   0.065 |    1.90 |   6.0 | 1.268 |  32.5
+ 32 |  1.2530 |  14.9 | 139.5 |   0.000 |    0.00 |   0.0 | 1.268 |  32.5
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=Trefethen_20000.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=64
 
@@ -2372,33 +2685,33 @@ MEMORY USAGE:
   Total memory:       0.94 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.001129 s
-  Computation time:   0.000032 s  (2.8%)
-    └─| Local SpMV:    0.000032 s
-  Communication time: 0.001506 s  (133.3%)
-    ├─| Ghost exchange: 0.000127 s
-    └─| Gatherv:       0.000437 s
+  Total time:         3.180252 s
+  Computation time:   0.014558 s  (0.5%)
+    └─| Local SpMV:    0.014558 s
+  Communication time: 3.974802 s  (125.0%)
+    ├─| Ghost exchange: 0.778003 s
+    └─| Gatherv:       1.526935 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        35930
-  GFLOP/s:            0.032
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            1.39x
-  Efficiency:         2.17%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 64 |  0.0011 |   2.8 | 133.3 |   0.032 |    1.39 |   2.2 | 1.311 |  40.0
+ 64 |  3.1803 |   0.5 | 125.0 |   0.000 |    0.00 |   0.0 | 1.311 |  40.0
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=Trefethen_20000.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 [Rank 0] Matrix: 20000 x 20000, nnz=287233 | 1D cyclic rows over P=128
 
@@ -2429,43 +2742,95 @@ MEMORY USAGE:
   Total memory:       0.82 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.001809 s
-  Computation time:   0.000010 s  (0.6%)
-    └─| Local SpMV:    0.000010 s
-  Communication time: 0.002730 s  (150.9%)
-    ├─| Ghost exchange: 0.000228 s
-    └─| Gatherv:       0.000925 s
+  Total time:         9.158001 s
+  Computation time:   0.000161 s  (0.0%)
+    └─| Local SpMV:    0.000161 s
+  Communication time: 11.515923 s  (125.7%)
+    ├─| Ghost exchange: 3.851996 s
+    └─| Gatherv:       4.035873 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        27492
-  GFLOP/s:            0.015
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.001566 s
-  Speedup:            0.87x
-  Efficiency:         0.68%
+  Baseline (T1):      0.004582 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-128 |  0.0018 |   0.6 | 150.9 |   0.015 |    0.87 |   0.7 | 1.425 |  47.3
+128 |  9.1580 |   0.0 | 125.7 |   0.000 |    0.00 |   0.0 | 1.425 |  47.3
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 1D: torso3.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=torso3.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.012427 s
+*************************************************
+STRONG SCALING 1D | Matrix = torso3.mtx
+*************************************************
+Baseline T1 = 0.005334s
 
 ---------------------------------------------
-P=2 | Matrix=torso3.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=4429042  avg=4429042.0  max=4429042
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=123.21 MiB  max=123.21 MiB
+  Total memory:       123.21 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.005030 s
+  Computation time:   0.004971 s  (98.8%)
+    └─| Local SpMV:    0.004971 s
+  Communication time: 0.002095 s  (41.6%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.002033 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8858084
+  GFLOP/s:            1.761
+
+SCALABILITY:
+  Baseline (T1):      0.005334 s
+  Speedup:            1.06x
+  Efficiency:         106.04%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0050 |  98.8 |  41.6 |   1.761 |    1.06 | 106.0 | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=2
 
@@ -2496,33 +2861,33 @@ MEMORY USAGE:
   Total memory:       65.59 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.041668 s
-  Computation time:   0.033908 s  (81.4%)
-    └─| Local SpMV:    0.033908 s
-  Communication time: 0.009952 s  (23.9%)
-    ├─| Ghost exchange: 0.003987 s
-    └─| Gatherv:       0.001150 s
+  Total time:         0.006606 s
+  Computation time:   0.003577 s  (54.1%)
+    └─| Local SpMV:    0.003577 s
+  Communication time: 0.004146 s  (62.8%)
+    ├─| Ghost exchange: 0.001068 s
+    └─| Gatherv:       0.001355 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        4431608
-  GFLOP/s:            0.106
+  GFLOP/s:            0.671
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            0.30x
-  Efficiency:         14.91%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.81x
+  Efficiency:         40.37%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  2 |  0.0417 |  81.4 |  23.9 |   0.106 |    0.30 |  14.9 | 1.025 |   5.9
+  2 |  0.0066 |  54.1 |  62.8 |   0.671 |    0.81 |  40.4 | 1.025 |   5.9
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=torso3.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=4
 
@@ -2553,33 +2918,33 @@ MEMORY USAGE:
   Total memory:       36.62 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.017276 s
-  Computation time:   0.014250 s  (82.5%)
-    └─| Local SpMV:    0.014250 s
-  Communication time: 0.007634 s  (44.2%)
-    ├─| Ghost exchange: 0.002117 s
-    └─| Gatherv:       0.005088 s
+  Total time:         0.110715 s
+  Computation time:   0.019552 s  (17.7%)
+    └─| Local SpMV:    0.019552 s
+  Communication time: 0.135984 s  (122.8%)
+    ├─| Ghost exchange: 0.051811 s
+    └─| Gatherv:       0.049933 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        2214392
-  GFLOP/s:            0.128
+  GFLOP/s:            0.020
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            0.72x
-  Efficiency:         17.98%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.05x
+  Efficiency:         1.20%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  4 |  0.0173 |  82.5 |  44.2 |   0.128 |    0.72 |  18.0 | 1.042 |  16.7
+  4 |  0.1107 |  17.7 | 122.8 |   0.020 |    0.05 |   1.2 | 1.042 |  16.7
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=torso3.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=8
 
@@ -2610,33 +2975,33 @@ MEMORY USAGE:
   Total memory:       21.90 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.005996 s
-  Computation time:   0.004115 s  (68.6%)
-    └─| Local SpMV:    0.004115 s
-  Communication time: 0.004333 s  (72.3%)
-    ├─| Ghost exchange: 0.000726 s
-    └─| Gatherv:       0.002615 s
+  Total time:         0.220521 s
+  Computation time:   0.045547 s  (20.7%)
+    └─| Local SpMV:    0.045547 s
+  Communication time: 0.267745 s  (121.4%)
+    ├─| Ghost exchange: 0.053126 s
+    └─| Gatherv:       0.129230 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1107112
-  GFLOP/s:            0.185
+  GFLOP/s:            0.005
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            2.07x
-  Efficiency:         25.90%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.02x
+  Efficiency:         0.30%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  8 |  0.0060 |  68.6 |  72.3 |   0.185 |    2.07 |  25.9 | 1.057 |  34.3
+  8 |  0.2205 |  20.7 | 121.4 |   0.005 |    0.02 |   0.3 | 1.057 |  34.3
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=torso3.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=16
 
@@ -2667,33 +3032,33 @@ MEMORY USAGE:
   Total memory:       14.16 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.004097 s
-  Computation time:   0.001109 s  (27.1%)
-    └─| Local SpMV:    0.001109 s
-  Communication time: 0.005481 s  (133.8%)
-    ├─| Ghost exchange: 0.000881 s
-    └─| Gatherv:       0.002492 s
+  Total time:         0.528907 s
+  Computation time:   0.091816 s  (17.4%)
+    └─| Local SpMV:    0.091816 s
+  Communication time: 0.702587 s  (132.8%)
+    ├─| Ghost exchange: 0.094913 s
+    └─| Gatherv:       0.263119 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        557502
-  GFLOP/s:            0.136
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            3.03x
-  Efficiency:         18.96%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.01x
+  Efficiency:         0.06%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 16 |  0.0041 |  27.1 | 133.8 |   0.136 |    3.03 |  19.0 | 1.076 |  55.7
+ 16 |  0.5289 |  17.4 | 132.8 |   0.001 |    0.01 |   0.1 | 1.076 |  55.7
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=torso3.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=32
 
@@ -2724,33 +3089,33 @@ MEMORY USAGE:
   Total memory:       9.73 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.009578 s
-  Computation time:   0.000285 s  (3.0%)
-    └─| Local SpMV:    0.000285 s
-  Communication time: 0.012686 s  (132.4%)
-    ├─| Ghost exchange: 0.001379 s
-    └─| Gatherv:       0.002196 s
+  Total time:         1.433196 s
+  Computation time:   0.187142 s  (13.1%)
+    └─| Local SpMV:    0.187142 s
+  Communication time: 1.770002 s  (123.5%)
+    ├─| Ghost exchange: 0.362862 s
+    └─| Gatherv:       0.704409 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        280820
-  GFLOP/s:            0.029
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            1.30x
-  Efficiency:         4.05%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 32 |  0.0096 |   3.0 | 132.4 |   0.029 |    1.30 |   4.1 | 1.094 |  64.7
+ 32 |  1.4332 |  13.1 | 123.5 |   0.000 |    0.00 |   0.0 | 1.094 |  64.7
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=torso3.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=64
 
@@ -2781,33 +3146,33 @@ MEMORY USAGE:
   Total memory:       7.46 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.016856 s
-  Computation time:   0.000082 s  (0.5%)
-    └─| Local SpMV:    0.000082 s
-  Communication time: 0.020136 s  (119.5%)
-    ├─| Ghost exchange: 0.002135 s
-    └─| Gatherv:       0.002179 s
+  Total time:         3.890045 s
+  Computation time:   0.363000 s  (9.3%)
+    └─| Local SpMV:    0.363000 s
+  Communication time: 5.265018 s  (135.3%)
+    ├─| Ghost exchange: 1.065951 s
+    └─| Gatherv:       1.537313 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        142298
-  GFLOP/s:            0.008
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            0.74x
-  Efficiency:         1.15%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 64 |  0.0169 |   0.5 | 119.5 |   0.008 |    0.74 |   1.2 | 1.141 |  76.3
+ 64 |  3.8900 |   9.3 | 135.3 |   0.000 |    0.00 |   0.0 | 1.141 |  76.3
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=torso3.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 [Rank 0] Matrix: 259156 x 259156, nnz=4429042 | 1D cyclic rows over P=128
 
@@ -2838,43 +3203,95 @@ MEMORY USAGE:
   Total memory:       6.28 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.055588 s
-  Computation time:   0.000043 s  (0.1%)
-    └─| Local SpMV:    0.000043 s
-  Communication time: 0.058395 s  (105.1%)
-    ├─| Ghost exchange: 0.027473 s
-    └─| Gatherv:       0.014903 s
+  Total time:         11.989025 s
+  Computation time:   0.000115 s  (0.0%)
+    └─| Local SpMV:    0.000115 s
+  Communication time: 14.834898 s  (123.7%)
+    ├─| Ghost exchange: 3.560880 s
+    └─| Gatherv:       3.589896 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        72760
-  GFLOP/s:            0.001
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.012427 s
-  Speedup:            0.22x
-  Efficiency:         0.17%
+  Baseline (T1):      0.005334 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-128 |  0.0556 |   0.1 | 105.1 |   0.001 |    0.22 |   0.2 | 1.140 |  87.4
+128 | 11.9890 |   0.0 | 123.7 |   0.000 |    0.00 |   0.0 | 1.140 |  87.4
 --------------------------------------------------------------------------------
 
 
-
-*********************************************
-STRONG SCALING 1D: Ga41As41H72.mtx
-*********************************************
-
----------------------------------------------
-P=1 | Matrix=Ga41As41H72.mtx (BASELINE)
----------------------------------------------
->> BASELINE_T1 = 0.053283 s
+*************************************************
+STRONG SCALING 1D | Matrix = Ga41As41H72.mtx
+*************************************************
+Baseline T1 = 0.009615s
 
 ---------------------------------------------
-P=2 | Matrix=Ga41As41H72.mtx
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=18488476  avg=18488476.0  max=18488476
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=498.81 MiB  max=498.81 MiB
+  Total memory:       498.81 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.008976 s
+  Computation time:   0.008921 s  (99.4%)
+    └─| Local SpMV:    0.008921 s
+  Communication time: 0.001928 s  (21.5%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.001870 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36976952
+  GFLOP/s:            4.120
+
+SCALABILITY:
+  Baseline (T1):      0.009615 s
+  Speedup:            1.07x
+  Efficiency:         107.12%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0090 |  99.4 |  21.5 |   4.120 |    1.07 | 107.1 | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=2
 
@@ -2905,33 +3322,33 @@ MEMORY USAGE:
   Total memory:       253.86 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.157274 s
-  Computation time:   0.149689 s  (95.2%)
-    └─| Local SpMV:    0.149689 s
-  Communication time: 0.022568 s  (14.3%)
-    ├─| Ghost exchange: 0.003271 s
-    └─| Gatherv:       0.001186 s
+  Total time:         0.030926 s
+  Computation time:   0.017395 s  (56.2%)
+    └─| Local SpMV:    0.017395 s
+  Communication time: 0.017379 s  (56.2%)
+    ├─| Ghost exchange: 0.008651 s
+    └─| Gatherv:       0.002805 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        18504218
-  GFLOP/s:            0.118
+  GFLOP/s:            0.598
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            0.34x
-  Efficiency:         16.94%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.31x
+  Efficiency:         15.55%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  2 |  0.1573 |  95.2 |  14.3 |   0.118 |    0.34 |  16.9 | 1.020 |   1.6
+  2 |  0.0309 |  56.2 |  56.2 |   0.598 |    0.31 |  15.5 | 1.020 |   1.6
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=4 | Matrix=Ga41As41H72.mtx
+MPI ranks = 4, OMP threads = 32
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=4
 
@@ -2962,33 +3379,33 @@ MEMORY USAGE:
   Total memory:       131.25 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.055563 s
-  Computation time:   0.052796 s  (95.0%)
-    └─| Local SpMV:    0.052796 s
-  Communication time: 0.009886 s  (17.8%)
-    ├─| Ghost exchange: 0.002859 s
-    └─| Gatherv:       0.006441 s
+  Total time:         0.140558 s
+  Computation time:   0.043165 s  (30.7%)
+    └─| Local SpMV:    0.043165 s
+  Communication time: 0.179945 s  (128.0%)
+    ├─| Ghost exchange: 0.052968 s
+    └─| Gatherv:       0.077990 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        9241048
-  GFLOP/s:            0.166
+  GFLOP/s:            0.066
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            0.96x
-  Efficiency:         23.97%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.07x
+  Efficiency:         1.71%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  4 |  0.0556 |  95.0 |  17.8 |   0.166 |    0.96 |  24.0 | 1.043 |   5.2
+  4 |  0.1406 |  30.7 | 128.0 |   0.066 |    0.07 |   1.7 | 1.043 |   5.2
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=8 | Matrix=Ga41As41H72.mtx
+MPI ranks = 8, OMP threads = 16
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=8
 
@@ -3019,33 +3436,33 @@ MEMORY USAGE:
   Total memory:       70.51 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.019626 s
-  Computation time:   0.017315 s  (88.2%)
-    └─| Local SpMV:    0.017315 s
-  Communication time: 0.008004 s  (40.8%)
-    ├─| Ghost exchange: 0.001147 s
-    └─| Gatherv:       0.005804 s
+  Total time:         0.248948 s
+  Computation time:   0.087984 s  (35.3%)
+    └─| Local SpMV:    0.087984 s
+  Communication time: 0.370433 s  (148.8%)
+    ├─| Ghost exchange: 0.043953 s
+    └─| Gatherv:       0.222162 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        4639074
-  GFLOP/s:            0.236
+  GFLOP/s:            0.019
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            2.71x
-  Efficiency:         33.94%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.04x
+  Efficiency:         0.48%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-  8 |  0.0196 |  88.2 |  40.8 |   0.236 |    2.71 |  33.9 | 1.045 |  13.0
+  8 |  0.2489 |  35.3 | 148.8 |   0.019 |    0.04 |   0.5 | 1.045 |  13.0
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=16 | Matrix=Ga41As41H72.mtx
+MPI ranks = 16, OMP threads = 8
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=16
 
@@ -3076,33 +3493,33 @@ MEMORY USAGE:
   Total memory:       39.60 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.008054 s
-  Computation time:   0.004465 s  (55.4%)
-    └─| Local SpMV:    0.004465 s
-  Communication time: 0.005835 s  (72.5%)
-    ├─| Ghost exchange: 0.001237 s
-    └─| Gatherv:       0.002544 s
+  Total time:         0.701973 s
+  Computation time:   0.175984 s  (25.1%)
+    └─| Local SpMV:    0.175984 s
+  Communication time: 0.789969 s  (112.5%)
+    ├─| Ghost exchange: 0.187110 s
+    └─| Gatherv:       0.264023 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        2313908
-  GFLOP/s:            0.287
+  GFLOP/s:            0.003
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            6.62x
-  Efficiency:         41.35%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.01x
+  Efficiency:         0.09%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 16 |  0.0081 |  55.4 |  72.5 |   0.287 |    6.62 |  41.4 | 1.148 |  27.2
+ 16 |  0.7020 |  25.1 | 112.5 |   0.003 |    0.01 |   0.1 | 1.148 |  27.2
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=32 | Matrix=Ga41As41H72.mtx
+MPI ranks = 32, OMP threads = 4
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=32
 
@@ -3133,33 +3550,33 @@ MEMORY USAGE:
   Total memory:       23.55 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.011717 s
-  Computation time:   0.001160 s  (9.9%)
-    └─| Local SpMV:    0.001160 s
-  Communication time: 0.013174 s  (112.4%)
-    ├─| Ghost exchange: 0.002184 s
-    └─| Gatherv:       0.002303 s
+  Total time:         1.422955 s
+  Computation time:   0.187872 s  (13.2%)
+    └─| Local SpMV:    0.187872 s
+  Communication time: 1.745745 s  (122.7%)
+    ├─| Ghost exchange: 0.351969 s
+    └─| Gatherv:       0.578331 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        1163104
-  GFLOP/s:            0.099
+  GFLOP/s:            0.001
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            4.55x
-  Efficiency:         14.21%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.01x
+  Efficiency:         0.02%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 32 |  0.0117 |   9.9 | 112.4 |   0.099 |    4.55 |  14.2 | 1.158 |  43.7
+ 32 |  1.4230 |  13.2 | 122.7 |   0.001 |    0.01 |   0.0 | 1.158 |  43.7
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=64 | Matrix=Ga41As41H72.mtx
+MPI ranks = 64, OMP threads = 2
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=64
 
@@ -3190,33 +3607,33 @@ MEMORY USAGE:
   Total memory:       15.04 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.024007 s
-  Computation time:   0.000319 s  (1.3%)
-    └─| Local SpMV:    0.000319 s
-  Communication time: 0.027176 s  (113.2%)
-    ├─| Ghost exchange: 0.001071 s
-    └─| Gatherv:       0.002316 s
+  Total time:         3.516258 s
+  Computation time:   0.363195 s  (10.3%)
+    └─| Local SpMV:    0.363195 s
+  Communication time: 4.447378 s  (126.5%)
+    ├─| Ghost exchange: 0.769988 s
+    └─| Gatherv:       1.411701 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        588698
-  GFLOP/s:            0.025
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            2.22x
-  Efficiency:         3.47%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
- 64 |  0.0240 |   1.3 | 113.2 |   0.025 |    2.22 |   3.5 | 1.245 |  61.3
+ 64 |  3.5163 |  10.3 | 126.5 |   0.000 |    0.00 |   0.0 | 1.245 |  61.3
 --------------------------------------------------------------------------------
 
 
 ---------------------------------------------
-P=128 | Matrix=Ga41As41H72.mtx
+MPI ranks = 128, OMP threads = 1
 ---------------------------------------------
 [Rank 0] Matrix: 268096 x 268096, nnz=9378286 | 1D cyclic rows over P=128
 
@@ -3247,30 +3664,29 @@ MEMORY USAGE:
   Total memory:       10.34 MiB  (estimated)
 
 PERFORMANCE METRICS:
-  Total time:         0.093196 s
-  Computation time:   0.000219 s  (0.2%)
-    └─| Local SpMV:    0.000219 s
-  Communication time: 0.095889 s  (102.9%)
-    ├─| Ghost exchange: 0.005236 s
-    └─| Gatherv:       0.003277 s
+  Total time:         12.081078 s
+  Computation time:   0.000234 s  (0.0%)
+    └─| Local SpMV:    0.000234 s
+  Communication time: 15.157852 s  (125.5%)
+    ├─| Ghost exchange: 3.537843 s
+    └─| Gatherv:       3.527880 s
 
 COMPUTATIONAL INTENSITY:
   Total FLOPs:        295192
-  GFLOP/s:            0.003
+  GFLOP/s:            0.000
 
 SCALABILITY:
-  Baseline (T1):      0.053283 s
-  Speedup:            0.57x
-  Efficiency:         0.45%
+  Baseline (T1):      0.009615 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
 
 ********************************************************************************
 SUMMARY TABLE:
 --------------------------------------------------------------------------------
   P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
 --------------------------------------------------------------------------------
-128 |  0.0932 |   0.2 | 102.9 |   0.003 |    0.57 |   0.4 | 1.686 |  75.8
+128 | 12.0811 |   0.0 | 125.5 |   0.000 |    0.00 |   0.0 | 1.686 |  75.8
 --------------------------------------------------------------------------------
-
 
 
 Strong scaling completed!

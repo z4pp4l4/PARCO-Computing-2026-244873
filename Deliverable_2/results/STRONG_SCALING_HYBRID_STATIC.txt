@@ -1,0 +1,2254 @@
+Compiling code...
+Compilation OK
+
+**************************************************
+STRONG SCALING 2D | schedule(static) | nemeth19.mtx
+**************************************************
+Baseline T1 = 0.004877s
+
+---------------------------------------------
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 818302 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1636604
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=818302  avg=818302.0  max=818302
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=22.10 MiB  max=22.10 MiB
+  Total memory:       22.10 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004571 s
+  Computation time:   0.004510 s  (98.7%)
+    └─ Local SpMV:    0.004510 s
+  Communication time: 0.000034 s  (0.7%)
+    ├─ Bcast (x):     0.000003 s
+    └─ Reduce (y):    0.000031 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1636604
+  GFLOP/s:            0.358
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            1.07x
+  Efficiency:         106.70%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0046 |  98.7 |   0.7 |   0.358 |    1.07 | 106.7 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
+---------------------------------------------
+CHECK NNZ: 818557 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=2x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1637114
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Process grid:       2 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=405741  avg=409278.5  max=412816
+  Imbalance ratio:    1.009  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=11.09 MiB  max=11.19 MiB
+  Total memory:       22.18 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.002816 s
+  Computation time:   0.002692 s  (95.6%)
+    └─ Local SpMV:    0.002692 s
+  Communication time: 0.000017 s  (0.6%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000015 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1637114
+  GFLOP/s:            0.581
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            1.73x
+  Efficiency:         86.60%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  2 |  2x1  |  0.0028 |  95.6 |   0.6 |   0.581 |    1.73 |  86.6 | 1.009
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 4, OMP threads = 32
+---------------------------------------------
+CHECK NNZ: 819071 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=2x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1638142
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Process grid:       2 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=1054  avg=204767.8  max=412019
+  Imbalance ratio:    2.012  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=5.59 MiB  max=11.13 MiB
+  Total memory:       22.38 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.129817 s
+  Computation time:   0.016175 s  (12.5%)
+    └─ Local SpMV:    0.016175 s
+  Communication time: 0.049683 s  (38.3%)
+    ├─ Bcast (x):     0.024687 s
+    └─ Reduce (y):    0.025281 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1638142
+  GFLOP/s:            0.013
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.04x
+  Efficiency:         0.94%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  4 |  2x2  |  0.1298 |  12.5 |  38.3 |   0.013 |    0.04 |   0.9 | 2.012
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 8, OMP threads = 16
+---------------------------------------------
+CHECK NNZ: 820095 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=4x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1640190
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Process grid:       4 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=102511.9  max=207256
+  Imbalance ratio:    2.022  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=2.82 MiB  max=5.62 MiB
+  Total memory:       22.55 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.351982 s
+  Computation time:   0.044374 s  (12.6%)
+    └─ Local SpMV:    0.044374 s
+  Communication time: 0.083609 s  (23.8%)
+    ├─ Bcast (x):     0.051113 s
+    └─ Reduce (y):    0.043149 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1640190
+  GFLOP/s:            0.005
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.01x
+  Efficiency:         0.17%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  8 |  4x2  |  0.3520 |  12.6 |  23.8 |   0.005 |    0.01 |   0.2 | 2.022
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 16, OMP threads = 8
+---------------------------------------------
+CHECK NNZ: 822160 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=4x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1644320
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Process grid:       4 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=51385.0  max=206772
+  Imbalance ratio:    4.024  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=1.44 MiB  max=5.58 MiB
+  Total memory:       22.97 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         1.407978 s
+  Computation time:   0.176125 s  (12.5%)
+    └─ Local SpMV:    0.176125 s
+  Communication time: 0.607381 s  (43.1%)
+    ├─ Bcast (x):     0.433398 s
+    └─ Reduce (y):    0.175914 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1644320
+  GFLOP/s:            0.001
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 16 |  4x4  |  1.4080 |  12.5 |  43.1 |   0.001 |    0.00 |   0.0 | 4.024
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 32, OMP threads = 4
+---------------------------------------------
+CHECK NNZ: 826289 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=8x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1652578
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Process grid:       8 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=25821.5  max=104144
+  Imbalance ratio:    4.033  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.73 MiB  max=2.82 MiB
+  Total memory:       23.37 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         3.350971 s
+  Computation time:   0.187412 s  (5.6%)
+    └─ Local SpMV:    0.187412 s
+  Communication time: 1.060781 s  (31.7%)
+    ├─ Bcast (x):     0.884784 s
+    └─ Reduce (y):    0.351923 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1652578
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 32 |  8x4  |  3.3510 |   5.6 |  31.7 |   0.000 |    0.00 |   0.0 | 4.033
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 64, OMP threads = 2
+---------------------------------------------
+CHECK NNZ: 834539 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=8x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1669078
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Process grid:       8 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=13039.7  max=104077
+  Imbalance ratio:    7.982  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.38 MiB  max=2.81 MiB
+  Total memory:       24.32 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         10.145974 s
+  Computation time:   0.378439 s  (3.7%)
+    └─ Local SpMV:    0.378439 s
+  Communication time: 5.630785 s  (55.5%)
+    ├─ Bcast (x):     4.255545 s
+    └─ Reduce (y):    1.768932 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1669078
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 64 |  8x8  | 10.1460 |   3.7 |  55.5 |   0.000 |    0.00 |   0.0 | 7.982
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 128, OMP threads = 1
+---------------------------------------------
+CHECK NNZ: 851088 (expected 413904)
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | grid=16x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1702176
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Process grid:       16 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=6649.1  max=53078
+  Imbalance ratio:    7.983  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.20 MiB  max=1.44 MiB
+  Total memory:       25.34 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         21.853024 s
+  Computation time:   0.001838 s  (0.0%)
+    └─ Local SpMV:    0.001838 s
+  Communication time: 11.966940 s  (54.8%)
+    ├─ Bcast (x):     9.159951 s
+    └─ Reduce (y):    3.515990 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1702176
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004877 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+128 | 16x8  | 21.8530 |   0.0 |  54.8 |   0.000 |    0.00 |   0.0 | 7.983
+--------------------------------------------------------------------------------
+
+
+**************************************************
+STRONG SCALING 2D | schedule(static) | Trefethen_20000.mtx
+**************************************************
+Baseline T1 = 0.004443s
+
+---------------------------------------------
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 554466 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1108932
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=554466  avg=554466.0  max=554466
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=15.34 MiB  max=15.34 MiB
+  Total memory:       15.34 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004225 s
+  Computation time:   0.004153 s  (98.3%)
+    └─ Local SpMV:    0.004153 s
+  Communication time: 0.000044 s  (1.0%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000042 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1108932
+  GFLOP/s:            0.262
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            1.05x
+  Efficiency:         105.17%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0042 |  98.3 |   1.0 |   0.262 |    1.05 | 105.2 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
+---------------------------------------------
+CHECK NNZ: 555017 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=2x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1110034
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Process grid:       2 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=277233  avg=277508.5  max=277784
+  Imbalance ratio:    1.001  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=7.75 MiB  max=7.76 MiB
+  Total memory:       15.51 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.002137 s
+  Computation time:   0.001922 s  (89.9%)
+    └─ Local SpMV:    0.001922 s
+  Communication time: 0.000023 s  (1.1%)
+    ├─ Bcast (x):     0.000001 s
+    └─ Reduce (y):    0.000022 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1110034
+  GFLOP/s:            0.520
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            2.08x
+  Efficiency:         103.97%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  2 |  2x1  |  0.0021 |  89.9 |   1.1 |   0.520 |    2.08 | 104.0 | 1.001
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 4, OMP threads = 32
+---------------------------------------------
+CHECK NNZ: 556204 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=2x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1112408
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Process grid:       2 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=20021  avg=139051.0  max=258332
+  Imbalance ratio:    1.858  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=3.98 MiB  max=7.17 MiB
+  Total memory:       15.92 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.078910 s
+  Computation time:   0.002607 s  (3.3%)
+    └─ Local SpMV:    0.002607 s
+  Communication time: 0.002498 s  (3.2%)
+    ├─ Bcast (x):     0.001415 s
+    └─ Reduce (y):    0.001481 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1112408
+  GFLOP/s:            0.014
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.06x
+  Efficiency:         1.41%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  4 |  2x2  |  0.0789 |   3.3 |   3.2 |   0.014 |    0.06 |   1.4 | 1.858
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 8, OMP threads = 16
+---------------------------------------------
+CHECK NNZ: 558575 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=4x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1117150
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Process grid:       4 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=6849  avg=69821.9  max=130139
+  Imbalance ratio:    1.864  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=2.04 MiB  max=3.65 MiB
+  Total memory:       16.29 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.428731 s
+  Computation time:   0.120782 s  (28.2%)
+    └─ Local SpMV:    0.120782 s
+  Communication time: 0.133554 s  (31.2%)
+    ├─ Bcast (x):     0.036520 s
+    └─ Reduce (y):    0.132580 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1117150
+  GFLOP/s:            0.003
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.01x
+  Efficiency:         0.13%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  8 |  4x2  |  0.4287 |  28.2 |  31.2 |   0.003 |    0.01 |   0.1 | 1.864
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 16, OMP threads = 8
+---------------------------------------------
+CHECK NNZ: 563318 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=4x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1126636
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Process grid:       4 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=3234  avg=35207.4  max=120954
+  Imbalance ratio:    3.435  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=1.07 MiB  max=3.36 MiB
+  Total memory:       17.18 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         1.418971 s
+  Computation time:   0.091095 s  (6.4%)
+    └─ Local SpMV:    0.091095 s
+  Communication time: 0.607824 s  (42.8%)
+    ├─ Bcast (x):     0.431924 s
+    └─ Reduce (y):    0.175901 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1126636
+  GFLOP/s:            0.001
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.00x
+  Efficiency:         0.02%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 16 |  4x4  |  1.4190 |   6.4 |  42.8 |   0.001 |    0.00 |   0.0 | 3.435
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 32, OMP threads = 4
+---------------------------------------------
+CHECK NNZ: 572892 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=8x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1145784
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Process grid:       8 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=713  avg=17902.9  max=61594
+  Imbalance ratio:    3.440  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.56 MiB  max=1.73 MiB
+  Total memory:       18.04 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         3.520958 s
+  Computation time:   0.354404 s  (10.1%)
+    └─ Local SpMV:    0.354404 s
+  Communication time: 1.414490 s  (40.2%)
+    ├─ Bcast (x):     1.062578 s
+    └─ Reduce (y):    0.351928 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1145784
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 32 |  8x4  |  3.5210 |  10.1 |  40.2 |   0.000 |    0.00 |   0.0 | 3.440
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 64, OMP threads = 2
+---------------------------------------------
+CHECK NNZ: 591948 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=8x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1183896
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Process grid:       8 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=9249.2  max=58311
+  Imbalance ratio:    6.304  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.31 MiB  max=1.62 MiB
+  Total memory:       20.08 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         10.851956 s
+  Computation time:   0.367903 s  (3.4%)
+    └─ Local SpMV:    0.367903 s
+  Communication time: 5.978556 s  (55.1%)
+    ├─ Bcast (x):     4.934201 s
+    └─ Reduce (y):    1.768905 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1183896
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 64 |  8x8  | 10.8520 |   3.4 |  55.1 |   0.000 |    0.00 |   0.0 | 6.304
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 128, OMP threads = 1
+---------------------------------------------
+CHECK NNZ: 630127 (expected 287233)
+[Rank 0] Matrix: 20000 x 20000, nnz=287233 | grid=16x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 1260254
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Trefethen_20000.mtx
+  Dimensions:         20000 x 20000
+  Total NNZ:          287233
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Process grid:       16 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=4922.9  max=31168
+  Imbalance ratio:    6.331  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.17 MiB  max=0.88 MiB
+  Total memory:       22.32 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         24.575959 s
+  Computation time:   0.000969 s  (0.0%)
+    └─ Local SpMV:    0.000969 s
+  Communication time: 13.373881 s  (54.4%)
+    ├─ Bcast (x):     9.871914 s
+    └─ Reduce (y):    4.219963 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1260254
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.004443 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+128 | 16x8  | 24.5760 |   0.0 |  54.4 |   0.000 |    0.00 |   0.0 | 6.331
+--------------------------------------------------------------------------------
+
+
+**************************************************
+STRONG SCALING 2D | schedule(static) | torso3.mtx
+**************************************************
+Baseline T1 = 0.008038s
+
+---------------------------------------------
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 4429042 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=1x1 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8858084
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=4429042  avg=4429042.0  max=4429042
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=125.19 MiB  max=125.19 MiB
+  Total memory:       125.19 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.007722 s
+  Computation time:   0.005274 s  (68.3%)
+    └─ Local SpMV:    0.005274 s
+  Communication time: 0.001928 s  (25.0%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.001926 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8858084
+  GFLOP/s:            1.147
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            1.04x
+  Efficiency:         104.09%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0077 |  68.3 |  25.0 |   1.147 |    1.04 | 104.1 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
+---------------------------------------------
+CHECK NNZ: 4429158 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=2x1 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8858316
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Process grid:       2 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=2211298  avg=2214579.0  max=2217860
+  Imbalance ratio:    1.001  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=63.58 MiB  max=63.67 MiB
+  Total memory:       127.17 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.008857 s
+  Computation time:   0.003162 s  (35.7%)
+    └─ Local SpMV:    0.003162 s
+  Communication time: 0.000812 s  (9.2%)
+    ├─ Bcast (x):     0.000003 s
+    └─ Reduce (y):    0.000809 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8858316
+  GFLOP/s:            1.000
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.91x
+  Efficiency:         45.37%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  2 |  2x1  |  0.0089 |  35.7 |   9.2 |   1.000 |    0.91 |  45.4 | 1.001
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 4, OMP threads = 32
+---------------------------------------------
+CHECK NNZ: 4429403 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=2x2 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8858806
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Process grid:       2 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=40074  avg=1107350.8  max=2177718
+  Imbalance ratio:    1.967  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=33.03 MiB  max=61.61 MiB
+  Total memory:       132.12 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.323797 s
+  Computation time:   0.029092 s  (9.0%)
+    └─ Local SpMV:    0.029092 s
+  Communication time: 0.253724 s  (78.4%)
+    ├─ Bcast (x):     0.151092 s
+    └─ Reduce (y):    0.102632 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8858806
+  GFLOP/s:            0.027
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.02x
+  Efficiency:         0.62%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  4 |  2x2  |  0.3238 |   9.0 |  78.4 |   0.027 |    0.02 |   0.6 | 1.967
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 8, OMP threads = 16
+---------------------------------------------
+CHECK NNZ: 4429881 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=4x2 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8859762
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Process grid:       4 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=18531  avg=553735.1  max=1096104
+  Imbalance ratio:    1.979  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=17.01 MiB  max=31.49 MiB
+  Total memory:       136.09 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.666779 s
+  Computation time:   0.171803 s  (25.8%)
+    └─ Local SpMV:    0.171803 s
+  Communication time: 0.376846 s  (56.5%)
+    ├─ Bcast (x):     0.245297 s
+    └─ Reduce (y):    0.173062 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8859762
+  GFLOP/s:            0.013
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.01x
+  Efficiency:         0.15%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  8 |  4x2  |  0.6668 |  25.8 |  56.5 |   0.013 |    0.01 |   0.2 | 1.979
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 16, OMP threads = 8
+---------------------------------------------
+CHECK NNZ: 4430839 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=4x4 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8861678
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Process grid:       4 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=3767  avg=276927.4  max=1082562
+  Imbalance ratio:    3.909  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=9.12 MiB  max=30.64 MiB
+  Total memory:       146.00 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         3.685467 s
+  Computation time:   0.029118 s  (0.8%)
+    └─ Local SpMV:    0.029118 s
+  Communication time: 2.803873 s  (76.1%)
+    ├─ Bcast (x):     2.099985 s
+    └─ Reduce (y):    0.791916 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8861678
+  GFLOP/s:            0.002
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 16 |  4x4  |  3.6855 |   0.8 |  76.1 |   0.002 |    0.00 |   0.0 | 3.909
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 32, OMP threads = 4
+---------------------------------------------
+CHECK NNZ: 4432753 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=8x4 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8865506
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Process grid:       8 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=33  avg=138523.5  max=550529
+  Imbalance ratio:    3.974  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=4.81 MiB  max=15.81 MiB
+  Total memory:       153.96 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         7.197446 s
+  Computation time:   0.024361 s  (0.3%)
+    └─ Local SpMV:    0.024361 s
+  Communication time: 5.102660 s  (70.9%)
+    ├─ Bcast (x):     3.881522 s
+    └─ Reduce (y):    1.230877 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8865506
+  GFLOP/s:            0.001
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 32 |  8x4  |  7.1974 |   0.3 |  70.9 |   0.001 |    0.00 |   0.0 | 3.974
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 64, OMP threads = 2
+---------------------------------------------
+CHECK NNZ: 4436573 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=8x8 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8873146
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Process grid:       8 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=9  avg=69321.5  max=542837
+  Imbalance ratio:    7.831  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=2.72 MiB  max=15.36 MiB
+  Total memory:       173.83 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         22.542697 s
+  Computation time:   0.028467 s  (0.1%)
+    └─ Local SpMV:    0.028467 s
+  Communication time: 17.656209 s  (78.3%)
+    ├─ Bcast (x):     15.756010 s
+    └─ Reduce (y):    2.472939 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8873146
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 64 |  8x8  | 22.5427 |   0.1 |  78.3 |   0.000 |    0.00 |   0.0 | 7.831
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 128, OMP threads = 1
+---------------------------------------------
+CHECK NNZ: 4444218 (expected 4429042)
+[Rank 0] Matrix: 259156 x 259156, nnz=4429042 | grid=16x8 | pattern=0 symmetric=0
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 8888436
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/torso3.mtx
+  Dimensions:         259156 x 259156
+  Total NNZ:          4429042
+  Matrix type:        real, general
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Process grid:       16 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=34720.5  max=278653
+  Imbalance ratio:    8.026  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=1.48 MiB  max=8.00 MiB
+  Total memory:       189.85 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         43.656799 s
+  Computation time:   0.008675 s  (0.0%)
+    └─ Local SpMV:    0.008675 s
+  Communication time: 32.384631 s  (74.2%)
+    ├─ Bcast (x):     30.970676 s
+    └─ Reduce (y):    2.805947 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        8888436
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.008038 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+128 | 16x8  | 43.6568 |   0.0 |  74.2 |   0.000 |    0.00 |   0.0 | 8.026
+--------------------------------------------------------------------------------
+
+
+**************************************************
+STRONG SCALING 2D | schedule(static) | Ga41As41H72.mtx
+**************************************************
+Baseline T1 = 0.011153s
+
+---------------------------------------------
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+CHECK NNZ: 18488476 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=1x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36976952
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Process grid:       1 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=18488476  avg=18488476.0  max=18488476
+  Imbalance ratio:    1.000  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=500.85 MiB  max=500.85 MiB
+  Total memory:       500.85 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.010396 s
+  Computation time:   0.008750 s  (84.2%)
+    └─ Local SpMV:    0.008750 s
+  Communication time: 0.000695 s  (6.7%)
+    ├─ Bcast (x):     0.000002 s
+    └─ Reduce (y):    0.000693 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36976952
+  GFLOP/s:            3.557
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            1.07x
+  Efficiency:         107.29%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  1 |  1x1  |  0.0104 |  84.2 |   6.7 |   3.557 |    1.07 | 107.3 | 1.000
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
+---------------------------------------------
+CHECK NNZ: 18488723 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=2x1 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36977446
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Process grid:       2 x 1 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=9173026  avg=9244361.5  max=9315697
+  Imbalance ratio:    1.008  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=251.45 MiB  max=253.36 MiB
+  Total memory:       502.91 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.013896 s
+  Computation time:   0.010076 s  (72.5%)
+    └─ Local SpMV:    0.010076 s
+  Communication time: 0.000246 s  (1.8%)
+    ├─ Bcast (x):     0.000003 s
+    └─ Reduce (y):    0.000245 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36977446
+  GFLOP/s:            2.661
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.80x
+  Efficiency:         40.13%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  2 |  2x1  |  0.0139 |  72.5 |   1.8 |   2.661 |    0.80 |  40.1 | 1.008
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 4, OMP threads = 32
+---------------------------------------------
+CHECK NNZ: 18489226 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=2x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36978452
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Process grid:       2 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=464527  avg=4622306.5  max=8851407
+  Imbalance ratio:    1.915  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=127.01 MiB  max=239.94 MiB
+  Total memory:       508.03 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.183903 s
+  Computation time:   0.026633 s  (14.5%)
+    └─ Local SpMV:    0.026633 s
+  Communication time: 0.109745 s  (59.7%)
+    ├─ Bcast (x):     0.084268 s
+    └─ Reduce (y):    0.025478 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36978452
+  GFLOP/s:            0.201
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.06x
+  Efficiency:         1.52%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  4 |  2x2  |  0.1839 |  14.5 |  59.7 |   0.201 |    0.06 |   1.5 | 1.915
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 8, OMP threads = 16
+---------------------------------------------
+CHECK NNZ: 18490211 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=4x2 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36980422
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Process grid:       4 x 2 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=2311276.4  max=5540153
+  Imbalance ratio:    2.397  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=64.02 MiB  max=150.24 MiB
+  Total memory:       512.15 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.746434 s
+  Computation time:   0.053071 s  (7.1%)
+    └─ Local SpMV:    0.053071 s
+  Communication time: 0.436002 s  (58.4%)
+    ├─ Bcast (x):     0.261679 s
+    └─ Reduce (y):    0.174323 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36980422
+  GFLOP/s:            0.050
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.01x
+  Efficiency:         0.19%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+  8 |  4x2  |  0.7464 |   7.1 |  58.4 |   0.050 |    0.01 |   0.2 | 2.397
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 16, OMP threads = 8
+---------------------------------------------
+CHECK NNZ: 18492150 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=4x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36984300
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Process grid:       4 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=1155759.4  max=5263843
+  Imbalance ratio:    4.554  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=32.65 MiB  max=142.35 MiB
+  Total memory:       522.43 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         4.709446 s
+  Computation time:   0.107294 s  (2.3%)
+    └─ Local SpMV:    0.107294 s
+  Communication time: 3.718528 s  (79.0%)
+    ├─ Bcast (x):     2.471263 s
+    └─ Reduce (y):    1.353893 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36984300
+  GFLOP/s:            0.008
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 16 |  4x4  |  4.7094 |   2.3 |  79.0 |   0.008 |    0.00 |   0.0 | 4.554
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 32, OMP threads = 4
+---------------------------------------------
+CHECK NNZ: 18496034 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=8x4 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 36992068
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Process grid:       8 x 4 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=578001.1  max=2703941
+  Imbalance ratio:    4.678  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=16.58 MiB  max=73.35 MiB
+  Total memory:       530.71 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         8.977452 s
+  Computation time:   0.177886 s  (2.0%)
+    └─ Local SpMV:    0.177886 s
+  Communication time: 6.855044 s  (76.4%)
+    ├─ Bcast (x):     5.449141 s
+    └─ Reduce (y):    1.570901 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        36992068
+  GFLOP/s:            0.004
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 32 |  8x4  |  8.9775 |   2.0 |  76.4 |   0.004 |    0.00 |   0.0 | 4.678
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 64, OMP threads = 2
+---------------------------------------------
+CHECK NNZ: 18503861 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=8x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 37007722
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Process grid:       8 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=289122.8  max=2387813
+  Imbalance ratio:    8.259  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=8.62 MiB  max=64.66 MiB
+  Total memory:       551.38 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         38.853700 s
+  Computation time:   0.738254 s  (1.9%)
+    └─ Local SpMV:    0.738254 s
+  Communication time: 34.131239 s  (87.8%)
+    ├─ Bcast (x):     30.304398 s
+    └─ Reduce (y):    4.092992 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        37007722
+  GFLOP/s:            0.001
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+ 64 |  8x8  | 38.8537 |   1.9 |  87.8 |   0.001 |    0.00 |   0.0 | 8.259
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 128, OMP threads = 1
+---------------------------------------------
+CHECK NNZ: 18519530 (expected 9378286)
+[Rank 0] Matrix: 268096 x 268096, nnz=9378286 | grid=16x8 | pattern=0 symmetric=1
+[Rank 0] Partitioning: 2D BLOCK (contiguous blocks)
+Global FLOPs per SpMV: 37039060
+
+                    2D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+*******************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/Ga41As41H72.mtx
+  Dimensions:         268096 x 268096
+  Total NNZ:          9378286
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    128
+  Process grid:       16 x 8 (Px x Py)
+  Partitioning:       2D BLOCK (contiguous)
+  Topology:           Cartesian communicator
+
+LOAD BALANCE:
+  NNZ per rank:       min=0  avg=144683.8  max=1225705
+  Imbalance ratio:    8.472  (max/avg)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=4.44 MiB  max=33.31 MiB
+  Total memory:       568.16 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         74.896713 s
+  Computation time:   1.422389 s  (1.9%)
+    └─ Local SpMV:    1.422389 s
+  Communication time: 64.027689 s  (85.5%)
+    ├─ Bcast (x):     60.851734 s
+    └─ Reduce (y):    4.934979 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        37039060
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.011153 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+================================================================================
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Grid  | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal
+--------------------------------------------------------------------------------
+128 | 16x8  | 74.8967 |   1.9 |  85.5 |   0.000 |    0.00 |   0.0 | 8.472
+--------------------------------------------------------------------------------
+
+
+*************************************************
+STRONG SCALING 1D | schedule(static) | nemeth19.mtx
+*************************************************
+Baseline T1 = 0.005444s
+
+---------------------------------------------
+MPI ranks = 1, OMP threads = 128
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=1
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    1
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=818302  avg=818302.0  max=818302
+  Imbalance ratio:    1.000  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=0  avg=0.0  max=0
+  Total ghost cols:   0
+  Ghost ratio:        0.00%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=22.03 MiB  max=22.03 MiB
+  Total memory:       22.03 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.004028 s
+  Computation time:   0.003975 s  (98.7%)
+    └─| Local SpMV:    0.003975 s
+  Communication time: 0.000074 s  (1.8%)
+    ├─| Ghost exchange: 0.000000 s
+    └─| Gatherv:       0.000019 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        1636604
+  GFLOP/s:            0.406
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            1.35x
+  Efficiency:         135.15%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  1 |  0.0040 |  98.7 |   1.8 |   0.406 |    1.35 | 135.2 | 1.000 |   0.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 2, OMP threads = 64
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=2
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    2
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=202860  avg=205534.5  max=208209
+  Imbalance ratio:    1.013  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=2383  avg=2400.5  max=2418
+  Total ghost cols:   4801
+  Ghost ratio:        1.17%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=5.61 MiB  max=5.68 MiB
+  Total memory:       11.21 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.002035 s
+  Computation time:   0.001877 s  (92.2%)
+    └─| Local SpMV:    0.001877 s
+  Communication time: 0.000465 s  (22.8%)
+    ├─| Ghost exchange: 0.000051 s
+    └─| Gatherv:       0.000059 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        822138
+  GFLOP/s:            0.404
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            2.67x
+  Efficiency:         133.75%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  2 |  0.0020 |  92.2 |  22.8 |   0.404 |    2.67 | 133.7 | 1.013 |   1.2
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 4, OMP threads = 32
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=4
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    4
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=50689  avg=51907.2  max=53332
+  Imbalance ratio:    1.027  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=1796  avg=1834.8  max=1860
+  Total ghost cols:   7339
+  Ghost ratio:        3.53%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=1.45 MiB  max=1.49 MiB
+  Total memory:       5.81 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.078835 s
+  Computation time:   0.039689 s  (50.3%)
+    └─| Local SpMV:    0.039689 s
+  Communication time: 0.062879 s  (79.8%)
+    ├─| Ghost exchange: 0.013250 s
+    └─| Gatherv:       0.000262 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        415258
+  GFLOP/s:            0.005
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            0.07x
+  Efficiency:         1.73%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  4 |  0.0788 |  50.3 |  79.8 |   0.005 |    0.07 |   1.7 | 1.027 |   3.5
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 8, OMP threads = 16
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=8
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    8
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=12681  avg=13246.5  max=14002
+  Imbalance ratio:    1.057  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=1058  avg=1107.1  max=1155
+  Total ghost cols:   8857
+  Ghost ratio:        8.36%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.39 MiB  max=0.41 MiB
+  Total memory:       3.11 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.224003 s
+  Computation time:   0.043995 s  (19.6%)
+    └─| Local SpMV:    0.043995 s
+  Communication time: 0.325886 s  (145.5%)
+    ├─| Ghost exchange: 0.087974 s
+    └─| Gatherv:       0.000026 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        211944
+  GFLOP/s:            0.001
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            0.02x
+  Efficiency:         0.30%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+  8 |  0.2240 |  19.6 | 145.5 |   0.001 |    0.02 |   0.3 | 1.057 |   8.4
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 16, OMP threads = 8
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=16
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    16
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=3188  avg=3443.1  max=3753
+  Imbalance ratio:    1.090  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=577  avg=629.8  max=673
+  Total ghost cols:   10076
+  Ghost ratio:        18.29%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.11 MiB  max=0.12 MiB
+  Total memory:       1.77 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         0.803996 s
+  Computation time:   0.175868 s  (21.9%)
+    └─| Local SpMV:    0.175868 s
+  Communication time: 0.786900 s  (97.9%)
+    ├─| Ghost exchange: 0.176003 s
+    └─| Gatherv:       0.000061 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        110178
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            0.01x
+  Efficiency:         0.04%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 16 |  0.8040 |  21.9 |  97.9 |   0.000 |    0.01 |   0.0 | 1.090 |  18.3
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 32, OMP threads = 4
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=32
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    32
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=776  avg=927.3  max=1038
+  Imbalance ratio:    1.119  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=308  avg=358.2  max=390
+  Total ghost cols:   11463
+  Ghost ratio:        38.63%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.03 MiB  max=0.04 MiB
+  Total memory:       1.11 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         1.649312 s
+  Computation time:   0.179500 s  (10.9%)
+    └─| Local SpMV:    0.179500 s
+  Communication time: 2.188505 s  (132.7%)
+    ├─| Ghost exchange: 0.552941 s
+    └─| Gatherv:       0.707637 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        59350
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            0.00x
+  Efficiency:         0.01%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 32 |  1.6493 |  10.9 | 132.7 |   0.000 |    0.00 |   0.0 | 1.119 |  38.6
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 64, OMP threads = 2
+---------------------------------------------
+[Rank 0] Matrix: 9506 x 9506, nnz=413904 | 1D cyclic rows over P=64
+
+                    1D DISTRIBUTED SpMV - PERFORMANCE REPORT                   
+********************************************************************************
+
+MATRIX INFORMATION:
+  Matrix file:        ../src/nemeth19.mtx
+  Dimensions:         9506 x 9506
+  Total NNZ:          413904
+  Matrix type:        real, symmetric
+
+PARALLEL CONFIGURATION:
+  Total processes:    64
+  Partitioning:       1D cyclic (row-wise, modulo)
+
+LOAD BALANCE:
+  NNZ per rank:       min=212  avg=264.7  max=324
+  Imbalance ratio:    1.224  (max/avg)
+
+COMMUNICATION VOLUME:
+  Ghost cols/rank:    min=163  avg=203.7  max=232
+  Total ghost cols:   13038
+  Ghost ratio:        76.97%  (ghost/total NNZ)
+
+MEMORY USAGE:
+  Per-rank memory:    avg=0.01 MiB  max=0.01 MiB
+  Total memory:       0.78 MiB  (estimated)
+
+PERFORMANCE METRICS:
+  Total time:         4.611009 s
+  Computation time:   0.373916 s  (8.1%)
+    └─| Local SpMV:    0.373916 s
+  Communication time: 5.928993 s  (128.6%)
+    ├─| Ghost exchange: 1.045031 s
+    └─| Gatherv:       1.761732 s
+
+COMPUTATIONAL INTENSITY:
+  Total FLOPs:        33880
+  GFLOP/s:            0.000
+
+SCALABILITY:
+  Baseline (T1):      0.005444 s
+  Speedup:            0.00x
+  Efficiency:         0.00%
+
+********************************************************************************
+SUMMARY TABLE:
+--------------------------------------------------------------------------------
+  P | Time(s) | Comp% | Comm% | GFLOP/s | Speedup |  Eff%  | Imbal | Ghost%
+--------------------------------------------------------------------------------
+ 64 |  4.6110 |   8.1 | 128.6 |   0.000 |    0.00 |   0.0 | 1.224 |  77.0
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------
+MPI ranks = 128, OMP threads = 1
+---------------------------------------------

@@ -3,7 +3,7 @@
 SOURCE="generate_weak_mtx.c"
 GEN="./generate_weak_mtx.out"
 #compile generator
-gcc -O3 "${SOURCE}" -o "${GEN}" -lm
+gcc -O3 "${SOURCE}" -o "${GEN}" -lm -std=c99
 
 ROWS_PER_PROC=20000
 NNZ_PER_ROW=10

@@ -540,7 +540,7 @@ int main(int argc, char **argv) {
         t_comm  += tb;
 
         double tc = MPI_Wtime();
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for (int r = 0; r < local_num_rows; r++) {
             double acc = 0.0;
             for (int k = row_ptr[r]; k < row_ptr[r + 1]; k++) {

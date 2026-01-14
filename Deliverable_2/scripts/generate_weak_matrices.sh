@@ -1,5 +1,9 @@
 #!/bin/bash
 # Generate weak-scaling matrices (run ONCE)
+SOURCE="generate_weak_mtx.c"
+GEN="./generate_weak_mtx.out"
+#compile generator
+gcc -O3 "${SOURCE}" -o "${GEN}" -lm
 
 ROWS_PER_PROC=20000
 NNZ_PER_ROW=10
@@ -8,8 +12,6 @@ PROCS=(1 2 4 8 16 32 64 128)
 
 OUTDIR=../src/matrices
 mkdir -p "${OUTDIR}"
-
-GEN=./generate_weak_mtx.out
 
 for P in "${PROCS[@]}"; do
     N=$((ROWS_PER_PROC * P))

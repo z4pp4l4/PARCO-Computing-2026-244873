@@ -12,6 +12,9 @@ typedef struct {
     double val;
 } COO_entry;
 
+/* Comparison function used to sort COO entries by (row, col).
+ * Required before converting COO to CSR format.
+ */
 static int compare_coo_entries(const void *a, const void *b) {
     const COO_entry *ea = (const COO_entry *)a;
     const COO_entry *eb = (const COO_entry *)b;
@@ -19,7 +22,9 @@ static int compare_coo_entries(const void *a, const void *b) {
         return ea->row - eb->row;
     return ea->col - eb->col;
 }
-
+/* Utility: read a double from environment variable or return -1.
+ * Used for optional baseline timing (speedup computation).
+ */
 static double env_double_or_neg(const char *name) {
     const char *s = getenv(name);
     if (!s || !*s) return -1.0;
@@ -33,9 +38,9 @@ static double bytes_to_mib(double bytes) {
     return bytes / (1024.0 * 1024.0);
 }
 
-/* 
-   BLOCK PARTITIONING: Processor pr owns rows [start_row, end_row)
-*/
+/* Compute the contiguous block of rows owned by process pr
+   in a Px-way block row partitioning.
+ */
 static void get_block_row_range(int N, int Px, int pr, int *start, int *end) {
     int base_size = N / Px;
     int remainder = N % Px;
@@ -87,6 +92,10 @@ static int get_col_owner(int global_col, int N, int Py) {
         return remainder + (global_col - threshold) / base_size;
     }
 }
+
+/* Read Matrix Market header and broadcast metadata to all ranks.
+  Only rank 0 performs file parsing; results are broadcast.
+  */
 
 static void read_header_mtx(
     MPI_File fh, int rank, int *rows, int *cols, int *nnz, int *is_pattern, int *is_symmetric, MPI_Offset *data_offset
@@ -165,6 +174,13 @@ static void read_header_mtx(
     *is_pattern = pattern;
     *is_symmetric = symmetric;
 }
+/* Read the matrix in parallel using MPI-IO and redistribute entries
+  according to a 2D block partitioning (Px x Py process grid).
+ 
+  Phase A: each rank parses a chunk of the file into COO format.
+  Phase B: COO entries are redistributed using MPI_Alltoallv
+           to their owning (pr, pc) process.
+ */
 
 static void read_and_distribute_2D_block(
     const char *filename, int rank, int size, MPI_Comm grid_comm,
@@ -344,6 +360,9 @@ static void read_and_distribute_2D_block(
     free(sdisp); free(rdisp); free(tmp);
 }
 
+/* Convert local COO entries to CSR format.
+  CSR is used for efficient row-wise SpMV computation.
+ */
 static void coo_to_csr(
     int local_nnz, int local_rows,
     const int *coo_r,const int *coo_c,const double *coo_v,
@@ -408,6 +427,10 @@ int main(int argc, char **argv) {
         MPI_Finalize();
         return 0;
     }
+
+    /* Create a 2D Cartesian communicator to represent the logical Px x Py grid.
+        Row and column sub-communicators are extracted for SUMMA communication.
+    */
 
     int dims[2] = {0, 0};
     MPI_Dims_create(size, 2, dims);
@@ -522,7 +545,13 @@ int main(int argc, char **argv) {
 
     memset(y_partial, 0, local_num_rows * sizeof(double));
 
-    // SUMMA algorithm with BLOCK partitioning
+    /*
+        SUMMA-style distributed SpMV:
+        - Iterate over process columns
+        - Broadcast x panels along row communicators
+        - Perform local CSR SpMV on owned rows
+
+    */
     for (int pc_iter = 0; pc_iter < Py; pc_iter++) {
         int iter_col_start, iter_col_end;
         get_block_col_range(cols, Py, pc_iter, &iter_col_start, &iter_col_end);
@@ -560,6 +589,10 @@ int main(int argc, char **argv) {
         t_comp += tc;
     }
 
+    /* 
+        Reduce partial y contributions along row communicators.
+        Only pc = 0 ranks hold the final y block.
+    */
     double tr = MPI_Wtime();
     MPI_Reduce(y_partial, y_row_sum, local_num_rows, MPI_DOUBLE, MPI_SUM, 0, row_comm);
     tr = MPI_Wtime() - tr;

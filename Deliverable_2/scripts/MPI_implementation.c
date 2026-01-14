@@ -13,12 +13,22 @@ typedef struct {
     double val;
 } COO_entry;
 
+/* 
+    Comparison function to sort COO entries by (row, col),
+    required for correct CSR construction.
+ */
+
 static int compare_coo_entries(const void *a, const void *b) {
     const COO_entry *ea = (const COO_entry *)a;
     const COO_entry *eb = (const COO_entry *)b;
     if (ea->row != eb->row) return ea->row - eb->row;
     return ea->col - eb->col;
 }
+
+/* Read a double from environment variables.
+   Used to optionally inject a sequential baseline (T1)
+   for speedup and efficiency computation.
+ */
 
 static double env_double_or_neg(const char *name) {
     const char *s = getenv(name);
@@ -77,7 +87,9 @@ static int bsearch_int(const int *arr, int n, int key) {
     return -1;
 }
 
-
+/* Parse Matrix Market header and broadcast metadata.
+   Only rank 0 reads the header; all ranks receive matrix info.
+ */
 static void read_header_mtx(
     MPI_File fh, int rank, int *rows, int *cols,
     int *nnz, int *is_pattern, int *is_symmetric, MPI_Offset *data_offset
@@ -148,6 +160,11 @@ static void read_header_mtx(
     *is_symmetric = symmetric;
 }
 
+/*
+  Parallel MPI-IO read with 1D cyclic row ownership.
+  Each rank parses a file chunk and keeps only entries
+  whose row index satisfies (row % P == rank).
+ */
 static void read_and_distribute_1D(
     const char *filename, int rank, int size,
     int *rows, int *cols, int *global_nnz, int *is_pattern, int *is_symmetric,
@@ -326,9 +343,7 @@ int main(int argc, char **argv) {
     double *vals = NULL;
     coo_to_csr(local_nnz, local_num_rows, coo_r, coo_c, coo_v, &row_ptr, &col_idx, &vals);
 
-    // ============================
-    // Build ghost column list
-    // ============================
+    // BUILD GHOST COLUMN LIST
     int *ghost_cols = NULL;
     int ghost_count = 0;
 
@@ -387,9 +402,7 @@ int main(int argc, char **argv) {
     MPI_Allreduce(&ghost_count_ll, &ghost_sum, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
     double ghost_avg = (size > 0) ? ((double)ghost_sum / (double)size) : 0.0;
 
-    // --------------------
     // Local x vector (cyclic ownership over columns)
-    // --------------------
     int x_local_n = local_cyclic_size(cols, size, rank);
     double *x_local = (double*)malloc((size_t)x_local_n * sizeof(double));
     if (!x_local) {
@@ -410,7 +423,7 @@ int main(int argc, char **argv) {
     double t0 = MPI_Wtime();
 
 
-    // Halo exchange for ghost x
+    // HALO EXCHANGE for ghost x
     double *ghost_vals = NULL;
 
     int *send_counts = calloc(size, sizeof(int));
